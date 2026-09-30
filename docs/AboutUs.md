@@ -9,16 +9,6 @@ You can reach us at the email `seer[at]comp.nus.edu.sg`
 
 ## Project team
 
-### John Doe
-
-<img src="images/johndoe.png" width="200px">
-
-[[homepage](http://www.comp.nus.edu.sg/~damithch)]
-[[github](https://github.com/johndoe)]
-[[portfolio](team/johndoe.md)]
-
-* Role: Project Advisor
-
 ### Chia Song Jie
 
 <img src="images/soch-ia.png" width="200px">
@@ -28,31 +18,20 @@ You can reach us at the email `seer[at]comp.nus.edu.sg`
 * Role: Team Lead
 * Responsibilities: Overall project coordination, Documentation, Deliverables and deadlines
 
-### Johnny Doe
+### Elhanan Neriah Wong
 
-<img src="images/johndoe.png" width="200px">
+<img src="images/elhanannw.png" width="200px">
 
-[[github](http://github.com/johndoe)] [[portfolio](team/johndoe.md)]
+[[github](http://github.com/elhanannw)]
 
-* Role: Developer
-* Responsibilities: Data
+* Role: Quality Assurance
+* Responsibilities: Code Quality and Coding Standards, PR Reviewer
 
-### Jean Doe
+### Daniel
 
-<img src="images/johndoe.png" width="200px">
+<img src="images/dancodes2.png" width="200px">
 
-[[github](http://github.com/johndoe)]
-[[portfolio](team/johndoe.md)]
+[[github](https://github.com/Dancodes2)]
 
-* Role: Developer
-* Responsibilities: Dev Ops + Threading
-
-### James Doe
-
-<img src="images/johndoe.png" width="200px">
-
-[[github](http://github.com/johndoe)]
-[[portfolio](team/johndoe.md)]
-
-* Role: Developer
-* Responsibilities: UI
+* Role: Tester
+* Responsibilities: Smoke Testing, Github Versioning
