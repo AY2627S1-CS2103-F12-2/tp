@@ -261,29 +261,83 @@ _{Explain here how the data archiving feature will be implemented}_
 
 **Target user profile**:
 
-* has a need to manage a significant number of contacts
-* prefers desktop apps over other types of applications
-* can type fast
-* prefers typing to mouse interactions
+* is an independent private tutor who teaches several students through recurring one-to-one lessons
+* works alone and keeps records on a personal computer
+* needs to remember each student's learning context between lessons, often with only a few minutes to prepare
+* currently relies on a mix of notes, chat histories, documents and memory
+* can type fast and prefers typing to mouse interactions
 * is reasonably comfortable using CLI apps
 
-**Value proposition**: Manage contacts faster than with a typical mouse-driven GUI application.
+**Value proposition**: TutorLink gives private tutors quick access to each student's subjects, dated interaction notes and outstanding follow-ups, so that they can regain context before a lesson and provide consistent, personalised guidance through a fast CLI workflow.
+
+TutorLink is a single-user app. It does not schedule or plan lessons, keep a gradebook, manage fees or payments, send messages to students or guardians, or provide student or guardian accounts.
 
 
 ### User stories
 
 Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unlikely to have) - `*`
 
-| Priority | As a …​                                    | I want to …​                     | So that I can…​                                                        |
-| -------- | ------------------------------------------ | ------------------------------ | ---------------------------------------------------------------------- |
-| `* * *`  | new user                                   | see usage instructions         | refer to instructions when I forget how to use the App                 |
-| `* * *`  | user                                       | add a new person               |                                                                        |
-| `* * *`  | user                                       | delete a person                | remove entries that I no longer need                                   |
-| `* * *`  | user                                       | find a person by name          | locate details of persons without having to go through the entire list |
-| `* *`    | user                                       | hide private contact details   | minimize chance of someone else seeing them by accident                |
-| `*`      | user with many persons in the address book | sort persons by name           | locate a person easily                                                 |
+| Priority | ID | As a …​ | I can …​ | So that …​ |
+| -------- | -- | ------ | ------- | ---------- |
+| `* * *` | US03 | private tutor | record a student | I can maintain information about the tutoring relationship |
+| `* * *` | US04 | private tutor | view a student’s details | I can recall essential information about them |
+| `* * *` | US13 | private tutor | record the subjects I teach a student | their learning context is clear |
+| `* * *` | US21 | private tutor | record a dated interaction with a student | the tutoring relationship has a chronological history |
+| `* * *` | US24 | private tutor | record a concise interaction note | I can remember what happened |
+| `* * *` | US28 | private tutor | view a student’s interactions chronologically | I can understand how the tutoring relationship has developed |
+| `* * *` | US33 | private tutor | create a follow-up from an interaction | something I intend to revisit is not forgotten |
+| `* * *` | US34 | private tutor | describe what a follow-up requires | I understand the intended action later |
+| `* * *` | US35 | private tutor | give a follow-up a date for review | I know when it should receive attention |
+| `* * *` | US39 | private tutor | view outstanding follow-ups for one student | I can prepare for their next session |
+| `* * *` | US53 | fast typist | perform frequent actions efficiently using the keyboard | record-keeping does not disrupt my work |
+| `* *` | US05 | private tutor | correct a student’s details | inaccurate information does not persist |
+| `* *` | US08 | privacy-conscious tutor | permanently remove a student’s record | information is not retained unnecessarily |
+| `* *` | US09 | busy tutor | find a student using partial information | I can retrieve their context quickly |
+| `* *` | US15 | private tutor | record a current learning need | I remember where the student requires support |
+| `* *` | US17 | private tutor | mark a learning need as resolved | completed needs do not remain current |
+| `* *` | US18 | private tutor | record a qualitative progress observation | I can recognise how the student is developing |
+| `* *` | US29 | private tutor | correct an interaction record | mistakes do not remain in the history |
+| `* *` | US30 | private tutor | remove an incorrect interaction | false information does not affect future guidance |
+| `* *` | US36 | private tutor | mark a follow-up as completed or cancelled | only relevant items remain outstanding |
+| `* *` | US42 | private tutor preparing for a lesson | view the student’s recent progress, current needs, and open follow-ups together | I can regain context quickly |
+| `* *` | US43 | private tutor | view a student’s most recent interaction | I can recall where the previous session ended |
+| `* *` | US57 | tutor teaching multiple students | view the students I currently tutor | I can quickly identify whose context I need |
+| `*` | US01 | potential user | explore sample student records | I can understand how TutorLink may fit my work |
+| `*` | US02 | tutor ready to enter real data | remove the sample records | they are not mixed with my actual students |
+| `*` | US06 | private tutor | archive a former student | inactive relationships do not clutter my current work |
+| `*` | US07 | private tutor | restore an archived student | I can resume the relationship if tutoring restarts |
+| `*` | US10 | private tutor | record a student’s contact details | essential contact information is kept with the relationship |
+| `*` | US11 | private tutor | record a student’s guardian contact, kept separate from the student’s own details | I know whom to contact when necessary |
+| `*` | US14 | private tutor | record a student’s current learning goals | my guidance remains aligned with those goals |
+| `*` | US16 | private tutor | indicate which learning needs currently deserve the most attention | I can prioritise them |
+| `*` | US20 | long-term tutor | retain previous learning needs and observations | changes over time are not lost |
+| `*` | US22 | private tutor | identify the type of interaction | I can distinguish tutoring sessions from other discussions |
+| `*` | US23 | private tutor | associate an interaction with a subject or topic | its academic context is clear |
+| `*` | US25 | private tutor | record an observed strength | positive progress is not overlooked |
+| `*` | US26 | private tutor | record an observed difficulty | it can be revisited later |
+| `*` | US27 | private tutor | associate relevant observations with the interaction that produced them | their context is preserved |
+| `*` | US31 | long-time tutor | search previous interaction notes | I can retrieve details I only partially remember |
+| `*` | US32 | tutor teaching multiple subjects | view interactions relating to one subject or topic | unrelated history does not distract me |
+| `*` | US37 | private tutor | postpone a follow-up | its timing reflects the student’s changing circumstances |
+| `*` | US38 | busy tutor | view outstanding follow-ups across all students | I know what needs attention |
+| `*` | US40 | forgetful tutor | identify overdue follow-ups | missed items can be recovered |
+| `*` | US41 | private tutor | trace a follow-up to the interaction that created it | I understand why it exists |
+| `*` | US44 | private tutor | view unresolved learning needs | ongoing difficulties are not overlooked |
+| `*` | US45 | tutor with many students | identify which student records were updated recently | I can orient myself after a busy period |
+| `*` | US46 | tutor returning after a break | see when learning information was last updated | I can judge whether it may be stale |
+| `*` | US47 | private tutor | consolidate duplicate student records | a student’s history is not fragmented |
+| `*` | US48 | tutor migrating from another system | bring in existing student information | I do not need to re-enter everything |
+| `*` | US49 | private tutor | export appropriate student records | I can retain a usable copy outside TutorLink |
+| `*` | US51 | tutor concerned about data loss | back up and restore my records | accidental loss does not destroy the tutoring history |
+| `*` | US56 | long-term tutor | view only a student’s most recent interactions by default, with older ones on request | I can regain relevant context without going through old history |
+| `*` | US58 | tutor teaching multiple students | distinguish between students with similar identifying information | I do not confuse one student’s learning context with another’s |
+| `*` | US59 | busy tutor | see outstanding follow-ups sorted by review date, with overdue ones flagged | I can deal with the most pressing items first |
+| `*` | US62 | privacy-conscious tutor | review the information I have retained about a student | I can identify information I no longer need to keep |
 
-*{More to be added}*
+The IDs follow the team's original list of 62 stories. The following IDs were reviewed and are not listed above:
+
+* US12, US19, US55, US60 and US61 were merged into other stories (US11, US42, US17/US46, US43/US46 and US42 respectively).
+* US50, US52 and US54 describe system qualities rather than user actions, and are covered by the non-functional requirements below.
 
 ### Use cases
 
@@ -317,15 +371,18 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 ### Non-Functional Requirements
 
 1.  Should work on any _mainstream OS_ as long as it has Java `25` or above installed.
-2.  Should be able to hold up to 1000 persons without noticeable sluggishness in performance for typical usage.
-3.  A user with above average typing speed for regular English text (i.e. not code, not system admin commands) should be able to accomplish most of the tasks faster using commands than using the mouse.
-
-*{More to be added}*
+2.  Should be usable by a single user on one computer, with no account, login or network connection required.
+3.  Should save all data locally in a human-editable file after every command that changes data, so that no data is lost when the app is closed (US50, US52).
+4.  Should be able to hold up to 100 students, each with up to 200 interactions and 50 follow-ups, and still respond to any command within 2 seconds on a typical laptop (US54).
+5.  A user with above average typing speed for regular English text (i.e. not code, not system admin commands) should be able to accomplish every frequent task faster using commands than using the mouse (US53).
+6.  Should be distributed as a single JAR file of at most 100MB that runs without an installer.
+7.  Should show an error message for every invalid command that states what is wrong and the expected command format, without changing any stored data.
+8.  Should display text readably on screens with a resolution of 1920x1080 or higher, at 100% and 125% screen scale.
 
 ### Glossary
 
 * **Mainstream OS**: Windows, Linux, Unix, or macOS
-* **Private contact detail**: A contact detail that is not meant to be shared with others
+* **Student**: A person the tutor teaches, identified in TutorLink by their name (case-insensitive and unique). Interactions and follow-ups are always recorded against a student.
 
 --------------------------------------------------------------------------------------------------------------------
 
