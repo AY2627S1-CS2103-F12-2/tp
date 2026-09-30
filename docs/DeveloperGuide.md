@@ -334,6 +334,11 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 | `*` | US59 | busy tutor | see outstanding follow-ups sorted by review date, with overdue ones flagged | I can deal with the most pressing items first |
 | `*` | US62 | privacy-conscious tutor | review the information I have retained about a student | I can identify information I no longer need to keep |
 
+The IDs follow the team's original list of 62 stories. The following IDs were reviewed and are not listed above:
+
+* US12, US19, US55, US60 and US61 were merged into other stories (US11, US42, US17/US46, US43/US46 and US42 respectively).
+* US50, US52 and US54 describe system qualities rather than user actions, and are covered by the non-functional requirements below.
+
 ### Use cases
 
 (For all use cases below, the **System** is the `AddressBook` and the **Actor** is the `user`, unless specified otherwise)
@@ -366,10 +371,13 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 ### Non-Functional Requirements
 
 1.  Should work on any _mainstream OS_ as long as it has Java `25` or above installed.
-2.  Should be able to hold up to 1000 persons without noticeable sluggishness in performance for typical usage.
-3.  A user with above average typing speed for regular English text (i.e. not code, not system admin commands) should be able to accomplish most of the tasks faster using commands than using the mouse.
-
-*{More to be added}*
+2.  Should be usable by a single user on one computer, with no account, login or network connection required.
+3.  Should save all data locally in a human-editable file after every command that changes data, so that no data is lost when the app is closed (US50, US52).
+4.  Should be able to hold up to 100 students, each with up to 200 interactions and 50 follow-ups, and still respond to any command within 2 seconds on a typical laptop (US54).
+5.  A user with above average typing speed for regular English text (i.e. not code, not system admin commands) should be able to accomplish every frequent task faster using commands than using the mouse (US53).
+6.  Should be distributed as a single JAR file of at most 100MB that runs without an installer.
+7.  Should show an error message for every invalid command that states what is wrong and the expected command format, without changing any stored data.
+8.  Should display text readably on screens with a resolution of 1920x1080 or higher, at 100% and 125% screen scale.
 
 ### Glossary
 
