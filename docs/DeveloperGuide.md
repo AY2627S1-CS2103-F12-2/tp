@@ -289,8 +289,6 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 | `* * *` | US34 | private tutor | describe what a follow-up requires | I understand the intended action later |
 | `* * *` | US35 | private tutor | give a follow-up a date for review | I know when it should receive attention |
 | `* * *` | US39 | private tutor | view outstanding follow-ups for one student | I can prepare for their next session |
-| `* * *` | US50 | returning user | retain my records between sessions | I do not need to recreate them |
-| `* * *` | US52 | privacy-conscious tutor | keep student information on my own computer | I remain in control of sensitive records |
 | `* * *` | US53 | fast typist | perform frequent actions efficiently using the keyboard | record-keeping does not disrupt my work |
 | `* *` | US05 | private tutor | correct a student’s details | inaccurate information does not persist |
 | `* *` | US08 | privacy-conscious tutor | permanently remove a student’s record | information is not retained unnecessarily |
@@ -303,18 +301,15 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 | `* *` | US36 | private tutor | mark a follow-up as completed or cancelled | only relevant items remain outstanding |
 | `* *` | US42 | private tutor preparing for a lesson | view the student’s recent progress, current needs, and open follow-ups together | I can regain context quickly |
 | `* *` | US43 | private tutor | view a student’s most recent interaction | I can recall where the previous session ended |
-| `* *` | US54 | busy tutor | retrieve common information quickly | TutorLink remains useful immediately before a lesson |
 | `* *` | US57 | tutor teaching multiple students | view the students I currently tutor | I can quickly identify whose context I need |
 | `*` | US01 | potential user | explore sample student records | I can understand how TutorLink may fit my work |
 | `*` | US02 | tutor ready to enter real data | remove the sample records | they are not mixed with my actual students |
 | `*` | US06 | private tutor | archive a former student | inactive relationships do not clutter my current work |
 | `*` | US07 | private tutor | restore an archived student | I can resume the relationship if tutoring restarts |
 | `*` | US10 | private tutor | record a student’s contact details | essential contact information is kept with the relationship |
-| `*` | US11 | private tutor | record a student’s guardian contact | I know whom to contact when necessary |
-| `*` | US12 | private tutor | keep guardian information separate from student information | their respective details are not confused |
+| `*` | US11 | private tutor | record a student’s guardian contact, kept separate from the student’s own details | I know whom to contact when necessary |
 | `*` | US14 | private tutor | record a student’s current learning goals | my guidance remains aligned with those goals |
 | `*` | US16 | private tutor | indicate which learning needs currently deserve the most attention | I can prioritise them |
-| `*` | US19 | private tutor | view the student’s current goals, needs, and progress together | I can understand their present learning context |
 | `*` | US20 | long-term tutor | retain previous learning needs and observations | changes over time are not lost |
 | `*` | US22 | private tutor | identify the type of interaction | I can distinguish tutoring sessions from other discussions |
 | `*` | US23 | private tutor | associate an interaction with a subject or topic | its academic context is clear |
@@ -334,14 +329,10 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 | `*` | US48 | tutor migrating from another system | bring in existing student information | I do not need to re-enter everything |
 | `*` | US49 | private tutor | export appropriate student records | I can retain a usable copy outside TutorLink |
 | `*` | US51 | tutor concerned about data loss | back up and restore my records | accidental loss does not destroy the tutoring history |
-| `*` | US55 | private tutor | distinguish a student’s current learning context from outdated information | I do not prepare for a lesson based on needs that are no longer relevant |
-| `*` | US56 | long-term tutor | focus on a student’s recent interactions | I can regain relevant context without going through unnecessary older history |
+| `*` | US56 | long-term tutor | view only a student’s most recent interactions by default, with older ones on request | I can regain relevant context without going through old history |
 | `*` | US58 | tutor teaching multiple students | distinguish between students with similar identifying information | I do not confuse one student’s learning context with another’s |
-| `*` | US59 | busy tutor | identify which outstanding follow-ups need my attention most | I can focus on the most pressing matters first |
-| `*` | US60 | tutor returning to a student after a long break | review the student’s last known learning context | I can resume tutoring without reconstructing everything from memory |
-| `*` | US61 | tutor with little time before a lesson | quickly retrieve a student’s current learning context | I can prepare without searching through irrelevant information |
+| `*` | US59 | busy tutor | see outstanding follow-ups sorted by review date, with overdue ones flagged | I can deal with the most pressing items first |
 | `*` | US62 | privacy-conscious tutor | review the information I have retained about a student | I can identify information I no longer need to keep |
-
 
 ### Use cases
 
