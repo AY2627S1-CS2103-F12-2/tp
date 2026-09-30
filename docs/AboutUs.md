@@ -13,7 +13,7 @@ You can reach us at the email `seer[at]comp.nus.edu.sg`
 
 <img src="images/elhanannw.png" width="200px">
 
-[[github](http://github.com/elhanannw)] 
+[[github](http://github.com/elhanannw)]
 
 * Role: Quality Assurance
 * Responsibilities: Code Quality and Coding Standards, PR Reviewer
