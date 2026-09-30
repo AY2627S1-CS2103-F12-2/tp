@@ -9,10 +9,12 @@ import static seedu.tutorlink.testutil.TypicalStudents.ALICE;
 import static seedu.tutorlink.testutil.TypicalStudents.BENSON;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
 import seedu.tutorlink.commons.core.GuiSettings;
+import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.NameContainsKeywordsPredicate;
 import seedu.tutorlink.testutil.TutorLinkBuilder;
 
@@ -66,6 +68,24 @@ public class ModelManagerTest {
     public void hasStudent_studentInTutorLink_returnsTrue() {
         modelManager.addStudent(ALICE);
         assertTrue(modelManager.hasStudent(ALICE));
+    }
+
+    @Test
+    public void findStudentByName_nullName_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> modelManager.findStudentByName(null));
+    }
+
+    @Test
+    public void findStudentByName_studentNotInTutorLink_returnsEmpty() {
+        modelManager.addStudent(ALICE);
+        assertEquals(Optional.empty(), modelManager.findStudentByName(BENSON.getName()));
+    }
+
+    @Test
+    public void findStudentByName_nameDiffersInCaseAndSpacing_returnsStudent() {
+        modelManager.addStudent(ALICE);
+        Name differentlyTypedName = new Name(ALICE.getName().fullName.toUpperCase().replace(" ", "  ") + " ");
+        assertEquals(Optional.of(ALICE), modelManager.findStudentByName(differentlyTypedName));
     }
 
     @Test

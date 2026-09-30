@@ -3,6 +3,7 @@ package seedu.tutorlink.model;
 import static java.util.Objects.requireNonNull;
 import static seedu.tutorlink.commons.util.CollectionUtil.requireAllNonNull;
 
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
@@ -10,6 +11,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import seedu.tutorlink.commons.core.GuiSettings;
 import seedu.tutorlink.commons.core.LogsCenter;
+import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.Student;
 
 /**
@@ -73,6 +75,14 @@ public class ModelManager implements Model {
     public boolean hasStudent(Student student) {
         requireNonNull(student);
         return tutorLink.hasStudent(student);
+    }
+
+    @Override
+    public Optional<Student> findStudentByName(Name name) {
+        requireNonNull(name);
+        return tutorLink.getStudentList().stream()
+                .filter(student -> student.getName().isSameName(name))
+                .findFirst();
     }
 
     @Override
