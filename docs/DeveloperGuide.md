@@ -285,7 +285,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 | `* * *` | US21 | private tutor | record a dated interaction with a student | the tutoring relationship has a chronological history |
 | `* * *` | US24 | private tutor | record a concise interaction note | I can remember what happened |
 | `* * *` | US28 | private tutor | view a student’s interactions chronologically | I can understand how the tutoring relationship has developed |
-| `* * *` | US33 | private tutor | create a follow-up from an interaction | something I intend to revisit is not forgotten |
+| `* * *` | US33 | private tutor | create a follow-up for a student | something I intend to revisit is not forgotten |
 | `* * *` | US34 | private tutor | describe what a follow-up requires | I understand the intended action later |
 | `* * *` | US35 | private tutor | give a follow-up a date for review | I know when it should receive attention |
 | `* * *` | US39 | private tutor | view outstanding follow-ups for one student | I can prepare for their next session |
@@ -341,16 +341,16 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 
 ### Use cases
 
-(For all use cases below, the **System** is the `AddressBook` and the **Actor** is the `user`, unless specified otherwise)
+(For all use cases below, the **System** is the `TutorLink` and the **Actor** is the `Tutor`, unless specified otherwise)
 
 **Use case: Delete a person**
 
 **MSS**
 
 1.  User requests to list persons
-2.  AddressBook shows a list of persons
+2.  TutorLink shows a list of persons
 3.  User requests to delete a specific person in the list
-4.  AddressBook deletes the person
+4.  TutorLink deletes the person
 
     Use case ends.
 
@@ -362,9 +362,65 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 
 * 3a. The given index is invalid.
 
-    * 3a1. AddressBook shows an error message.
+    * 3a1. TutorLink shows an error message.
 
       Use case resumes at step 2.
+
+**Use case: Add a follow-up for a student**
+
+**MSS**
+
+1.  Tutor enters `followup add n/NAME desc/TEXT review/DATE` with the student's name, a description, and a review date.
+2.  TutorLink finds the student and validates the description and review date.
+3.  TutorLink adds the follow-up to the student's record.
+4.  TutorLink confirms that the follow-up was added.
+
+    Use case ends.
+
+**Extensions**
+
+* 2a. No student matches the given name.
+
+    * 2a1. TutorLink shows an error message.
+
+      Use case ends without changing any stored data.
+
+* 2b. The command is incomplete, the description is empty, or the review date is invalid.
+
+    * 2b1. TutorLink shows an error message and the correct command format.
+
+      Use case ends without changing any stored data.
+
+**Use case: View a student's follow-ups**
+
+**MSS**
+
+1.  Tutor enters `followup list n/NAME` with the student's name.
+2.  TutorLink finds the student.
+3.  TutorLink retrieves the student's outstanding follow-ups.
+4.  TutorLink shows each follow-up's description and review date.
+
+    Use case ends.
+
+**Extensions**
+
+* 1a. The command does not include a student name or has the wrong format.
+
+    * 1a1. TutorLink shows an error message and the correct command format.
+
+      Use case ends.
+
+* 2a. No student matches the given name.
+
+    * 2a1. TutorLink shows an error message.
+
+      Use case ends.
+
+* 3a. The student has no follow-ups.
+
+    * 3a1. TutorLink tells the tutor that no follow-ups were found for the student.
+
+      Use case ends.
 
 *{More to be added}*
 
@@ -383,6 +439,9 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 
 * **Mainstream OS**: Windows, Linux, Unix, or macOS
 * **Student**: A person the tutor teaches, identified in TutorLink by their name (case-insensitive and unique). Interactions and follow-ups are always recorded against a student.
+* **Follow-up**: A note describing something the tutor intends to revisit with a student. Each follow-up belongs to a student, rather than to a particular interaction, and has a description and a review date.
+* **Review date**: The date on which the tutor intends to review a follow-up, in `yyyy-MM-dd` format. It is not necessarily the date of a lesson.
+* **Outstanding follow-up**: A follow-up that has not been completed or cancelled. Until TutorLink supports completing or cancelling follow-ups, every recorded follow-up is outstanding.
 
 --------------------------------------------------------------------------------------------------------------------
 
