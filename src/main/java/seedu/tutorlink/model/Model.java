@@ -1,9 +1,11 @@
 package seedu.tutorlink.model;
 
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import javafx.collections.ObservableList;
 import seedu.tutorlink.commons.core.GuiSettings;
+import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.Student;
 
 /**
@@ -40,6 +42,12 @@ public interface Model {
      * Returns true if a student with the same identity as {@code student} exists in TutorLink.
      */
     boolean hasStudent(Student student);
+
+    /**
+     * Returns the student whose name matches {@code name}, ignoring case and extra whitespace,
+     * or an empty {@code Optional} if there is no such student.
+     */
+    Optional<Student> findStudentByName(Name name);
 
     /**
      * Deletes the given student.

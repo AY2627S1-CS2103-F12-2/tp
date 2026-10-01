@@ -9,6 +9,7 @@ import static seedu.tutorlink.testutil.TypicalStudents.ALICE;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import seedu.tutorlink.model.Model;
 import seedu.tutorlink.model.ReadOnlyTutorLink;
 import seedu.tutorlink.model.ReadOnlyUserPrefs;
 import seedu.tutorlink.model.TutorLink;
+import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.Student;
 import seedu.tutorlink.testutil.StudentBuilder;
 
@@ -119,6 +121,11 @@ public class AddCommandTest {
 
         @Override
         public boolean hasStudent(Student student) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public Optional<Student> findStudentByName(Name name) {
             throw new AssertionError("This method should not be called.");
         }
 
