@@ -40,6 +40,23 @@ public class TutorLinkParserTest {
     }
 
     @Test
+    public void parseCommand_addWithMixedCaseAndExtraSpaces_returnsAddCommand() throws Exception {
+        Student student = new StudentBuilder().build();
+        String userInput = "Student   ADD " + StudentUtil.getStudentDetails(student);
+        assertEquals(new AddCommand(student), parser.parseCommand(userInput));
+    }
+
+    @Test
+    public void parseCommand_domainWithoutAction_throwsParseException() {
+        assertThrows(ParseException.class, MESSAGE_UNKNOWN_COMMAND, () -> parser.parseCommand("student"));
+    }
+
+    @Test
+    public void parseCommand_domainWithUnknownAction_throwsParseException() {
+        assertThrows(ParseException.class, MESSAGE_UNKNOWN_COMMAND, () -> parser.parseCommand("student fly"));
+    }
+
+    @Test
     public void parseCommand_clear() throws Exception {
         assertTrue(parser.parseCommand(ClearCommand.COMMAND_WORD) instanceof ClearCommand);
         assertTrue(parser.parseCommand(ClearCommand.COMMAND_WORD + " 3") instanceof ClearCommand);

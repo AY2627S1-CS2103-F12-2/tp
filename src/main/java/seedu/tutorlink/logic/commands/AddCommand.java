@@ -18,7 +18,7 @@ import seedu.tutorlink.model.student.Student;
  */
 public class AddCommand extends Command {
 
-    public static final String COMMAND_WORD = "add";
+    public static final String COMMAND_WORD = "student add";
 
     public static final String MESSAGE_USAGE = COMMAND_WORD + ": Adds a student to TutorLink. "
             + "Parameters: "

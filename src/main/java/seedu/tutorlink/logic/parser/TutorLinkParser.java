@@ -3,6 +3,7 @@ package seedu.tutorlink.logic.parser;
 import static seedu.tutorlink.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.tutorlink.logic.Messages.MESSAGE_UNKNOWN_COMMAND;
 
+import java.util.Locale;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,8 +27,12 @@ public class TutorLinkParser {
 
     /**
      * Used for initial separation of command word and args.
+     * A command word is either one word (e.g. {@code help}), or a domain followed by an action
+     * (e.g. {@code student add}). Command words are not case-sensitive.
      */
-    private static final Pattern BASIC_COMMAND_FORMAT = Pattern.compile("(?<commandWord>\\S+)(?<arguments>.*)");
+    private static final Pattern BASIC_COMMAND_FORMAT = Pattern.compile(
+            "(?<commandWord>(?:(?:student|interaction|followup)\\s+)?\\S+)(?<arguments>.*)",
+            Pattern.CASE_INSENSITIVE);
     private static final Logger logger = LogsCenter.getLogger(TutorLinkParser.class);
 
     /**
@@ -43,7 +48,7 @@ public class TutorLinkParser {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, HelpCommand.MESSAGE_USAGE));
         }
 
-        final String commandWord = matcher.group("commandWord");
+        final String commandWord = normalizeCommandWord(matcher.group("commandWord"));
         final String arguments = matcher.group("arguments");
 
         // Note to developers: Change LOG_LEVEL in LogsCenter to enable lower level (i.e., FINE, FINER and lower)
@@ -65,6 +70,13 @@ public class TutorLinkParser {
                 throw new ParseException(MESSAGE_UNKNOWN_COMMAND);
             }
         };
+    }
+
+    /**
+     * Returns {@code commandWord} in lower case, with the domain and action separated by a single space.
+     */
+    private static String normalizeCommandWord(String commandWord) {
+        return commandWord.toLowerCase(Locale.ROOT).replaceAll("\\s+", " ");
     }
 
 }
