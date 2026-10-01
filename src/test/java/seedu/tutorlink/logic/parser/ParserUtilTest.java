@@ -139,4 +139,9 @@ public class ParserUtilTest {
         assertEquals(LocalDate.of(2024, 2, 29), ParserUtil.parseReviewDate(" 2024-02-29 "));
         assertEquals(LocalDate.of(2020, 1, 1), ParserUtil.parseReviewDate("2020-01-01"));
     }
+
+    @Test
+    public void parseName_repeatedSpacesBetweenWords_returnsNameWithSingleSpaces() throws Exception {
+        assertEquals(new Name("John Tan"), ParserUtil.parseName("  John   Tan "));
+    }
 }
