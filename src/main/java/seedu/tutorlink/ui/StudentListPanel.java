@@ -2,6 +2,7 @@ package seedu.tutorlink.ui;
 
 import java.util.logging.Logger;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -9,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.layout.Region;
 import seedu.tutorlink.commons.core.LogsCenter;
 import seedu.tutorlink.model.student.Student;
@@ -45,6 +47,22 @@ public class StudentListPanel extends UiPart<Region> {
         }
         studentListView.getSelectionModel().select(student);
         studentListView.scrollTo(student);
+        // Adjust again after the list has laid out any newly added row, so the selected row is shown in full
+        Platform.runLater(() -> scrollIntoView(studentListView.getItems().indexOf(student)));
+    }
+
+    /**
+     * Scrolls the list by the smallest amount that shows the whole row at {@code index}.
+     */
+    private void scrollIntoView(int index) {
+        if (index < 0) {
+            return;
+        }
+        if (studentListView.lookup(".virtual-flow") instanceof VirtualFlow<?> flow) {
+            flow.scrollTo(index);
+        } else {
+            studentListView.scrollTo(index);
+        }
     }
 
     /**
@@ -61,6 +79,8 @@ public class StudentListPanel extends UiPart<Region> {
             } else {
                 setGraphic(new StudentCard(student, getIndex() + 1).getRoot());
             }
+            // Keep each row within the list's width, so long names wrap instead of adding a horizontal scroll bar
+            setPrefWidth(0);
         }
     }
 

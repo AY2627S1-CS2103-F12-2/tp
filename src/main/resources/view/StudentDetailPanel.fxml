@@ -20,7 +20,7 @@
       </minWidth>
     </Label>
     <VBox spacing="4">
-      <Label fx:id="name" styleClass="detail-name" />
+      <Label fx:id="name" styleClass="detail-name" wrapText="true" />
       <FlowPane fx:id="subjects" hgap="6" vgap="4" />
     </VBox>
   </HBox>

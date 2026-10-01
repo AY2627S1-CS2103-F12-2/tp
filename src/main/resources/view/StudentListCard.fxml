@@ -16,16 +16,16 @@
       <Region fx:constant="USE_PREF_SIZE" />
     </minWidth>
   </Label>
-  <VBox alignment="CENTER_LEFT">
-    <HBox spacing="4">
+  <VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" minWidth="0">
+    <HBox spacing="4" minWidth="0">
       <Label fx:id="id" styleClass="card-index">
         <minWidth>
           <!-- Ensures that the index is never truncated -->
           <Region fx:constant="USE_PREF_SIZE" />
         </minWidth>
       </Label>
-      <Label fx:id="name" styleClass="card-name" />
+      <Label fx:id="name" styleClass="card-name" wrapText="true" />
     </HBox>
-    <Label fx:id="subjects" styleClass="card-subjects" />
+    <Label fx:id="subjects" styleClass="card-subjects" wrapText="true" />
   </VBox>
 </HBox>
