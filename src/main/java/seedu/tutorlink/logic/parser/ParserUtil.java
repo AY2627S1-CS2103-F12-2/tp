@@ -2,6 +2,9 @@ package seedu.tutorlink.logic.parser;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -26,6 +29,7 @@ public class ParserUtil {
     public static final String MESSAGE_INVALID_INDEX = "Index must be a positive integer.";
     public static final String MESSAGE_INVALID_SUBJECT = "Subject '%1$s' is not valid. %2$s";
     public static final String MESSAGE_DUPLICATE_SUBJECT = "Subject '%1$s' is specified twice for the same student.";
+    public static final String MESSAGE_INVALID_REVIEW_DATE = "Review date must be a valid date in yyyy-MM-dd format.";
 
     /**
      * Parses {@code oneBasedIndex} into an {@code Index} and returns it. Leading and trailing whitespaces will be
@@ -159,5 +163,25 @@ public class ParserUtil {
             subjectList.add(subject);
         }
         return subjectList;
+    }
+
+    /**
+     * Parses {@code reviewDate} into a {@code LocalDate} in yyyy-MM-dd format.
+     * Leading and trailing whitespaces will be trimmed.
+     *
+     * @throws ParseException if the review date is malformed or does not exist.
+     */
+    public static LocalDate parseReviewDate(String reviewDate) throws ParseException {
+        requireNonNull(reviewDate);
+        String trimmedReviewDate = reviewDate.trim();
+        if (!trimmedReviewDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            throw new ParseException(MESSAGE_INVALID_REVIEW_DATE);
+        }
+
+        try {
+            return LocalDate.parse(trimmedReviewDate, DateTimeFormatter.ISO_LOCAL_DATE);
+        } catch (DateTimeParseException e) {
+            throw new ParseException(MESSAGE_INVALID_REVIEW_DATE);
+        }
     }
 }
