@@ -17,8 +17,7 @@ public class AddCommand extends Command {
 
     public static final String COMMAND_WORD = "student add";
 
-    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Adds a student to TutorLink. "
-            + "Parameters: "
+    public static final String MESSAGE_USAGE = "Command format: " + COMMAND_WORD + " "
             + PREFIX_NAME + "NAME "
             + "[" + PREFIX_SUBJECT + "SUBJECT]...\n"
             + "Example: " + COMMAND_WORD + " "
@@ -26,8 +25,11 @@ public class AddCommand extends Command {
             + PREFIX_SUBJECT + "Math "
             + PREFIX_SUBJECT + "Physics";
 
-    public static final String MESSAGE_SUCCESS = "New student added: %1$s";
-    public static final String MESSAGE_DUPLICATE_STUDENT = "This student already exists in TutorLink.";
+    public static final String MESSAGE_SUCCESS = "\u2714 Student added: %1$s (%2$s)\nTotal students: %3$d";
+    public static final String MESSAGE_SUBJECTS = "subjects: %1$s";
+    public static final String MESSAGE_NO_SUBJECTS = "no subjects recorded";
+    public static final String MESSAGE_DUPLICATE_STUDENT =
+            "A student named '%1$s' already exists. Student names must be unique.";
 
     private final Student toAdd;
 
@@ -44,11 +46,20 @@ public class AddCommand extends Command {
         requireNonNull(model);
 
         if (model.hasStudent(toAdd)) {
-            throw new CommandException(MESSAGE_DUPLICATE_STUDENT);
+            throw new CommandException(String.format(MESSAGE_DUPLICATE_STUDENT, toAdd.getName()));
         }
 
         model.addStudent(toAdd);
-        return new CommandResult(String.format(MESSAGE_SUCCESS, Messages.format(toAdd)));
+        int totalStudents = model.getTutorLink().getStudentList().size();
+        return new CommandResult(String.format(MESSAGE_SUCCESS, toAdd.getName(), describeSubjects(toAdd),
+                totalStudents));
+    }
+
+    private static String describeSubjects(Student student) {
+        if (student.getSubjects().isEmpty()) {
+            return MESSAGE_NO_SUBJECTS;
+        }
+        return String.format(MESSAGE_SUBJECTS, Messages.formatSubjects(student.getSubjects()));
     }
 
     @Override
