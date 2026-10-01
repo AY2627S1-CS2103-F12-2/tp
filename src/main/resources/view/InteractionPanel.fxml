@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox styleClass="panel" spacing="6" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+  <padding>
+    <Insets top="12" right="14" bottom="12" left="14" />
+  </padding>
+  <Label text="INTERACTIONS" styleClass="section-title" />
+  <Label fx:id="placeholder" styleClass="placeholder-text" wrapText="true" />
+</VBox>
