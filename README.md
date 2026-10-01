@@ -32,3 +32,5 @@ TutorLink is intended for one tutor using a personal computer, with data stored 
 ## Documentation
 
 See the [User Guide](docs/UserGuide.md) for usage details, the [Developer Guide](docs/DeveloperGuide.md) for requirements and design, and the [team page](docs/AboutUs.md) for the people behind TutorLink. These documents are being updated as the app moves from its AddressBook starting point toward the planned TutorLink features.
+
+This project is based on the [AddressBook-Level3 project](https://se-education.org/addressbook-level3/) created by the [SE-EDU initiative](https://se-education.org).
