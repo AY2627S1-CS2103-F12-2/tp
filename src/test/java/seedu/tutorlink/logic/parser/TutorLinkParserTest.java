@@ -21,7 +21,9 @@ import seedu.tutorlink.logic.commands.ExitCommand;
 import seedu.tutorlink.logic.commands.FindCommand;
 import seedu.tutorlink.logic.commands.HelpCommand;
 import seedu.tutorlink.logic.commands.ListCommand;
+import seedu.tutorlink.logic.commands.ViewStudentCommand;
 import seedu.tutorlink.logic.parser.exceptions.ParseException;
+import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.NameContainsKeywordsPredicate;
 import seedu.tutorlink.model.student.Student;
 import seedu.tutorlink.testutil.EditStudentDescriptorBuilder;
@@ -37,6 +39,12 @@ public class TutorLinkParserTest {
         Student student = new StudentBuilder().build();
         AddCommand command = (AddCommand) parser.parseCommand(StudentUtil.getAddCommand(student));
         assertEquals(new AddCommand(student), command);
+    }
+
+    @Test
+    public void parseCommand_viewStudent() throws Exception {
+        assertEquals(new ViewStudentCommand(new Name("John Tan")),
+                parser.parseCommand(ViewStudentCommand.COMMAND_WORD + " n/John Tan"));
     }
 
     @Test
