@@ -167,6 +167,12 @@ public class AddCommandTest {
             requireNonNull(student);
             return this.student.isSameStudent(student);
         }
+
+        @Override
+        public Optional<Student> findStudentByName(Name name) {
+            requireNonNull(name);
+            return student.getName().isSameName(name) ? Optional.of(student) : Optional.empty();
+        }
     }
 
     /**

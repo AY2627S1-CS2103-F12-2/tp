@@ -48,6 +48,15 @@ public class AddCommandIntegrationTest {
     }
 
     @Test
+    public void execute_duplicateNameInDifferentCase_showsStoredName() {
+        Student studentInList = model.getTutorLink().getStudentList().get(0);
+        Student sameNameLowerCase = new StudentBuilder().withName(studentInList.getName().fullName.toLowerCase())
+                .build();
+        assertCommandFailure(new AddCommand(sameNameLowerCase), model,
+                String.format(AddCommand.MESSAGE_DUPLICATE_STUDENT, studentInList.getName()));
+    }
+
+    @Test
     public void execute_duplicateStudent_throwsCommandException() {
         Student studentInList = model.getTutorLink().getStudentList().get(0);
         assertCommandFailure(new AddCommand(studentInList), model,

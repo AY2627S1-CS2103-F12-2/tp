@@ -8,6 +8,7 @@ import seedu.tutorlink.commons.util.ToStringBuilder;
 import seedu.tutorlink.logic.Messages;
 import seedu.tutorlink.logic.commands.exceptions.CommandException;
 import seedu.tutorlink.model.Model;
+import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.Student;
 
 /**
@@ -46,7 +47,8 @@ public class AddCommand extends Command {
         requireNonNull(model);
 
         if (model.hasStudent(toAdd)) {
-            throw new CommandException(String.format(MESSAGE_DUPLICATE_STUDENT, toAdd.getName()));
+            Name existingName = model.findStudentByName(toAdd.getName()).map(Student::getName).orElse(toAdd.getName());
+            throw new CommandException(String.format(MESSAGE_DUPLICATE_STUDENT, existingName));
         }
 
         model.addStudent(toAdd);
