@@ -40,6 +40,7 @@ public class ViewStudentCommand extends Command {
 
         Student student = model.findStudentByName(name)
                 .orElseThrow(() -> new CommandException(String.format(MESSAGE_STUDENT_NOT_FOUND, name)));
+        model.setSelectedStudent(student);
 
         return new CommandResult(String.format(MESSAGE_SUCCESS, student.getName(),
                 Messages.formatSubjects(student.getSubjects())));

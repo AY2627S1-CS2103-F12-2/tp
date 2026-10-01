@@ -14,6 +14,7 @@ import java.util.function.Predicate;
 
 import org.junit.jupiter.api.Test;
 
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.ObservableList;
 import seedu.tutorlink.commons.core.GuiSettings;
 import seedu.tutorlink.logic.commands.exceptions.CommandException;
@@ -131,6 +132,16 @@ public class AddCommandTest {
         }
 
         @Override
+        public ReadOnlyObjectProperty<Student> getSelectedStudent() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void setSelectedStudent(Student student) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
         public void deleteStudent(Student target) {
             throw new AssertionError("This method should not be called.");
         }
@@ -191,6 +202,11 @@ public class AddCommandTest {
         public void addStudent(Student student) {
             requireNonNull(student);
             studentsAdded.add(student);
+        }
+
+        @Override
+        public void setSelectedStudent(Student student) {
+            // selection is not checked by these tests
         }
 
         @Override

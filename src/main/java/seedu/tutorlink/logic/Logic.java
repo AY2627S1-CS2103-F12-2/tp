@@ -1,5 +1,6 @@
 package seedu.tutorlink.logic;
 
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.ObservableList;
 import seedu.tutorlink.commons.core.GuiSettings;
 import seedu.tutorlink.logic.commands.CommandResult;
@@ -22,6 +23,9 @@ public interface Logic {
 
     /** Returns an unmodifiable view of the filtered list of students */
     ObservableList<Student> getFilteredStudentList();
+
+    /** Returns the student currently shown in detail, which holds {@code null} if no student is selected. */
+    ReadOnlyObjectProperty<Student> getSelectedStudent();
 
     /**
      * Returns the user prefs' GUI settings.

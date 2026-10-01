@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Test;
 import seedu.tutorlink.commons.core.GuiSettings;
 import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.NameContainsKeywordsPredicate;
+import seedu.tutorlink.model.student.Student;
+import seedu.tutorlink.testutil.StudentBuilder;
 import seedu.tutorlink.testutil.TutorLinkBuilder;
 
 public class ModelManagerTest {
@@ -128,5 +130,44 @@ public class ModelManagerTest {
         UserPrefs differentUserPrefs = new UserPrefs();
         differentUserPrefs.setGuiSettings(new GuiSettings(1, 2, 3, 4));
         assertFalse(modelManager.equals(new ModelManager(tutorLink, differentUserPrefs)));
+    }
+
+    @Test
+    public void getSelectedStudent_nothingSelected_holdsNull() {
+        assertEquals(null, modelManager.getSelectedStudent().get());
+    }
+
+    @Test
+    public void setStudent_selectedStudentEdited_selectionFollowsEdit() {
+        modelManager.addStudent(ALICE);
+        modelManager.setSelectedStudent(ALICE);
+        Student editedAlice = new StudentBuilder(ALICE).withSubjects("Physics").build();
+
+        modelManager.setStudent(ALICE, editedAlice);
+
+        assertEquals(editedAlice, modelManager.getSelectedStudent().get());
+    }
+
+    @Test
+    public void deleteStudent_selectedStudentDeleted_selectionCleared() {
+        modelManager.addStudent(ALICE);
+        modelManager.addStudent(BENSON);
+        modelManager.setSelectedStudent(ALICE);
+
+        modelManager.deleteStudent(BENSON);
+        assertEquals(ALICE, modelManager.getSelectedStudent().get());
+
+        modelManager.deleteStudent(ALICE);
+        assertEquals(null, modelManager.getSelectedStudent().get());
+    }
+
+    @Test
+    public void setTutorLink_selectionCleared() {
+        modelManager.addStudent(ALICE);
+        modelManager.setSelectedStudent(ALICE);
+
+        modelManager.setTutorLink(new TutorLink());
+
+        assertEquals(null, modelManager.getSelectedStudent().get());
     }
 }

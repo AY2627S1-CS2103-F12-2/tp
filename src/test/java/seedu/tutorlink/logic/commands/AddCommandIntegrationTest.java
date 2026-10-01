@@ -1,5 +1,6 @@
 package seedu.tutorlink.logic.commands;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static seedu.tutorlink.logic.commands.CommandTestUtil.assertCommandFailure;
 import static seedu.tutorlink.logic.commands.CommandTestUtil.assertCommandSuccess;
 import static seedu.tutorlink.testutil.TypicalStudents.getTypicalTutorLink;
@@ -54,6 +55,13 @@ public class AddCommandIntegrationTest {
                 .build();
         assertCommandFailure(new AddCommand(sameNameLowerCase), model,
                 String.format(AddCommand.MESSAGE_DUPLICATE_STUDENT, studentInList.getName()));
+    }
+
+    @Test
+    public void execute_newStudent_selectsAddedStudent() throws Exception {
+        Student validStudent = new StudentBuilder().withName("John Tan").build();
+        new AddCommand(validStudent).execute(model);
+        assertEquals(validStudent, model.getSelectedStudent().get());
     }
 
     @Test

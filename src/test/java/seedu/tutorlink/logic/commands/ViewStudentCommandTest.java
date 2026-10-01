@@ -41,6 +41,12 @@ public class ViewStudentCommandTest {
     }
 
     @Test
+    public void execute_existingStudent_selectsStudent() throws Exception {
+        new ViewStudentCommand(new Name("benson meier")).execute(model);
+        assertEquals(BENSON, model.getSelectedStudent().get());
+    }
+
+    @Test
     public void execute_unknownStudent_throwsCommandException() {
         assertCommandFailure(new ViewStudentCommand(new Name("John Tan")), model,
                 String.format(ViewStudentCommand.MESSAGE_STUDENT_NOT_FOUND, "John Tan"));

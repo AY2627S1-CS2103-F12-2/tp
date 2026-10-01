@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import seedu.tutorlink.commons.core.GuiSettings;
@@ -23,6 +25,7 @@ public class ModelManager implements Model {
     private final TutorLink tutorLink;
     private final UserPrefs userPrefs;
     private final FilteredList<Student> filteredStudents;
+    private final SimpleObjectProperty<Student> selectedStudent = new SimpleObjectProperty<>();
 
     /**
      * Initializes a ModelManager with the given tutorLink and userPrefs.
@@ -64,6 +67,7 @@ public class ModelManager implements Model {
     @Override
     public void setTutorLink(ReadOnlyTutorLink tutorLink) {
         this.tutorLink.resetData(tutorLink);
+        selectedStudent.set(null);
     }
 
     @Override
@@ -88,6 +92,9 @@ public class ModelManager implements Model {
     @Override
     public void deleteStudent(Student target) {
         tutorLink.removeStudent(target);
+        if (target.equals(selectedStudent.get())) {
+            selectedStudent.set(null);
+        }
     }
 
     @Override
@@ -101,6 +108,21 @@ public class ModelManager implements Model {
         requireAllNonNull(target, editedStudent);
 
         tutorLink.setStudent(target, editedStudent);
+        if (target.equals(selectedStudent.get())) {
+            selectedStudent.set(editedStudent);
+        }
+    }
+
+    //=========== Selected Student ===========================================================================
+
+    @Override
+    public ReadOnlyObjectProperty<Student> getSelectedStudent() {
+        return selectedStudent;
+    }
+
+    @Override
+    public void setSelectedStudent(Student student) {
+        selectedStudent.set(student);
     }
 
     //=========== Filtered Student List Accessors =============================================================

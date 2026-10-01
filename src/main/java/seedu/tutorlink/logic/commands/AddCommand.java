@@ -52,6 +52,7 @@ public class AddCommand extends Command {
         }
 
         model.addStudent(toAdd);
+        model.setSelectedStudent(toAdd);
         int totalStudents = model.getTutorLink().getStudentList().size();
         return new CommandResult(String.format(MESSAGE_SUCCESS, toAdd.getName(), describeSubjects(toAdd),
                 totalStudents));

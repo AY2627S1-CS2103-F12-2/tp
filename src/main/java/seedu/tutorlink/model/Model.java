@@ -3,6 +3,7 @@ package seedu.tutorlink.model;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.ObservableList;
 import seedu.tutorlink.commons.core.GuiSettings;
 import seedu.tutorlink.model.student.Name;
@@ -70,6 +71,17 @@ public interface Model {
 
     /** Returns an unmodifiable view of the filtered student list */
     ObservableList<Student> getFilteredStudentList();
+
+    /**
+     * Returns the student currently shown in detail, or a property holding {@code null} if no student is selected.
+     * The selection is cleared when the student is deleted, and follows the student when it is edited.
+     */
+    ReadOnlyObjectProperty<Student> getSelectedStudent();
+
+    /**
+     * Shows {@code student} in detail. {@code student} may be {@code null} to clear the selection.
+     */
+    void setSelectedStudent(Student student);
 
     /**
      * Updates the filter of the filtered student list to filter by the given {@code predicate}.

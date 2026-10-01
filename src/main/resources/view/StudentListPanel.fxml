@@ -1,8 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
-  <ListView fx:id="studentListView" VBox.vgrow="ALWAYS" />
+  <padding>
+    <Insets top="14" right="8" bottom="8" left="8" />
+  </padding>
+  <Label text="STUDENT INDEX" styleClass="section-title">
+    <padding>
+      <Insets left="6" />
+    </padding>
+  </Label>
+  <Label fx:id="studentCount" styleClass="section-subtitle">
+    <padding>
+      <Insets left="6" bottom="8" />
+    </padding>
+  </Label>
+  <ListView fx:id="studentListView" styleClass="student-list" VBox.vgrow="ALWAYS" />
 </VBox>

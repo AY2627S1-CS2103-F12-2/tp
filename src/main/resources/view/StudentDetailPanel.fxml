@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox styleClass="panel" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+  <padding>
+    <Insets top="12" right="14" bottom="12" left="14" />
+  </padding>
+  <Label fx:id="placeholder" styleClass="placeholder-text"
+         text="Use student view n/NAME to see a student's details here." />
+  <HBox fx:id="details" spacing="12" alignment="CENTER_LEFT" managed="false" visible="false">
+    <Label fx:id="initials" styleClass="avatar-large">
+      <minWidth>
+        <Region fx:constant="USE_PREF_SIZE" />
+      </minWidth>
+    </Label>
+    <VBox spacing="4">
+      <Label fx:id="name" styleClass="detail-name" />
+      <FlowPane fx:id="subjects" hgap="6" vgap="4" />
+    </VBox>
+  </HBox>
+</VBox>

@@ -11,6 +11,9 @@ import javafx.scene.layout.Region;
  */
 public class ResultDisplay extends UiPart<Region> {
 
+    public static final String SUCCESS_STYLE_CLASS = "result-success";
+    public static final String ERROR_STYLE_CLASS = "result-error";
+
     private static final String FXML = "ResultDisplay.fxml";
 
     @FXML
@@ -20,9 +23,26 @@ public class ResultDisplay extends UiPart<Region> {
         super(FXML);
     }
 
+    /**
+     * Shows {@code feedbackToUser} as the result of a successful command.
+     */
     public void setFeedbackToUser(String feedbackToUser) {
         requireNonNull(feedbackToUser);
         resultDisplay.setText(feedbackToUser);
+        setStyle(SUCCESS_STYLE_CLASS);
     }
 
+    /**
+     * Shows {@code errorMessage} as the result of a failed command.
+     */
+    public void setErrorToUser(String errorMessage) {
+        requireNonNull(errorMessage);
+        resultDisplay.setText(errorMessage);
+        setStyle(ERROR_STYLE_CLASS);
+    }
+
+    private void setStyle(String styleClass) {
+        resultDisplay.getStyleClass().removeAll(SUCCESS_STYLE_CLASS, ERROR_STYLE_CLASS);
+        resultDisplay.getStyleClass().add(styleClass);
+    }
 }

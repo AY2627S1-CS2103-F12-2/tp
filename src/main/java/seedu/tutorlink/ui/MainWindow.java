@@ -20,8 +20,8 @@ import seedu.tutorlink.logic.commands.exceptions.CommandException;
 import seedu.tutorlink.logic.parser.exceptions.ParseException;
 
 /**
- * The Main Window. Provides the basic application layout containing
- * a menu bar and space where other JavaFX elements can be placed.
+ * The Main Window. Provides the application layout: a header bar, the student index on the left, and the
+ * result display, selected student, interactions, follow-ups and command bar on the right.
  */
 public class MainWindow extends UiPart<Stage> {
 
@@ -49,6 +49,15 @@ public class MainWindow extends UiPart<Stage> {
 
     @FXML
     private StackPane resultDisplayPlaceholder;
+
+    @FXML
+    private StackPane studentDetailPanelPlaceholder;
+
+    @FXML
+    private StackPane interactionPanelPlaceholder;
+
+    @FXML
+    private StackPane followUpPanelPlaceholder;
 
     @FXML
     private StackPane statusbarPlaceholder;
@@ -115,8 +124,17 @@ public class MainWindow extends UiPart<Stage> {
      * Fills up all the placeholders of this window.
      */
     void fillInnerParts() {
-        studentListPanel = new StudentListPanel(logic.getFilteredStudentList());
+        studentListPanel = new StudentListPanel(logic.getFilteredStudentList(), logic.getSelectedStudent());
         studentListPanelPlaceholder.getChildren().add(studentListPanel.getRoot());
+
+        StudentDetailPanel studentDetailPanel = new StudentDetailPanel(logic.getSelectedStudent());
+        studentDetailPanelPlaceholder.getChildren().add(studentDetailPanel.getRoot());
+
+        InteractionPanel interactionPanel = new InteractionPanel(logic.getSelectedStudent());
+        interactionPanelPlaceholder.getChildren().add(interactionPanel.getRoot());
+
+        FollowUpPanel followUpPanel = new FollowUpPanel(logic.getSelectedStudent());
+        followUpPanelPlaceholder.getChildren().add(followUpPanel.getRoot());
 
         resultDisplay = new ResultDisplay();
         resultDisplayPlaceholder.getChildren().add(resultDisplay.getRoot());
@@ -194,7 +212,7 @@ public class MainWindow extends UiPart<Stage> {
             return commandResult;
         } catch (CommandException | ParseException e) {
             logger.info("An error occurred while executing command: " + commandText);
-            resultDisplay.setFeedbackToUser(Messages.MESSAGE_ERROR_PREFIX + e.getMessage());
+            resultDisplay.setErrorToUser(Messages.MESSAGE_ERROR_PREFIX + e.getMessage());
             throw e;
         }
     }
