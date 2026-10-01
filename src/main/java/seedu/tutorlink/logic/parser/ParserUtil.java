@@ -2,8 +2,10 @@ package seedu.tutorlink.logic.parser;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import seedu.tutorlink.commons.core.index.Index;
@@ -13,6 +15,7 @@ import seedu.tutorlink.model.student.Address;
 import seedu.tutorlink.model.student.Email;
 import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.Phone;
+import seedu.tutorlink.model.student.Subject;
 import seedu.tutorlink.model.tag.Tag;
 
 /**
@@ -21,6 +24,8 @@ import seedu.tutorlink.model.tag.Tag;
 public class ParserUtil {
 
     public static final String MESSAGE_INVALID_INDEX = "Index must be a positive integer.";
+    public static final String MESSAGE_INVALID_SUBJECT = "Subject '%1$s' is not valid. %2$s";
+    public static final String MESSAGE_DUPLICATE_SUBJECT = "Subject '%1$s' is specified twice for the same student.";
 
     /**
      * Parses {@code oneBasedIndex} into an {@code Index} and returns it. Leading and trailing whitespaces will be
@@ -120,5 +125,39 @@ public class ParserUtil {
             tagSet.add(parseTag(tagName));
         }
         return tagSet;
+    }
+
+    /**
+     * Parses a {@code String subject} into a {@code Subject}.
+     * Leading and trailing whitespaces will be trimmed.
+     *
+     * @throws ParseException if the given {@code subject} is invalid.
+     */
+    public static Subject parseSubject(String subject) throws ParseException {
+        requireNonNull(subject);
+        String trimmedSubject = subject.trim();
+        if (!Subject.isValidSubject(trimmedSubject)) {
+            throw new ParseException(
+                    String.format(MESSAGE_INVALID_SUBJECT, trimmedSubject, Subject.MESSAGE_CONSTRAINTS));
+        }
+        return new Subject(trimmedSubject);
+    }
+
+    /**
+     * Parses {@code Collection<String> subjects} into a {@code List<Subject>}, keeping the order they were given in.
+     *
+     * @throws ParseException if any subject is invalid, or the same subject is given twice (ignoring case).
+     */
+    public static List<Subject> parseSubjects(Collection<String> subjects) throws ParseException {
+        requireNonNull(subjects);
+        final List<Subject> subjectList = new ArrayList<>();
+        for (String subjectName : subjects) {
+            Subject subject = parseSubject(subjectName);
+            if (subjectList.stream().anyMatch(subject::isSameSubject)) {
+                throw new ParseException(String.format(MESSAGE_DUPLICATE_SUBJECT, subject));
+            }
+            subjectList.add(subject);
+        }
+        return subjectList;
     }
 }
