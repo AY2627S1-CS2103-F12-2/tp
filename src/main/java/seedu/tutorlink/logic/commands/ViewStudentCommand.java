@@ -17,8 +17,7 @@ public class ViewStudentCommand extends Command {
 
     public static final String COMMAND_WORD = "student view";
 
-    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Shows the details of a student. "
-            + "Parameters: "
+    public static final String MESSAGE_USAGE = "Command format: " + COMMAND_WORD + " "
             + PREFIX_NAME + "NAME\n"
             + "Example: " + COMMAND_WORD + " " + PREFIX_NAME + "John Tan";
 

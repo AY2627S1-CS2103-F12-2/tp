@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 
 import javafx.collections.ObservableList;
 import seedu.tutorlink.commons.core.GuiSettings;
-import seedu.tutorlink.logic.Messages;
 import seedu.tutorlink.logic.commands.exceptions.CommandException;
 import seedu.tutorlink.model.Model;
 import seedu.tutorlink.model.ReadOnlyTutorLink;
@@ -40,8 +39,9 @@ public class AddCommandTest {
 
         CommandResult commandResult = new AddCommand(validStudent).execute(modelStub);
 
-        assertEquals(String.format(AddCommand.MESSAGE_SUCCESS, Messages.format(validStudent)),
-                commandResult.getFeedbackToUser());
+        // the stub's getTutorLink() is always empty, so the total shown is 0
+        assertEquals(String.format(AddCommand.MESSAGE_SUCCESS, validStudent.getName(),
+                AddCommand.MESSAGE_NO_SUBJECTS, 0), commandResult.getFeedbackToUser());
         assertEquals(List.of(validStudent), modelStub.studentsAdded);
     }
 
@@ -51,7 +51,8 @@ public class AddCommandTest {
         AddCommand addCommand = new AddCommand(validStudent);
         ModelStub modelStub = new ModelStubWithStudent(validStudent);
 
-        assertThrows(CommandException.class, AddCommand.MESSAGE_DUPLICATE_STUDENT, () -> addCommand.execute(modelStub));
+        assertThrows(CommandException.class, String.format(AddCommand.MESSAGE_DUPLICATE_STUDENT,
+                validStudent.getName()), () -> addCommand.execute(modelStub));
     }
 
     @Test
@@ -165,6 +166,12 @@ public class AddCommandTest {
         public boolean hasStudent(Student student) {
             requireNonNull(student);
             return this.student.isSameStudent(student);
+        }
+
+        @Override
+        public Optional<Student> findStudentByName(Name name) {
+            requireNonNull(name);
+            return student.getName().isSameName(name) ? Optional.of(student) : Optional.empty();
         }
     }
 
