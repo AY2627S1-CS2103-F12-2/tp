@@ -422,6 +422,68 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 
       Use case ends.
 
+**Use case: Record an interaction with a student**
+
+**MSS**
+
+1.  Tutor enters `interaction add n/NAME d/DATE [t/TIME] note/TEXT` with the student's name, the interaction date, an optional time, and a concise note.
+2.  TutorLink finds the student and validates the interaction date, optional time, and concise note.
+3.  TutorLink records the interaction in the student's interaction history.
+4.  TutorLink confirms that the interaction was recorded.
+
+    Use case ends.
+
+**Extensions**
+
+* 1a. The command is incomplete or has the wrong format.
+
+    * 1a1. TutorLink shows an error message and the correct command format.
+
+      Use case ends without changing any stored data.
+
+* 2a. No student matches the given name.
+
+    * 2a1. TutorLink shows an error message.
+
+      Use case ends without changing any stored data.
+
+* 2b. The interaction date or optional time is invalid, or the concise note is empty.
+
+    * 2b1. TutorLink shows an error message and the correct command format.
+
+      Use case ends without changing any stored data.
+
+**Use case: View a student's interaction history**
+
+**MSS**
+
+1.  Tutor enters `interaction list n/NAME` with the student's name.
+2.  TutorLink finds the student.
+3.  TutorLink retrieves the student's interactions in chronological order.
+4.  TutorLink shows each interaction's date, optional time, and concise note.
+
+    Use case ends.
+
+**Extensions**
+
+* 1a. The command does not include a student name or has the wrong format.
+
+    * 1a1. TutorLink shows an error message and the correct command format.
+
+      Use case ends.
+
+* 2a. No student matches the given name.
+
+    * 2a1. TutorLink shows an error message.
+
+      Use case ends.
+
+* 3a. The student has no interactions.
+
+    * 3a1. TutorLink tells the tutor that no interactions were found for the student.
+
+      Use case ends.
+
 *{More to be added}*
 
 ### Non-Functional Requirements
@@ -442,6 +504,9 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 * **Follow-up**: A note describing something the tutor intends to revisit with a student. Each follow-up belongs to a student, rather than to a particular interaction, and has a description and a review date.
 * **Review date**: The date on which the tutor intends to review a follow-up, in `yyyy-MM-dd` format. It is not necessarily the date of a lesson.
 * **Outstanding follow-up**: A follow-up that has not been completed or cancelled. Until TutorLink supports completing or cancelling follow-ups, every recorded follow-up is outstanding.
+* **Interaction**: A dated record of a lesson or other discussion with a student. Each interaction belongs to exactly one student and contains a concise note and, optionally, a time.
+* **Interaction date**: The date on which an interaction occurred, in `yyyy-MM-dd` format.
+* **Concise note**: Brief text recorded with an interaction to summarise what happened.
 
 --------------------------------------------------------------------------------------------------------------------
 
