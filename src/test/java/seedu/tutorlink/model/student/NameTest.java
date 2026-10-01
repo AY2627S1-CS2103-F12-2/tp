@@ -27,15 +27,25 @@ public class NameTest {
         // invalid name
         assertFalse(Name.isValidName("")); // empty string
         assertFalse(Name.isValidName(" ")); // spaces only
-        assertFalse(Name.isValidName("^")); // only non-alphanumeric characters
-        assertFalse(Name.isValidName("peter*")); // contains non-alphanumeric characters
+        assertFalse(Name.isValidName("^")); // only disallowed characters
+        assertFalse(Name.isValidName("peter*")); // contains a disallowed symbol
+        assertFalse(Name.isValidName("peter the 2nd")); // contains a digit
+        assertFalse(Name.isValidName("Ravi s/o Kumar")); // '/' clashes with command prefixes
+        assertFalse(Name.isValidName("-'.")); // no letter
+        assertFalse(Name.isValidName(" Peter")); // leading space
+        assertFalse(Name.isValidName("a".repeat(Name.MAX_LENGTH + 1))); // too long
 
         // valid name
-        assertTrue(Name.isValidName("peter jack")); // alphabets only
-        assertTrue(Name.isValidName("12345")); // numbers only
-        assertTrue(Name.isValidName("peter the 2nd")); // alphanumeric characters
+        assertTrue(Name.isValidName("A")); // one letter
+        assertTrue(Name.isValidName("peter jack")); // letters and spaces
         assertTrue(Name.isValidName("Capital Tan")); // with capital letters
-        assertTrue(Name.isValidName("David Roger Jackson Ray Jr 2nd")); // long names
+        assertTrue(Name.isValidName("Mary-Anne")); // hyphen
+        assertTrue(Name.isValidName("O'Brien")); // straight apostrophe
+        assertTrue(Name.isValidName("O\u2019Brien")); // curly apostrophe
+        assertTrue(Name.isValidName("John Tan Jr.")); // full stop
+        assertTrue(Name.isValidName("José Müller")); // accented letters
+        assertTrue(Name.isValidName("李小龙")); // non-Latin letters
+        assertTrue(Name.isValidName("a".repeat(Name.MAX_LENGTH))); // maximum length
     }
 
     @Test

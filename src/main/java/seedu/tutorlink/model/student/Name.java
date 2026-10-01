@@ -11,14 +11,19 @@ import java.util.Locale;
  */
 public class Name {
 
-    public static final String MESSAGE_CONSTRAINTS =
-            "Names should only contain alphanumeric characters and spaces, and should not be blank";
+    public static final int MAX_LENGTH = 50;
+
+    public static final String MESSAGE_CONSTRAINTS = "Student name must be 1 to " + MAX_LENGTH
+            + " characters, contain at least one letter, and use only letters, spaces, hyphens, apostrophes"
+            + " or full stops.";
 
     /*
-     * The first character of the name must not be a whitespace,
+     * Letters include accented letters and combining marks (e.g. José). Both straight and curly apostrophes are
+     * accepted (e.g. O'Brien). The first character of the name must not be a whitespace,
      * otherwise " " (a blank string) becomes a valid input.
      */
-    public static final String VALIDATION_REGEX = "[\\p{Alnum}][\\p{Alnum} ]*";
+    public static final String VALIDATION_REGEX = "[\\p{L}\\p{M}'\u2019.-][\\p{L}\\p{M}'\u2019. -]*";
+    private static final String LETTER_REGEX = ".*\\p{L}.*";
 
     public final String fullName;
 
@@ -37,7 +42,9 @@ public class Name {
      * Returns true if a given string is a valid name.
      */
     public static boolean isValidName(String test) {
-        return test.matches(VALIDATION_REGEX);
+        return test.length() <= MAX_LENGTH
+                && test.matches(VALIDATION_REGEX)
+                && test.matches(LETTER_REGEX);
     }
 
     /**
