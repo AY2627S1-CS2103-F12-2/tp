@@ -3,8 +3,7 @@ package seedu.tutorlink.model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static seedu.tutorlink.logic.commands.CommandTestUtil.VALID_ADDRESS_BOB;
-import static seedu.tutorlink.logic.commands.CommandTestUtil.VALID_TAG_HUSBAND;
+import static seedu.tutorlink.logic.commands.CommandTestUtil.VALID_SUBJECT_PHYSICS;
 import static seedu.tutorlink.testutil.Assert.assertThrows;
 import static seedu.tutorlink.testutil.TypicalStudents.ALICE;
 import static seedu.tutorlink.testutil.TypicalStudents.getTypicalTutorLink;
@@ -44,8 +43,7 @@ public class TutorLinkTest {
     @Test
     public void resetData_withDuplicateStudents_throwsDuplicateStudentException() {
         // Two students with the same identity fields
-        Student editedAlice = new StudentBuilder(ALICE).withAddress(VALID_ADDRESS_BOB).withTags(VALID_TAG_HUSBAND)
-                .build();
+        Student editedAlice = new StudentBuilder(ALICE).withSubjects(VALID_SUBJECT_PHYSICS).build();
         List<Student> newStudents = List.of(ALICE, editedAlice);
         TutorLinkStub newData = new TutorLinkStub(newStudents);
 
@@ -71,8 +69,7 @@ public class TutorLinkTest {
     @Test
     public void hasStudent_studentWithSameIdentityFieldsInTutorLink_returnsTrue() {
         tutorLink.addStudent(ALICE);
-        Student editedAlice = new StudentBuilder(ALICE).withAddress(VALID_ADDRESS_BOB).withTags(VALID_TAG_HUSBAND)
-                .build();
+        Student editedAlice = new StudentBuilder(ALICE).withSubjects(VALID_SUBJECT_PHYSICS).build();
         assertTrue(tutorLink.hasStudent(editedAlice));
     }
 

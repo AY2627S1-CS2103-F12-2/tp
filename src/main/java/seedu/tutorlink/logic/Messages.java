@@ -1,11 +1,13 @@
 package seedu.tutorlink.logic;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import seedu.tutorlink.logic.parser.Prefix;
 import seedu.tutorlink.model.student.Student;
+import seedu.tutorlink.model.student.Subject;
 
 /**
  * Container for user visible messages.
@@ -13,6 +15,7 @@ import seedu.tutorlink.model.student.Student;
 public class Messages {
 
     public static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command.";
+    public static final String MESSAGE_NO_SUBJECTS = "(none recorded)";
     public static final String MESSAGE_INVALID_COMMAND_FORMAT = "Invalid command format!\n%1$s";
     public static final String MESSAGE_INVALID_STUDENT_DISPLAYED_INDEX = "The student index provided is invalid.";
     public static final String MESSAGE_STUDENTS_LISTED_OVERVIEW = "%1$d student(s) listed!";
@@ -37,15 +40,19 @@ public class Messages {
     public static String format(Student student) {
         final StringBuilder builder = new StringBuilder();
         builder.append(student.getName())
-                .append("; Phone: ")
-                .append(student.getPhone())
-                .append("; Email: ")
-                .append(student.getEmail())
-                .append("; Address: ")
-                .append(student.getAddress())
-                .append("; Tags: ");
-        student.getTags().forEach(builder::append);
+                .append("; Subjects: ")
+                .append(formatSubjects(student.getSubjects()));
         return builder.toString();
+    }
+
+    /**
+     * Returns the subjects as a comma-separated list, or {@code (none recorded)} if there are none.
+     */
+    public static String formatSubjects(List<Subject> subjects) {
+        if (subjects.isEmpty()) {
+            return MESSAGE_NO_SUBJECTS;
+        }
+        return subjects.stream().map(Subject::toString).collect(Collectors.joining(", "));
     }
 
 }

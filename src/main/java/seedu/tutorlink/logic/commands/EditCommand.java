@@ -1,19 +1,13 @@
 package seedu.tutorlink.logic.commands;
 
 import static java.util.Objects.requireNonNull;
-import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_ADDRESS;
-import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_EMAIL;
 import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_NAME;
-import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_PHONE;
-import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_TAG;
+import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_SUBJECT;
 import static seedu.tutorlink.model.Model.PREDICATE_SHOW_ALL_STUDENTS;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 import seedu.tutorlink.commons.core.index.Index;
 import seedu.tutorlink.commons.util.CollectionUtil;
@@ -21,12 +15,9 @@ import seedu.tutorlink.commons.util.ToStringBuilder;
 import seedu.tutorlink.logic.Messages;
 import seedu.tutorlink.logic.commands.exceptions.CommandException;
 import seedu.tutorlink.model.Model;
-import seedu.tutorlink.model.student.Address;
-import seedu.tutorlink.model.student.Email;
 import seedu.tutorlink.model.student.Name;
-import seedu.tutorlink.model.student.Phone;
 import seedu.tutorlink.model.student.Student;
-import seedu.tutorlink.model.tag.Tag;
+import seedu.tutorlink.model.student.Subject;
 
 /**
  * Edits the details of an existing student in TutorLink.
@@ -40,13 +31,10 @@ public class EditCommand extends Command {
             + "Existing values will be overwritten by the input values.\n"
             + "Parameters: INDEX (must be a positive integer) "
             + "[" + PREFIX_NAME + "NAME] "
-            + "[" + PREFIX_PHONE + "PHONE] "
-            + "[" + PREFIX_EMAIL + "EMAIL] "
-            + "[" + PREFIX_ADDRESS + "ADDRESS] "
-            + "[" + PREFIX_TAG + "TAG]...\n"
+            + "[" + PREFIX_SUBJECT + "SUBJECT]...\n"
             + "Example: " + COMMAND_WORD + " 1 "
-            + PREFIX_PHONE + "91234567 "
-            + PREFIX_EMAIL + "johndoe@example.com";
+            + PREFIX_SUBJECT + "Math "
+            + PREFIX_SUBJECT + "Chemistry";
 
     public static final String MESSAGE_EDIT_STUDENT_SUCCESS = "Edited student: %1$s";
     public static final String MESSAGE_NOT_EDITED = "At least one field to edit must be provided.";
@@ -96,12 +84,9 @@ public class EditCommand extends Command {
         assert studentToEdit != null;
 
         Name updatedName = editStudentDescriptor.getName().orElse(studentToEdit.getName());
-        Phone updatedPhone = editStudentDescriptor.getPhone().orElse(studentToEdit.getPhone());
-        Email updatedEmail = editStudentDescriptor.getEmail().orElse(studentToEdit.getEmail());
-        Address updatedAddress = editStudentDescriptor.getAddress().orElse(studentToEdit.getAddress());
-        Set<Tag> updatedTags = editStudentDescriptor.getTags().orElse(studentToEdit.getTags());
+        List<Subject> updatedSubjects = editStudentDescriptor.getSubjects().orElse(studentToEdit.getSubjects());
 
-        return new Student(updatedName, updatedPhone, updatedEmail, updatedAddress, updatedTags);
+        return new Student(updatedName, updatedSubjects);
     }
 
     @Override
@@ -133,30 +118,24 @@ public class EditCommand extends Command {
      */
     public static class EditStudentDescriptor {
         private Name name;
-        private Phone phone;
-        private Email email;
-        private Address address;
-        private Set<Tag> tags;
+        private List<Subject> subjects;
 
         public EditStudentDescriptor() {}
 
         /**
          * Copy constructor.
-         * A defensive copy of {@code tags} is used internally.
+         * A defensive copy of {@code subjects} is used internally.
          */
         public EditStudentDescriptor(EditStudentDescriptor toCopy) {
             setName(toCopy.name);
-            setPhone(toCopy.phone);
-            setEmail(toCopy.email);
-            setAddress(toCopy.address);
-            setTags(toCopy.tags);
+            setSubjects(toCopy.subjects);
         }
 
         /**
          * Returns true if at least one field is edited.
          */
         public boolean isAnyFieldEdited() {
-            return CollectionUtil.isAnyNonNull(name, phone, email, address, tags);
+            return CollectionUtil.isAnyNonNull(name, subjects);
         }
 
         public void setName(Name name) {
@@ -167,45 +146,21 @@ public class EditCommand extends Command {
             return Optional.ofNullable(name);
         }
 
-        public void setPhone(Phone phone) {
-            this.phone = phone;
-        }
-
-        public Optional<Phone> getPhone() {
-            return Optional.ofNullable(phone);
-        }
-
-        public void setEmail(Email email) {
-            this.email = email;
-        }
-
-        public Optional<Email> getEmail() {
-            return Optional.ofNullable(email);
-        }
-
-        public void setAddress(Address address) {
-            this.address = address;
-        }
-
-        public Optional<Address> getAddress() {
-            return Optional.ofNullable(address);
-        }
-
         /**
-         * Sets {@code tags} to this object's {@code tags}.
-         * A defensive copy of {@code tags} is used internally.
+         * Sets {@code subjects} to this object's {@code subjects}.
+         * A defensive copy of {@code subjects} is used internally.
          */
-        public void setTags(Set<Tag> tags) {
-            this.tags = (tags != null) ? new HashSet<>(tags) : null;
+        public void setSubjects(List<Subject> subjects) {
+            this.subjects = (subjects != null) ? List.copyOf(subjects) : null;
         }
 
         /**
-         * Returns an unmodifiable tag set, which throws {@code UnsupportedOperationException}
+         * Returns an unmodifiable subject list, which throws {@code UnsupportedOperationException}
          * if modification is attempted.
-         * Returns {@code Optional#empty()} if {@code tags} is null.
+         * Returns {@code Optional#empty()} if {@code subjects} is null.
          */
-        public Optional<Set<Tag>> getTags() {
-            return (tags != null) ? Optional.of(Collections.unmodifiableSet(tags)) : Optional.empty();
+        public Optional<List<Subject>> getSubjects() {
+            return Optional.ofNullable(subjects);
         }
 
         @Override
@@ -220,20 +175,14 @@ public class EditCommand extends Command {
             }
 
             return Objects.equals(name, otherEditStudentDescriptor.name)
-                    && Objects.equals(phone, otherEditStudentDescriptor.phone)
-                    && Objects.equals(email, otherEditStudentDescriptor.email)
-                    && Objects.equals(address, otherEditStudentDescriptor.address)
-                    && Objects.equals(tags, otherEditStudentDescriptor.tags);
+                    && Objects.equals(subjects, otherEditStudentDescriptor.subjects);
         }
 
         @Override
         public String toString() {
             return new ToStringBuilder(this)
                     .add("name", name)
-                    .add("phone", phone)
-                    .add("email", email)
-                    .add("address", address)
-                    .add("tags", tags)
+                    .add("subjects", subjects)
                     .toString();
         }
     }

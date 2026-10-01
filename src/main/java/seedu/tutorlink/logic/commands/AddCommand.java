@@ -1,11 +1,8 @@
 package seedu.tutorlink.logic.commands;
 
 import static java.util.Objects.requireNonNull;
-import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_ADDRESS;
-import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_EMAIL;
 import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_NAME;
-import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_PHONE;
-import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_TAG;
+import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_SUBJECT;
 
 import seedu.tutorlink.commons.util.ToStringBuilder;
 import seedu.tutorlink.logic.Messages;
@@ -23,17 +20,11 @@ public class AddCommand extends Command {
     public static final String MESSAGE_USAGE = COMMAND_WORD + ": Adds a student to TutorLink. "
             + "Parameters: "
             + PREFIX_NAME + "NAME "
-            + PREFIX_PHONE + "PHONE "
-            + PREFIX_EMAIL + "EMAIL "
-            + PREFIX_ADDRESS + "ADDRESS "
-            + "[" + PREFIX_TAG + "TAG]...\n"
+            + "[" + PREFIX_SUBJECT + "SUBJECT]...\n"
             + "Example: " + COMMAND_WORD + " "
-            + PREFIX_NAME + "John Doe "
-            + PREFIX_PHONE + "98765432 "
-            + PREFIX_EMAIL + "johnd@example.com "
-            + PREFIX_ADDRESS + "311, Clementi Ave 2, #02-25 "
-            + PREFIX_TAG + "friends "
-            + PREFIX_TAG + "owesMoney";
+            + PREFIX_NAME + "John Tan "
+            + PREFIX_SUBJECT + "Math "
+            + PREFIX_SUBJECT + "Physics";
 
     public static final String MESSAGE_SUCCESS = "New student added: %1$s";
     public static final String MESSAGE_DUPLICATE_STUDENT = "This student already exists in TutorLink.";

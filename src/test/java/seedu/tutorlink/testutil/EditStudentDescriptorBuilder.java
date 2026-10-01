@@ -1,16 +1,9 @@
 package seedu.tutorlink.testutil;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import seedu.tutorlink.logic.commands.EditCommand.EditStudentDescriptor;
-import seedu.tutorlink.model.student.Address;
-import seedu.tutorlink.model.student.Email;
 import seedu.tutorlink.model.student.Name;
-import seedu.tutorlink.model.student.Phone;
 import seedu.tutorlink.model.student.Student;
-import seedu.tutorlink.model.tag.Tag;
+import seedu.tutorlink.model.util.SampleDataUtil;
 
 /**
  * A utility class to help with building EditStudentDescriptor objects.
@@ -33,10 +26,7 @@ public class EditStudentDescriptorBuilder {
     public EditStudentDescriptorBuilder(Student student) {
         descriptor = new EditStudentDescriptor();
         descriptor.setName(student.getName());
-        descriptor.setPhone(student.getPhone());
-        descriptor.setEmail(student.getEmail());
-        descriptor.setAddress(student.getAddress());
-        descriptor.setTags(student.getTags());
+        descriptor.setSubjects(student.getSubjects());
     }
 
     /**
@@ -48,36 +38,11 @@ public class EditStudentDescriptorBuilder {
     }
 
     /**
-     * Sets the {@code Phone} of the {@code EditStudentDescriptor} that we are building.
-     */
-    public EditStudentDescriptorBuilder withPhone(String phone) {
-        descriptor.setPhone(new Phone(phone));
-        return this;
-    }
-
-    /**
-     * Sets the {@code Email} of the {@code EditStudentDescriptor} that we are building.
-     */
-    public EditStudentDescriptorBuilder withEmail(String email) {
-        descriptor.setEmail(new Email(email));
-        return this;
-    }
-
-    /**
-     * Sets the {@code Address} of the {@code EditStudentDescriptor} that we are building.
-     */
-    public EditStudentDescriptorBuilder withAddress(String address) {
-        descriptor.setAddress(new Address(address));
-        return this;
-    }
-
-    /**
-     * Parses the {@code tags} into a {@code Set<Tag>} and sets it to the {@code EditStudentDescriptor}
+     * Parses the {@code subjects} into a {@code List<Subject>} and sets it to the {@code EditStudentDescriptor}
      * that we are building.
      */
-    public EditStudentDescriptorBuilder withTags(String... tags) {
-        Set<Tag> tagSet = Stream.of(tags).map(Tag::new).collect(Collectors.toSet());
-        descriptor.setTags(tagSet);
+    public EditStudentDescriptorBuilder withSubjects(String... subjects) {
+        descriptor.setSubjects(SampleDataUtil.getSubjectList(subjects));
         return this;
     }
 

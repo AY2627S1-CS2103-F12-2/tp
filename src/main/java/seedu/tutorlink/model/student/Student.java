@@ -2,13 +2,10 @@ package seedu.tutorlink.model.student;
 
 import static seedu.tutorlink.commons.util.CollectionUtil.requireAllNonNull;
 
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import seedu.tutorlink.commons.util.ToStringBuilder;
-import seedu.tutorlink.model.tag.Tag;
 
 /**
  * Represents a Student in TutorLink.
@@ -18,47 +15,30 @@ public class Student {
 
     // Identity fields
     private final Name name;
-    private final Phone phone;
-    private final Email email;
 
     // Data fields
-    private final Address address;
-    private final Set<Tag> tags = new HashSet<>();
+    private final List<Subject> subjects;
 
     /**
      * Every field must be present and not null.
+     * Subjects are kept in the order given.
      */
-    public Student(Name name, Phone phone, Email email, Address address, Set<Tag> tags) {
-        requireAllNonNull(name, phone, email, address, tags);
+    public Student(Name name, List<Subject> subjects) {
+        requireAllNonNull(name, subjects);
         this.name = name;
-        this.phone = phone;
-        this.email = email;
-        this.address = address;
-        this.tags.addAll(tags);
+        this.subjects = List.copyOf(subjects);
     }
 
     public Name getName() {
         return name;
     }
 
-    public Phone getPhone() {
-        return phone;
-    }
-
-    public Email getEmail() {
-        return email;
-    }
-
-    public Address getAddress() {
-        return address;
-    }
-
     /**
-     * Returns an immutable tag set, which throws {@code UnsupportedOperationException}
-     * if modification is attempted.
+     * Returns an immutable list of subjects, in the order they were added, which throws
+     * {@code UnsupportedOperationException} if modification is attempted.
      */
-    public Set<Tag> getTags() {
-        return Collections.unmodifiableSet(tags);
+    public List<Subject> getSubjects() {
+        return subjects;
     }
 
     /**
@@ -90,26 +70,20 @@ public class Student {
         }
 
         return name.equals(otherStudent.name)
-                && phone.equals(otherStudent.phone)
-                && email.equals(otherStudent.email)
-                && address.equals(otherStudent.address)
-                && tags.equals(otherStudent.tags);
+                && subjects.equals(otherStudent.subjects);
     }
 
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, phone, email, address, tags);
+        return Objects.hash(name, subjects);
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .add("name", name)
-                .add("phone", phone)
-                .add("email", email)
-                .add("address", address)
-                .add("tags", tags)
+                .add("subjects", subjects)
                 .toString();
     }
 
