@@ -24,6 +24,9 @@ public interface Logic {
     /** Returns an unmodifiable view of the filtered list of students */
     ObservableList<Student> getFilteredStudentList();
 
+    /** Returns an unmodifiable view of all students, ignoring any filter */
+    ObservableList<Student> getStudentList();
+
     /** Returns the student currently shown in detail, which holds {@code null} if no student is selected. */
     ReadOnlyObjectProperty<Student> getSelectedStudent();
 

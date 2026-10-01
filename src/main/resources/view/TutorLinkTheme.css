@@ -117,10 +117,6 @@
     -fx-background-radius: 4;
 }
 
-.student-list .list-cell:filled:hover {
-    -fx-background-color: #e3e9ef;
-}
-
 .student-list .list-cell:filled:selected {
     -fx-background-color: #dff3ef;
     -fx-border-color: transparent transparent transparent #3d8b83;

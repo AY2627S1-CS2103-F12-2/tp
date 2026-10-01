@@ -66,6 +66,11 @@ public class LogicManager implements Logic {
     }
 
     @Override
+    public ObservableList<Student> getStudentList() {
+        return model.getTutorLink().getStudentList();
+    }
+
+    @Override
     public ReadOnlyObjectProperty<Student> getSelectedStudent() {
         return model.getSelectedStudent();
     }
