@@ -10,7 +10,7 @@ import seedu.tutorlink.model.student.Student;
 import seedu.tutorlink.model.student.UniqueStudentList;
 
 /**
- * Wraps all data at the address-book level.
+ * Wraps all data at the TutorLink level.
  * Duplicates are not allowed (by .isSameStudent comparison).
  */
 public class TutorLink implements ReadOnlyTutorLink {
