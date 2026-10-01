@@ -3,6 +3,8 @@ package seedu.tutorlink.model.student;
 import static java.util.Objects.requireNonNull;
 import static seedu.tutorlink.commons.util.AppUtil.checkArgument;
 
+import java.util.Locale;
+
 /**
  * Represents a Student's name in TutorLink.
  * Guarantees: immutable; is valid as declared in {@link #isValidName(String)}
@@ -36,6 +38,20 @@ public class Name {
      */
     public static boolean isValidName(String test) {
         return test.matches(VALIDATION_REGEX);
+    }
+
+    /**
+     * Returns true if both names refer to the same student.
+     * Names are compared ignoring case and differences in whitespace, as real-world names are not case-sensitive.
+     *
+     * @param otherName The name to compare with.
+     */
+    public boolean isSameName(Name otherName) {
+        return otherName != null && normalize(fullName).equals(normalize(otherName.fullName));
+    }
+
+    private static String normalize(String name) {
+        return name.trim().replaceAll("\\s+", " ").toLowerCase(Locale.ROOT);
     }
 
 
