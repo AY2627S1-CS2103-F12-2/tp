@@ -422,6 +422,59 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 
       Use case ends.
 
+**Use case: Record an interaction with a student**
+
+**MSS**
+
+1.  Tutor requests to record an interaction, identifying the student and providing an interaction date, an optional time, and a concise note.
+2.  TutorLink records the interaction in the student's interaction history.
+3.  TutorLink confirms that the interaction was recorded.
+
+    Use case ends.
+
+**Extensions**
+
+* 1a. No student matches the specified name.
+
+    * 1a1. TutorLink informs the tutor that no matching student was found.
+
+      Use case ends without changing any stored data.
+
+* 1b. The supplied interaction details are incomplete or invalid.
+
+    * 1b1. TutorLink informs the tutor what is wrong and how to correct the input.
+
+      Use case ends without changing any stored data.
+
+**Use case: View a student's interaction history**
+
+**MSS**
+
+1.  Tutor requests to view a student's interaction history, identifying the student.
+2.  TutorLink shows the student's interactions in chronological order, including each interaction's date, optional time, and concise note.
+
+    Use case ends.
+
+**Extensions**
+
+* 1a. The tutor does not identify a student.
+
+    * 1a1. TutorLink informs the tutor how to correct the request.
+
+      Use case ends.
+
+* 1b. No student matches the specified name.
+
+    * 1b1. TutorLink informs the tutor that no matching student was found.
+
+      Use case ends.
+
+* 2a. The student has no interactions.
+
+    * 2a1. TutorLink informs the tutor that the student has no interactions.
+
+      Use case ends.
+
 *{More to be added}*
 
 ### Non-Functional Requirements
@@ -442,6 +495,9 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 * **Follow-up**: A note describing something the tutor intends to revisit with a student. Each follow-up belongs to a student, rather than to a particular interaction, and has a description and a review date.
 * **Review date**: The date on which the tutor intends to review a follow-up, in `yyyy-MM-dd` format. It is not necessarily the date of a lesson.
 * **Outstanding follow-up**: A follow-up that has not been completed or cancelled. Until TutorLink supports completing or cancelling follow-ups, every recorded follow-up is outstanding.
+* **Interaction**: A dated record of a lesson or other discussion with a student. Each interaction belongs to exactly one student and contains a concise note and, optionally, a time.
+* **Interaction date**: The date on which an interaction occurred, in `yyyy-MM-dd` format.
+* **Concise note**: Brief text recorded with an interaction to summarise what happened.
 
 --------------------------------------------------------------------------------------------------------------------
 
