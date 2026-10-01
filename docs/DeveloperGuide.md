@@ -426,30 +426,23 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 
 **MSS**
 
-1.  Tutor enters `interaction add n/NAME d/DATE [t/TIME] note/TEXT` with the student's name, the interaction date, an optional time, and a concise note.
-2.  TutorLink finds the student and validates the interaction date, optional time, and concise note.
-3.  TutorLink records the interaction in the student's interaction history.
-4.  TutorLink confirms that the interaction was recorded.
+1.  Tutor requests to record an interaction, identifying the student and providing an interaction date, an optional time, and a concise note.
+2.  TutorLink records the interaction in the student's interaction history.
+3.  TutorLink confirms that the interaction was recorded.
 
     Use case ends.
 
 **Extensions**
 
-* 1a. The command is incomplete or has the wrong format.
+* 1a. No student matches the specified name.
 
-    * 1a1. TutorLink shows an error message and the correct command format.
-
-      Use case ends without changing any stored data.
-
-* 2a. No student matches the given name.
-
-    * 2a1. TutorLink shows an error message.
+    * 1a1. TutorLink informs the tutor that no matching student was found.
 
       Use case ends without changing any stored data.
 
-* 2b. The interaction date or optional time is invalid, or the concise note is empty.
+* 1b. The supplied interaction details are incomplete or invalid.
 
-    * 2b1. TutorLink shows an error message and the correct command format.
+    * 1b1. TutorLink informs the tutor what is wrong and how to correct the input.
 
       Use case ends without changing any stored data.
 
@@ -457,30 +450,28 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 
 **MSS**
 
-1.  Tutor enters `interaction list n/NAME` with the student's name.
-2.  TutorLink finds the student.
-3.  TutorLink retrieves the student's interactions in chronological order.
-4.  TutorLink shows each interaction's date, optional time, and concise note.
+1.  Tutor requests to view a student's interaction history, identifying the student.
+2.  TutorLink shows the student's interactions in chronological order, including each interaction's date, optional time, and concise note.
 
     Use case ends.
 
 **Extensions**
 
-* 1a. The command does not include a student name or has the wrong format.
+* 1a. The tutor does not identify a student.
 
-    * 1a1. TutorLink shows an error message and the correct command format.
-
-      Use case ends.
-
-* 2a. No student matches the given name.
-
-    * 2a1. TutorLink shows an error message.
+    * 1a1. TutorLink informs the tutor how to correct the request.
 
       Use case ends.
 
-* 3a. The student has no interactions.
+* 1b. No student matches the specified name.
 
-    * 3a1. TutorLink tells the tutor that no interactions were found for the student.
+    * 1b1. TutorLink informs the tutor that no matching student was found.
+
+      Use case ends.
+
+* 2a. The student has no interactions.
+
+    * 2a1. TutorLink informs the tutor that the student has no interactions.
 
       Use case ends.
 
