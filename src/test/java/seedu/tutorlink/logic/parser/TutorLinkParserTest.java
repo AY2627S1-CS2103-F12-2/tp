@@ -7,12 +7,15 @@ import static seedu.tutorlink.logic.Messages.MESSAGE_UNKNOWN_COMMAND;
 import static seedu.tutorlink.testutil.Assert.assertThrows;
 import static seedu.tutorlink.testutil.TypicalIndexes.INDEX_FIRST_STUDENT;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
 import seedu.tutorlink.logic.commands.AddCommand;
+import seedu.tutorlink.logic.commands.AddInteractionCommand;
 import seedu.tutorlink.logic.commands.ClearCommand;
 import seedu.tutorlink.logic.commands.DeleteCommand;
 import seedu.tutorlink.logic.commands.EditCommand;
@@ -23,6 +26,7 @@ import seedu.tutorlink.logic.commands.HelpCommand;
 import seedu.tutorlink.logic.commands.ListCommand;
 import seedu.tutorlink.logic.commands.ViewStudentCommand;
 import seedu.tutorlink.logic.parser.exceptions.ParseException;
+import seedu.tutorlink.model.interaction.Interaction;
 import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.NameContainsKeywordsPredicate;
 import seedu.tutorlink.model.student.Student;
@@ -45,6 +49,15 @@ public class TutorLinkParserTest {
     public void parseCommand_viewStudent() throws Exception {
         assertEquals(new ViewStudentCommand(new Name("John Tan")),
                 parser.parseCommand(ViewStudentCommand.COMMAND_WORD + " n/John Tan"));
+    }
+
+    @Test
+    public void parseCommand_addInteraction() throws Exception {
+        AddInteractionCommand expected = new AddInteractionCommand(new Name("Alex Tan"),
+                new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "Discussed revision plan"));
+
+        assertEquals(expected, parser.parseCommand(
+                "interaction add n/Alex Tan d/2026-10-01 note/Discussed revision plan"));
     }
 
     @Test

@@ -11,12 +11,17 @@ import static seedu.tutorlink.testutil.TypicalStudents.AMY;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import seedu.tutorlink.logic.commands.AddCommand;
+import seedu.tutorlink.logic.commands.AddInteractionCommand;
 import seedu.tutorlink.logic.commands.CommandResult;
 import seedu.tutorlink.logic.commands.ListCommand;
 import seedu.tutorlink.logic.commands.exceptions.CommandException;
@@ -24,7 +29,10 @@ import seedu.tutorlink.logic.parser.exceptions.ParseException;
 import seedu.tutorlink.model.Model;
 import seedu.tutorlink.model.ModelManager;
 import seedu.tutorlink.model.ReadOnlyTutorLink;
+import seedu.tutorlink.model.TutorLink;
 import seedu.tutorlink.model.UserPrefs;
+import seedu.tutorlink.model.interaction.Interaction;
+import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.Student;
 import seedu.tutorlink.storage.JsonTutorLinkStorage;
 import seedu.tutorlink.storage.JsonUserPrefsStorage;
@@ -66,6 +74,27 @@ public class LogicManagerTest {
     public void execute_validCommand_success() throws Exception {
         String listCommand = ListCommand.COMMAND_WORD;
         assertCommandSuccess(listCommand, ListCommand.MESSAGE_SUCCESS, model);
+    }
+
+    @Test
+    public void execute_addInteraction_recordsAndPersistsInteraction() throws Exception {
+        logic.execute(AddCommand.COMMAND_WORD + " n/Alex Tan");
+
+        String interactionCommand = AddInteractionCommand.COMMAND_WORD
+                + " n/Alex Tan d/2026-10-01 t/14:30 note/Practised algebraic fractions";
+        CommandResult result = logic.execute(interactionCommand);
+
+        assertEquals(String.format(AddInteractionCommand.MESSAGE_SUCCESS, "Alex Tan"),
+                result.getFeedbackToUser());
+
+        Interaction expectedInteraction = new Interaction(LocalDate.of(2026, 10, 1),
+                Optional.of(LocalTime.of(14, 30)), "Practised algebraic fractions");
+        Student student = model.findStudentByName(new Name("Alex Tan")).orElseThrow();
+        assertEquals(List.of(expectedInteraction), student.getInteractions());
+
+        ReadOnlyTutorLink readBack = new JsonTutorLinkStorage(temporaryFolder.resolve("tutorLink.json"))
+                .readTutorLink().orElseThrow();
+        assertEquals(model.getTutorLink(), new TutorLink(readBack));
     }
 
     @Test

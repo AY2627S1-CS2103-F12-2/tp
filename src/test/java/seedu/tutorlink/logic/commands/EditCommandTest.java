@@ -14,6 +14,10 @@ import static seedu.tutorlink.testutil.TypicalIndexes.INDEX_FIRST_STUDENT;
 import static seedu.tutorlink.testutil.TypicalIndexes.INDEX_SECOND_STUDENT;
 import static seedu.tutorlink.testutil.TypicalStudents.getTypicalTutorLink;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 
 import seedu.tutorlink.commons.core.index.Index;
@@ -23,6 +27,7 @@ import seedu.tutorlink.model.Model;
 import seedu.tutorlink.model.ModelManager;
 import seedu.tutorlink.model.TutorLink;
 import seedu.tutorlink.model.UserPrefs;
+import seedu.tutorlink.model.interaction.Interaction;
 import seedu.tutorlink.model.student.Student;
 import seedu.tutorlink.testutil.EditStudentDescriptorBuilder;
 import seedu.tutorlink.testutil.StudentBuilder;
@@ -68,6 +73,29 @@ public class EditCommandTest {
         expectedModel.setStudent(lastStudent, editedStudent);
 
         assertCommandSuccess(editCommand, model, expectedMessage, expectedModel);
+    }
+
+    @Test
+    public void execute_studentWithInteractions_preservesInteractions() {
+        Interaction interaction = new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(),
+                "Discussed revision plan");
+        Student interactionStudent = new StudentBuilder().withName("Interaction Student").build()
+                .withInteraction(interaction);
+        model.addStudent(interactionStudent);
+
+        Index index = Index.fromOneBased(model.getFilteredStudentList().size());
+        Student editedStudent = new StudentBuilder(interactionStudent).withSubjects(VALID_SUBJECT_PHYSICS).build();
+        EditCommand editCommand = new EditCommand(index,
+                new EditStudentDescriptorBuilder().withSubjects(VALID_SUBJECT_PHYSICS).build());
+
+        String expectedMessage = String.format(EditCommand.MESSAGE_EDIT_STUDENT_SUCCESS,
+                Messages.format(editedStudent));
+        Model expectedModel = new ModelManager(new TutorLink(model.getTutorLink()), new UserPrefs());
+        expectedModel.setStudent(interactionStudent, editedStudent);
+
+        assertCommandSuccess(editCommand, model, expectedMessage, expectedModel);
+        assertEquals(List.of(interaction), model.findStudentByName(interactionStudent.getName()).orElseThrow()
+                .getInteractions());
     }
 
     @Test

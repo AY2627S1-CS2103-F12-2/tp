@@ -2,10 +2,12 @@ package seedu.tutorlink.model.student;
 
 import static seedu.tutorlink.commons.util.CollectionUtil.requireAllNonNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import seedu.tutorlink.commons.util.ToStringBuilder;
+import seedu.tutorlink.model.interaction.Interaction;
 
 /**
  * Represents a Student in TutorLink.
@@ -18,15 +20,28 @@ public class Student {
 
     // Data fields
     private final List<Subject> subjects;
+    private final List<Interaction> interactions;
 
     /**
      * Every field must be present and not null.
      * Subjects are kept in the order given.
      */
     public Student(Name name, List<Subject> subjects) {
-        requireAllNonNull(name, subjects);
+        this(name, subjects, List.of());
+    }
+
+    /**
+     * Creates a student with the given name, subjects, and interactions.
+     *
+     * @param name The student's name.
+     * @param subjects The subjects taught to the student.
+     * @param interactions The interactions recorded for the student.
+     */
+    public Student(Name name, List<Subject> subjects, List<Interaction> interactions) {
+        requireAllNonNull(name, subjects, interactions);
         this.name = name;
         this.subjects = List.copyOf(subjects);
+        this.interactions = List.copyOf(interactions);
     }
 
     public Name getName() {
@@ -39,6 +54,25 @@ public class Student {
      */
     public List<Subject> getSubjects() {
         return subjects;
+    }
+
+    /**
+     * Returns an immutable list of interactions, in the order they were added.
+     */
+    public List<Interaction> getInteractions() {
+        return interactions;
+    }
+
+    /**
+     * Returns a copy of this student with the given interaction appended.
+     *
+     * @param interaction The interaction to append.
+     * @return A student containing the appended interaction.
+     */
+    public Student withInteraction(Interaction interaction) {
+        List<Interaction> updatedInteractions = new ArrayList<>(interactions);
+        updatedInteractions.add(Objects.requireNonNull(interaction));
+        return new Student(name, subjects, updatedInteractions);
     }
 
     /**
@@ -70,13 +104,14 @@ public class Student {
         }
 
         return name.equals(otherStudent.name)
-                && subjects.equals(otherStudent.subjects);
+                && subjects.equals(otherStudent.subjects)
+                && interactions.equals(otherStudent.interactions);
     }
 
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, subjects);
+        return Objects.hash(name, subjects, interactions);
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import seedu.tutorlink.commons.exceptions.IllegalValueException;
+import seedu.tutorlink.model.interaction.Interaction;
 import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.Student;
 import seedu.tutorlink.model.student.Subject;
@@ -20,17 +21,29 @@ class JsonAdaptedStudent {
 
     private final String name;
     private final List<String> subjects = new ArrayList<>();
+    private final List<JsonAdaptedInteraction> interactions = new ArrayList<>();
 
     /**
      * Constructs a {@code JsonAdaptedStudent} with the given student details.
      */
     @JsonCreator
     public JsonAdaptedStudent(@JsonProperty("name") String name,
-            @JsonProperty("subjects") List<String> subjects) {
+            @JsonProperty("subjects") List<String> subjects,
+            @JsonProperty("interactions") List<JsonAdaptedInteraction> interactions) {
         this.name = name;
         if (subjects != null) {
             this.subjects.addAll(subjects);
         }
+        if (interactions != null) {
+            this.interactions.addAll(interactions);
+        }
+    }
+
+    /**
+     * Constructs a student adapter without interactions for backward compatibility with existing callers.
+     */
+    public JsonAdaptedStudent(String name, List<String> subjects) {
+        this(name, subjects, null);
     }
 
     /**
@@ -39,6 +52,7 @@ class JsonAdaptedStudent {
     public JsonAdaptedStudent(Student source) {
         name = source.getName().fullName;
         source.getSubjects().forEach(subject -> subjects.add(subject.subjectName));
+        source.getInteractions().forEach(interaction -> interactions.add(new JsonAdaptedInteraction(interaction)));
     }
 
     /**
@@ -63,7 +77,12 @@ class JsonAdaptedStudent {
             modelSubjects.add(new Subject(subject));
         }
 
-        return new Student(modelName, modelSubjects);
+        final List<Interaction> modelInteractions = new ArrayList<>();
+        for (JsonAdaptedInteraction interaction : interactions) {
+            modelInteractions.add(interaction.toModelType());
+        }
+
+        return new Student(modelName, modelSubjects, modelInteractions);
     }
 
 }

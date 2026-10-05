@@ -3,6 +3,7 @@ package seedu.tutorlink.logic.parser;
 import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -24,6 +25,11 @@ public class ParserUtil {
     public static final String MESSAGE_INVALID_SUBJECT = "Subject '%1$s' is not valid. %2$s";
     public static final String MESSAGE_DUPLICATE_SUBJECT = "Subject '%1$s' is specified twice for the same student.";
     public static final String MESSAGE_INVALID_REVIEW_DATE = "Review date must be a valid date in yyyy-MM-dd format.";
+    public static final String MESSAGE_INVALID_INTERACTION_DATE =
+            "Interaction date must be a valid date in yyyy-MM-dd format.";
+    public static final String MESSAGE_INVALID_INTERACTION_TIME =
+            "Interaction time must be a valid time in HH:mm format.";
+    public static final String MESSAGE_INVALID_INTERACTION_NOTE = "Interaction note must not be blank.";
 
     /**
      * Parses {@code oneBasedIndex} into an {@code Index} and returns it. Leading and trailing whitespaces will be
@@ -105,5 +111,59 @@ public class ParserUtil {
         } catch (DateTimeParseException e) {
             throw new ParseException(MESSAGE_INVALID_REVIEW_DATE);
         }
+    }
+
+    /**
+     * Parses {@code interactionDate} into a {@code LocalDate} in yyyy-MM-dd format.
+     * Leading and trailing whitespaces will be trimmed.
+     *
+     * @throws ParseException if the interaction date is malformed or does not exist.
+     */
+    public static LocalDate parseInteractionDate(String interactionDate) throws ParseException {
+        requireNonNull(interactionDate);
+        String trimmedInteractionDate = interactionDate.trim();
+        if (!trimmedInteractionDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            throw new ParseException(MESSAGE_INVALID_INTERACTION_DATE);
+        }
+
+        try {
+            return LocalDate.parse(trimmedInteractionDate, DateTimeFormatter.ISO_LOCAL_DATE);
+        } catch (DateTimeParseException e) {
+            throw new ParseException(MESSAGE_INVALID_INTERACTION_DATE);
+        }
+    }
+
+    /**
+     * Parses {@code interactionTime} into a {@code LocalTime} in HH:mm format.
+     * Leading and trailing whitespaces will be trimmed.
+     *
+     * @throws ParseException if the interaction time is malformed or does not exist.
+     */
+    public static LocalTime parseInteractionTime(String interactionTime) throws ParseException {
+        requireNonNull(interactionTime);
+        String trimmedInteractionTime = interactionTime.trim();
+        if (!trimmedInteractionTime.matches("\\d{2}:\\d{2}")) {
+            throw new ParseException(MESSAGE_INVALID_INTERACTION_TIME);
+        }
+
+        try {
+            return LocalTime.parse(trimmedInteractionTime, DateTimeFormatter.ofPattern("HH:mm"));
+        } catch (DateTimeParseException e) {
+            throw new ParseException(MESSAGE_INVALID_INTERACTION_TIME);
+        }
+    }
+
+    /**
+     * Parses an interaction note, trimming leading and trailing whitespaces.
+     *
+     * @throws ParseException if the interaction note is blank.
+     */
+    public static String parseInteractionNote(String interactionNote) throws ParseException {
+        requireNonNull(interactionNote);
+        String trimmedInteractionNote = interactionNote.trim();
+        if (trimmedInteractionNote.isBlank()) {
+            throw new ParseException(MESSAGE_INVALID_INTERACTION_NOTE);
+        }
+        return trimmedInteractionNote;
     }
 }
