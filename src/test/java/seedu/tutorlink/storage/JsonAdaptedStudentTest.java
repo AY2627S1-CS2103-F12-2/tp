@@ -49,6 +49,21 @@ public class JsonAdaptedStudentTest {
     }
 
     @Test
+    public void toModelType_missingInteractions_returnsStudentWithoutInteractions() throws Exception {
+        JsonAdaptedStudent student = new JsonAdaptedStudent(VALID_NAME, VALID_SUBJECTS);
+        assertEquals(List.of(), student.toModelType().getInteractions());
+    }
+
+    @Test
+    public void toModelType_validInteractions_returnsStudentWithInteractions() throws Exception {
+        JsonAdaptedInteraction interaction = new JsonAdaptedInteraction(
+                "2026-10-01", "14:30", "Discussed revision plan");
+        JsonAdaptedStudent student = new JsonAdaptedStudent(VALID_NAME, VALID_SUBJECTS, List.of(interaction));
+
+        assertEquals(List.of(interaction.toModelType()), student.toModelType().getInteractions());
+    }
+
+    @Test
     public void toModelType_invalidSubject_throwsIllegalValueException() {
         List<String> invalidSubjects = new ArrayList<>(VALID_SUBJECTS);
         invalidSubjects.add(INVALID_SUBJECT);
