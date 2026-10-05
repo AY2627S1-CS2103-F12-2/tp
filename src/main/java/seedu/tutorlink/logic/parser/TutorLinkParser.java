@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import seedu.tutorlink.commons.core.LogsCenter;
 import seedu.tutorlink.logic.commands.AddCommand;
+import seedu.tutorlink.logic.commands.AddInteractionCommand;
 import seedu.tutorlink.logic.commands.ClearCommand;
 import seedu.tutorlink.logic.commands.Command;
 import seedu.tutorlink.logic.commands.DeleteCommand;
@@ -59,6 +60,7 @@ public class TutorLinkParser {
 
         return switch (commandWord) {
             case AddCommand.COMMAND_WORD -> new AddCommandParser().parse(arguments);
+            case AddInteractionCommand.COMMAND_WORD -> new AddInteractionCommandParser().parse(arguments);
             case ViewStudentCommand.COMMAND_WORD -> new ViewStudentCommandParser().parse(arguments);
             case EditCommand.COMMAND_WORD -> new EditCommandParser().parse(arguments);
             case DeleteCommand.COMMAND_WORD -> new DeleteCommandParser().parse(arguments);

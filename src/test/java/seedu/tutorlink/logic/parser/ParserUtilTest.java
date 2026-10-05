@@ -10,6 +10,7 @@ import static seedu.tutorlink.testutil.Assert.assertThrows;
 import static seedu.tutorlink.testutil.TypicalIndexes.INDEX_FIRST_STUDENT;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -138,6 +139,22 @@ public class ParserUtilTest {
         assertEquals(LocalDate.of(2026, 10, 8), ParserUtil.parseReviewDate("2026-10-08"));
         assertEquals(LocalDate.of(2024, 2, 29), ParserUtil.parseReviewDate(" 2024-02-29 "));
         assertEquals(LocalDate.of(2020, 1, 1), ParserUtil.parseReviewDate("2020-01-01"));
+    }
+
+    @Test
+    public void parseInteractionDate_validDate_returnsLocalDate() throws Exception {
+        assertEquals(LocalDate.of(2026, 10, 1), ParserUtil.parseInteractionDate(" 2026-10-01 "));
+    }
+
+    @Test
+    public void parseInteractionTime_validTime_returnsLocalTime() throws Exception {
+        assertEquals(LocalTime.of(14, 30), ParserUtil.parseInteractionTime(" 14:30 "));
+    }
+
+    @Test
+    public void parseInteractionNote_blankNote_throwsParseException() {
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE, () ->
+                ParserUtil.parseInteractionNote("  "));
     }
 
     @Test
