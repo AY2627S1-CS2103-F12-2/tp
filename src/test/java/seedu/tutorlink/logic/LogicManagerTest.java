@@ -24,6 +24,7 @@ import seedu.tutorlink.logic.commands.AddCommand;
 import seedu.tutorlink.logic.commands.AddInteractionCommand;
 import seedu.tutorlink.logic.commands.CommandResult;
 import seedu.tutorlink.logic.commands.ListCommand;
+import seedu.tutorlink.logic.commands.ListInteractionsCommand;
 import seedu.tutorlink.logic.commands.exceptions.CommandException;
 import seedu.tutorlink.logic.parser.exceptions.ParseException;
 import seedu.tutorlink.model.Model;
@@ -95,6 +96,21 @@ public class LogicManagerTest {
         ReadOnlyTutorLink readBack = new JsonTutorLinkStorage(temporaryFolder.resolve("tutorLink.json"))
                 .readTutorLink().orElseThrow();
         assertEquals(model.getTutorLink(), new TutorLink(readBack));
+    }
+
+    @Test
+    public void execute_listInteractions_returnsChronologicalHistory() throws Exception {
+        logic.execute(AddCommand.COMMAND_WORD + " n/Alex Tan");
+        logic.execute(AddInteractionCommand.COMMAND_WORD
+                + " n/Alex Tan d/2026-10-02 t/14:30 note/Practised fractions");
+        logic.execute(AddInteractionCommand.COMMAND_WORD
+                + " n/Alex Tan d/2026-10-01 note/Discussed revision plan");
+
+        CommandResult result = logic.execute(ListInteractionsCommand.COMMAND_WORD + " n/Alex Tan");
+
+        assertEquals(String.format(ListInteractionsCommand.MESSAGE_SUCCESS, "Alex Tan",
+                "2026-10-01 - Discussed revision plan\n2026-10-02 14:30 - Practised fractions"),
+                result.getFeedbackToUser());
     }
 
     @Test
