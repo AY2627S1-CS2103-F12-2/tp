@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.tutorlink.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.tutorlink.logic.Messages.MESSAGE_UNKNOWN_COMMAND;
+import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.tutorlink.testutil.Assert.assertThrows;
-import static seedu.tutorlink.testutil.TypicalIndexes.INDEX_FIRST_STUDENT;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -77,8 +77,8 @@ public class TutorLinkParserTest {
     @Test
     public void parseCommand_delete() throws Exception {
         DeleteCommand command = (DeleteCommand) parser.parseCommand(
-                DeleteCommand.COMMAND_WORD + " " + INDEX_FIRST_STUDENT.getOneBased());
-        assertEquals(new DeleteCommand(INDEX_FIRST_STUDENT), command);
+                DeleteCommand.COMMAND_WORD + " " + PREFIX_NAME + "Amy Bee");
+        assertEquals(new DeleteCommand(new Name("Amy Bee")), command);
     }
 
     @Test

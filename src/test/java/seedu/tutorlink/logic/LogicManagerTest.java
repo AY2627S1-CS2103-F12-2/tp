@@ -1,7 +1,7 @@
 package seedu.tutorlink.logic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static seedu.tutorlink.logic.Messages.MESSAGE_INVALID_STUDENT_DISPLAYED_INDEX;
+import static seedu.tutorlink.logic.Messages.MESSAGE_STUDENT_NOT_FOUND;
 import static seedu.tutorlink.logic.Messages.MESSAGE_UNKNOWN_COMMAND;
 import static seedu.tutorlink.logic.commands.CommandTestUtil.NAME_DESC_AMY;
 import static seedu.tutorlink.logic.commands.CommandTestUtil.SUBJECT_DESC_MATH;
@@ -67,8 +67,8 @@ public class LogicManagerTest {
 
     @Test
     public void execute_commandExecutionError_throwsCommandException() {
-        String deleteCommand = "delete 9";
-        assertCommandException(deleteCommand, MESSAGE_INVALID_STUDENT_DISPLAYED_INDEX);
+        String deleteCommand = "student delete n/John Tan";
+        assertCommandException(deleteCommand, String.format(MESSAGE_STUDENT_NOT_FOUND, "John Tan"));
     }
 
     @Test
