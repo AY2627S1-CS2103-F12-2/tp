@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox styleClass="panel" spacing="6" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
@@ -10,4 +11,8 @@
   </padding>
   <Label text="INTERACTIONS" styleClass="section-title" />
   <Label fx:id="placeholder" styleClass="placeholder-text" wrapText="true" />
+  <ScrollPane fx:id="entriesScrollPane" styleClass="entry-scroll" fitToWidth="true" hbarPolicy="NEVER"
+              VBox.vgrow="ALWAYS">
+    <VBox fx:id="entries" />
+  </ScrollPane>
 </VBox>
