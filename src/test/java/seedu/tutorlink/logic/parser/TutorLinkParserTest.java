@@ -24,6 +24,7 @@ import seedu.tutorlink.logic.commands.ExitCommand;
 import seedu.tutorlink.logic.commands.FindCommand;
 import seedu.tutorlink.logic.commands.HelpCommand;
 import seedu.tutorlink.logic.commands.ListCommand;
+import seedu.tutorlink.logic.commands.ListInteractionsCommand;
 import seedu.tutorlink.logic.commands.ViewStudentCommand;
 import seedu.tutorlink.logic.parser.exceptions.ParseException;
 import seedu.tutorlink.model.interaction.Interaction;
@@ -123,6 +124,12 @@ public class TutorLinkParserTest {
     public void parseCommand_list() throws Exception {
         assertTrue(parser.parseCommand(ListCommand.COMMAND_WORD) instanceof ListCommand);
         assertTrue(parser.parseCommand(ListCommand.COMMAND_WORD + " 3") instanceof ListCommand);
+    }
+
+    @Test
+    public void parseCommand_listInteractions() throws Exception {
+        assertEquals(new ListInteractionsCommand(new Name("Alex Tan")), parser.parseCommand(
+                "interaction list n/Alex Tan"));
     }
 
     @Test
