@@ -15,7 +15,6 @@ import seedu.tutorlink.model.Model;
 import seedu.tutorlink.model.TutorLink;
 import seedu.tutorlink.model.student.NameContainsKeywordsPredicate;
 import seedu.tutorlink.model.student.Student;
-import seedu.tutorlink.testutil.EditStudentDescriptorBuilder;
 
 /**
  * Contains helper methods for testing commands.
@@ -37,16 +36,6 @@ public class CommandTestUtil {
 
     public static final String PREAMBLE_WHITESPACE = "\t  \r  \n";
     public static final String PREAMBLE_NON_EMPTY = "NonEmptyPreamble";
-
-    public static final EditCommand.EditStudentDescriptor DESC_AMY;
-    public static final EditCommand.EditStudentDescriptor DESC_BOB;
-
-    static {
-        DESC_AMY = new EditStudentDescriptorBuilder().withName(VALID_NAME_AMY)
-                .withSubjects(VALID_SUBJECT_MATH).build();
-        DESC_BOB = new EditStudentDescriptorBuilder().withName(VALID_NAME_BOB)
-                .withSubjects(VALID_SUBJECT_PHYSICS, VALID_SUBJECT_MATH).build();
-    }
 
     /**
      * Executes the given {@code command}, confirms that <br>
