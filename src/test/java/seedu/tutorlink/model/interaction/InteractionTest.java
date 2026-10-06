@@ -5,7 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 
@@ -34,5 +36,15 @@ public class InteractionTest {
 
         assertEquals(first, second);
         assertEquals(first.hashCode(), second.hashCode());
+    }
+
+    @Test
+    public void chronologicalOrder_mixedDatesAndTimes_sortsOldestFirst() {
+        Interaction laterDay = new Interaction(LocalDate.of(2026, 10, 2), Optional.empty(), "Later day");
+        Interaction timed = new Interaction(LocalDate.of(2026, 10, 1), Optional.of(LocalTime.of(9, 0)), "Timed");
+        Interaction untimed = new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "Untimed");
+
+        assertEquals(List.of(untimed, timed, laterDay),
+                Stream.of(laterDay, timed, untimed).sorted(Interaction.CHRONOLOGICAL_ORDER).toList());
     }
 }
