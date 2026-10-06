@@ -387,7 +387,7 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 
 * 2b. The description is empty or the review date is invalid.
 
-    * 2b1. TutorLink shows an error message.TutorLink shows an error message.
+    * 2b1. TutorLink shows an error message.
 
       Use case ends without changing any stored data.
 
