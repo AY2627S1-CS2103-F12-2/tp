@@ -27,6 +27,7 @@ import seedu.tutorlink.model.Model;
 import seedu.tutorlink.model.ModelManager;
 import seedu.tutorlink.model.TutorLink;
 import seedu.tutorlink.model.UserPrefs;
+import seedu.tutorlink.model.followup.FollowUp;
 import seedu.tutorlink.model.interaction.Interaction;
 import seedu.tutorlink.model.student.Student;
 import seedu.tutorlink.testutil.EditStudentDescriptorBuilder;
@@ -76,11 +77,12 @@ public class EditCommandTest {
     }
 
     @Test
-    public void execute_studentWithInteractions_preservesInteractions() {
+    public void execute_studentWithInteractionsAndFollowUps_preservesRecords() {
         Interaction interaction = new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(),
                 "Discussed revision plan");
         Student interactionStudent = new StudentBuilder().withName("Interaction Student").build()
-                .withInteraction(interaction);
+                .withInteraction(interaction)
+                .withFollowUp(new FollowUp("Review algebra", LocalDate.of(2026, 10, 8)));
         model.addStudent(interactionStudent);
 
         Index index = Index.fromOneBased(model.getFilteredStudentList().size());
@@ -96,6 +98,8 @@ public class EditCommandTest {
         assertCommandSuccess(editCommand, model, expectedMessage, expectedModel);
         assertEquals(List.of(interaction), model.findStudentByName(interactionStudent.getName()).orElseThrow()
                 .getInteractions());
+        assertEquals(interactionStudent.getFollowUps(),
+                model.findStudentByName(interactionStudent.getName()).orElseThrow().getFollowUps());
     }
 
     @Test
