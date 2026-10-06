@@ -3,6 +3,7 @@ package seedu.tutorlink.testutil;
 import java.util.ArrayList;
 import java.util.List;
 
+import seedu.tutorlink.model.followup.FollowUp;
 import seedu.tutorlink.model.interaction.Interaction;
 import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.Student;
@@ -19,6 +20,7 @@ public class StudentBuilder {
     private Name name;
     private List<Subject> subjects;
     private List<Interaction> interactions;
+    private List<FollowUp> followUps;
 
     /**
      * Creates a {@code StudentBuilder} with the default details.
@@ -27,6 +29,7 @@ public class StudentBuilder {
         name = new Name(DEFAULT_NAME);
         subjects = new ArrayList<>();
         interactions = new ArrayList<>();
+        followUps = new ArrayList<>();
     }
 
     /**
@@ -36,6 +39,7 @@ public class StudentBuilder {
         name = studentToCopy.getName();
         subjects = new ArrayList<>(studentToCopy.getSubjects());
         interactions = new ArrayList<>(studentToCopy.getInteractions());
+        followUps = new ArrayList<>(studentToCopy.getFollowUps());
     }
 
     /**
@@ -55,7 +59,7 @@ public class StudentBuilder {
     }
 
     public Student build() {
-        return new Student(name, subjects, interactions);
+        return new Student(name, subjects, interactions, followUps);
     }
 
 }

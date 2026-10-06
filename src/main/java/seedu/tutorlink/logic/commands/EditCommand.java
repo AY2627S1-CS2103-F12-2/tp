@@ -86,7 +86,7 @@ public class EditCommand extends Command {
         Name updatedName = editStudentDescriptor.getName().orElse(studentToEdit.getName());
         List<Subject> updatedSubjects = editStudentDescriptor.getSubjects().orElse(studentToEdit.getSubjects());
 
-        return new Student(updatedName, updatedSubjects, studentToEdit.getInteractions());
+        return new Student(updatedName, updatedSubjects, studentToEdit.getInteractions(), studentToEdit.getFollowUps());
     }
 
     @Override
