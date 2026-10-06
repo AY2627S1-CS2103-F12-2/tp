@@ -2,9 +2,7 @@ package seedu.tutorlink.logic.commands;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
 import java.util.stream.Collectors;
 
 import seedu.tutorlink.commons.util.ToStringBuilder;
@@ -27,9 +25,6 @@ public class ListInteractionsCommand extends Command {
     public static final String MESSAGE_STUDENT_NOT_FOUND = "No student named '%1$s' found.";
 
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
-    private static final Comparator<Interaction> CHRONOLOGICAL_ORDER = Comparator
-            .comparing(Interaction::getDate)
-            .thenComparing(interaction -> interaction.getTime().orElse(LocalTime.MIN));
 
     private final Name name;
 
@@ -51,7 +46,7 @@ public class ListInteractionsCommand extends Command {
         }
 
         String formattedInteractions = student.getInteractions().stream()
-                .sorted(CHRONOLOGICAL_ORDER)
+                .sorted(Interaction.CHRONOLOGICAL_ORDER)
                 .map(ListInteractionsCommand::formatInteraction)
                 .collect(Collectors.joining("\n"));
         return new CommandResult(String.format(MESSAGE_SUCCESS, student.getName(), formattedInteractions));
