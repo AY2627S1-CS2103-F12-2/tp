@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -16,6 +17,11 @@ import seedu.tutorlink.commons.util.ToStringBuilder;
 public class Interaction {
 
     public static final String MESSAGE_NOTE_CONSTRAINTS = "Interaction notes should not be blank.";
+
+    /** Orders interactions oldest first; an interaction without a time comes before timed ones on the same date. */
+    public static final Comparator<Interaction> CHRONOLOGICAL_ORDER = Comparator
+            .comparing(Interaction::getDate)
+            .thenComparing(interaction -> interaction.getTime().orElse(LocalTime.MIN));
 
     private final LocalDate date;
     private final Optional<LocalTime> time;

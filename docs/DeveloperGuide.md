@@ -370,7 +370,7 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 
 **MSS**
 
-1.  Tutor enters `followup add n/NAME desc/TEXT review/DATE` with the student's name, a description, and a review date.
+1.  Tutor requests to add a follow-up for a student, providing a description and a review date.
 2.  TutorLink finds the student and validates the description and review date.
 3.  TutorLink adds the follow-up to the student's record.
 4.  TutorLink confirms that the follow-up was added.
@@ -385,9 +385,9 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 
       Use case ends without changing any stored data.
 
-* 2b. The command is incomplete, the description is empty, or the review date is invalid.
+* 2b. The description is empty or the review date is invalid.
 
-    * 2b1. TutorLink shows an error message and the correct command format.
+    * 2b1. TutorLink shows an error message.
 
       Use case ends without changing any stored data.
 
@@ -395,7 +395,7 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 
 **MSS**
 
-1.  Tutor enters `followup list n/NAME` with the student's name.
+1.  Tutor requests to view the outstanding follow-ups of a specific student.
 2.  TutorLink finds the student.
 3.  TutorLink retrieves the student's outstanding follow-ups.
 4.  TutorLink shows each follow-up's description and review date.
@@ -404,9 +404,9 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 
 **Extensions**
 
-* 1a. The command does not include a student name or has the wrong format.
+* 1a. The tutor does not identify a student.
 
-    * 1a1. TutorLink shows an error message and the correct command format.
+    * 1a1. TutorLink shows an error message.
 
       Use case ends.
 

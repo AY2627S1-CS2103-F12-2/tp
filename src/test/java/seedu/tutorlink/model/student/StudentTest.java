@@ -11,15 +11,91 @@ import static seedu.tutorlink.testutil.TypicalStudents.BOB;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
+import seedu.tutorlink.model.followup.FollowUp;
 import seedu.tutorlink.model.interaction.Interaction;
 import seedu.tutorlink.testutil.StudentBuilder;
 
 public class StudentTest {
+
+    private static final FollowUp FIRST_FOLLOW_UP =
+            new FollowUp("Review algebra", LocalDate.of(2026, 10, 8));
+    private static final FollowUp SECOND_FOLLOW_UP =
+            new FollowUp("Revisit fractions", LocalDate.of(2026, 10, 9));
+
+    @Test
+    public void constructor_withoutFollowUps_emptyList() {
+        Student student = new StudentBuilder().build();
+        assertEquals(List.of(), student.getFollowUps());
+        Student studentWithInteractions = new Student(student.getName(), student.getSubjects(), List.of());
+        assertEquals(List.of(), studentWithInteractions.getFollowUps());
+        Student studentWithoutInteractions = new Student(student.getName(), student.getSubjects());
+        assertEquals(List.of(), studentWithoutInteractions.getFollowUps());
+    }
+
+    @Test
+    public void constructor_followUps_defensiveCopy() {
+        Student original = new StudentBuilder().build();
+        List<FollowUp> followUps = new ArrayList<>(List.of(FIRST_FOLLOW_UP));
+        Student student = new Student(original.getName(), original.getSubjects(), List.of(), followUps);
+
+        followUps.clear();
+
+        assertEquals(List.of(FIRST_FOLLOW_UP), student.getFollowUps());
+        assertThrows(UnsupportedOperationException.class, () -> student.getFollowUps().add(SECOND_FOLLOW_UP));
+    }
+
+    @Test
+    public void constructor_nullFollowUps_throwsNullPointerException() {
+        Student student = new StudentBuilder().build();
+        assertThrows(NullPointerException.class, () ->
+                new Student(student.getName(), student.getSubjects(), List.of(), null));
+        List<FollowUp> followUps = new ArrayList<>();
+        followUps.add(null);
+        assertThrows(NullPointerException.class, () ->
+                new Student(student.getName(), student.getSubjects(), List.of(), followUps));
+    }
+
+    @Test
+    public void withFollowUp_appendsWithoutMutatingOriginalStudent() {
+        Interaction interaction = new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "Revision plan");
+        Student student = new StudentBuilder().build().withInteraction(interaction).withFollowUp(FIRST_FOLLOW_UP);
+
+        Student updatedStudent = student.withFollowUp(SECOND_FOLLOW_UP);
+
+        assertEquals(List.of(FIRST_FOLLOW_UP), student.getFollowUps());
+        assertEquals(List.of(FIRST_FOLLOW_UP, SECOND_FOLLOW_UP), updatedStudent.getFollowUps());
+        assertEquals(student.getName(), updatedStudent.getName());
+        assertEquals(student.getSubjects(), updatedStudent.getSubjects());
+        assertEquals(student.getInteractions(), updatedStudent.getInteractions());
+        assertThrows(NullPointerException.class, () -> student.withFollowUp(null));
+    }
+
+    @Test
+    public void withInteraction_preservesFollowUps() {
+        Student student = new StudentBuilder().build().withFollowUp(FIRST_FOLLOW_UP);
+        Interaction interaction = new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "Revision plan");
+
+        assertEquals(student.getFollowUps(), student.withInteraction(interaction).getFollowUps());
+    }
+
+    @Test
+    public void equalsAndHashCode_includeFollowUps() {
+        Student student = new StudentBuilder().build().withFollowUp(FIRST_FOLLOW_UP);
+        Student copy = new StudentBuilder(student).build();
+
+        assertEquals(student, copy);
+        assertEquals(student.hashCode(), copy.hashCode());
+        assertFalse(student.equals(new StudentBuilder().build()));
+        assertFalse(student.equals(new StudentBuilder().build().withFollowUp(SECOND_FOLLOW_UP)));
+        assertFalse(student.equals(student.withFollowUp(SECOND_FOLLOW_UP)));
+        assertTrue(student.isSameStudent(student.withFollowUp(SECOND_FOLLOW_UP)));
+    }
 
     @Test
     public void asObservableList_modifyList_throwsUnsupportedOperationException() {

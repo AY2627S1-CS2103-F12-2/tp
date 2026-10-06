@@ -225,6 +225,28 @@
     -fx-text-fill: #8f2f22;
 }
 
+.entry-scroll,
+.entry-scroll > .viewport {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.entry {
+    -fx-border-color: transparent transparent #e3e8ee transparent;
+    -fx-padding: 6 0 6 0;
+}
+
+.entry-when {
+    -fx-font-family: "Monospaced";
+    -fx-font-size: 10px;
+    -fx-text-fill: #7a8595;
+}
+
+.entry-text {
+    -fx-font-size: 12px;
+}
+
 /* ---------- Command bar ---------- */
 
 .command-bar {
