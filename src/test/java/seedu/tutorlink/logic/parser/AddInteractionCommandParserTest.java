@@ -63,4 +63,18 @@ public class AddInteractionCommandParserTest {
         assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE, () ->
                 parser.parse(" n/Alex Tan d/2026-10-01 note/   "));
     }
+
+    @Test
+    public void parse_tooLongNote_throwsParseException() {
+        String tooLongNote = "a".repeat(ParserUtil.MAX_INTERACTION_NOTE_LENGTH + 1);
+
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE_LENGTH, () ->
+                parser.parse(" n/Alex Tan d/2026-10-01 note/" + tooLongNote));
+    }
+
+    @Test
+    public void parse_multilineNote_throwsParseException() {
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE_LENGTH, () ->
+                parser.parse(" n/Alex Tan d/2026-10-01 note/First line\nSecond line"));
+    }
 }
