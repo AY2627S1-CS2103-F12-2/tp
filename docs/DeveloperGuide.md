@@ -115,24 +115,20 @@ How the parsing works:
 * All `XYZCommandParser` classes, such as `AddCommandParser` and `DeleteCommandParser`, implement the `Parser` interface so they can be treated similarly where appropriate, for example during testing.
 
 ### Model component
-**API** : [`Model.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/model/Model.java)
+**API** : [`Model.java`](https://github.com/AY2627S1-CS2103-F12-2/tp/tree/master/src/main/java/seedu/tutorlink/model/Model.java)
 
 <img src="images/ModelClassDiagram.png" width="450" />
 
-
 The `Model` component,
 
-* stores the address book data i.e., all `Person` objects (which are contained in a `UniquePersonList` object).
-* stores the `Person` objects selected by the current filter, such as search results, in a separate _filtered_ list. It exposes this list as an unmodifiable `ObservableList<Person>` that the UI can observe and bind to, so the UI updates when the list changes.
-* stores a `UserPrefs` object that represents the user’s preferences (currently, just the GUI settings). This is exposed to the outside as a `ReadOnlyUserPrefs` object.
+* stores TutorLink's data, i.e. all `Student` objects, which are kept in a `UniqueStudentList`.
+* stores each student's records inside the `Student` itself. A `Student` has a `Name`, any number of `Subject`s, and lists of `Interaction`s and `FollowUp`s, which keep the order they were added in.
+* keeps every `Student` immutable. Recording an interaction or follow-up creates an updated copy (e.g. `Student#withInteraction`), and the command swaps it in with `Model#setStudent`.
+* stores the `Student` objects matched by the current filter (e.g. the result of `find`) in a separate _filtered_ list. It exposes this as an unmodifiable `ObservableList<Student>` that the UI observes, so the student list updates when the filter changes.
+* stores the _selected_ student, i.e. the one whose details, interactions and follow-ups are shown, as a `ReadOnlyObjectProperty<Student>` that the UI panels observe. The selection follows the student when they are updated, and is cleared when they are deleted or hidden by a filter.
+* finds students by name with `Model#findStudentByName`, which matches names ignoring case and extra spaces (see [Finding a student by name](#finding-a-student-by-name)).
+* stores a `UserPrefs` object that represents the user's preferences (currently, just the GUI settings). This is exposed to the outside as a `ReadOnlyUserPrefs` object.
 * does not depend on any of the other three components (as the `Model` represents data entities of the domain, they should make sense on their own without depending on other components)
-
-<div markdown="span" class="alert alert-info">:information_source: **Note:** The alternative, arguably more object-oriented, design below keeps a unique list of tags in `AddressBook`, and each `Person` references tags from that list. This lets `AddressBook` maintain one `Tag` object per unique tag instead of each `Person` holding its own `Tag` objects.<br>
-
-<img src="images/BetterModelClassDiagram.png" width="450" />
-
-</div>
-
 
 ### Storage component
 
@@ -154,6 +150,65 @@ Classes used by multiple components are in the `seedu.address.commons` package.
 ## **Implementation**
 
 This section describes some noteworthy details on how certain features are implemented.
+
+### Finding a student by name
+
+Every command that works on one student (`student view`, `student delete`, `interaction add`, `followup add` and so on) identifies the student by name with `n/NAME`, not by a list index. They all use the same lookup, `Model#findStudentByName(Name)`, and show the same error when no student matches.
+
+The sequence diagram below shows how `student view n/john tan` finds and selects the student `John Tan`.
+
+<img src="images/ViewStudentSequenceDiagram.png" width="750" />
+
+<div markdown="span" class="alert alert-info">:information_source: **Note:** The lifeline for `ViewStudentCommandParser` should end at the destroy marker (X), but due to a limitation of PlantUML, it continues to the end of the diagram.
+</div>
+
+1. `TutorLinkParser` reads the command word `student view` and passes the rest of the input to a new `ViewStudentCommandParser`.
+1. `ViewStudentCommandParser` checks that exactly one `n/` prefix is present and turns its value into a `Name`, which rejects names that break the naming rules. It returns a `ViewStudentCommand` holding that `Name`.
+1. When executed, `ViewStudentCommand` calls `Model#findStudentByName`. This compares names with `Name#isSameName`, which ignores case and treats runs of spaces as one space, so `john   TAN` finds `John Tan`.
+1. If a student is found, the command calls `Model#setSelectedStudent`. The UI panels observe the selected student, so they show John Tan's details, interactions and follow-ups. If no student is found, the command throws a `CommandException` with `No student named 'john tan' found.` and nothing changes.
+
+Names are unique in the same way. `UniqueStudentList` treats two students as duplicates when `Student#isSameStudent` is true, which also uses `Name#isSameName`. So `student add n/john tan` is rejected when `John Tan` exists, and a name lookup can never match two students.
+
+`Name#equals` still compares names exactly, because it decides whether two `Student` records hold identical data (e.g. in tests), not whether they are the same person. The stored name keeps the casing the tutor first typed.
+
+#### Design considerations
+
+**Aspect: How a command identifies a student**
+
+* **Alternative 1 (current choice):** By name, e.g. `student view n/John Tan`.
+  * Pros: The tutor already knows each student's name, so no list lookup is needed first. A command means the same thing whatever the list shows, so a filter cannot make it act on the wrong student.
+  * Cons: Names must be unique, so two students with the same name need distinguishing names (e.g. `John Tan Jr.`). Long names take longer to type.
+* **Alternative 2:** By list index, as in AB3's `delete 1`.
+  * Pros: Short to type.
+  * Cons: The same index refers to different students after `find`, so a tutor can easily act on the wrong student. The tutor must look at the list before every command.
+
+**Aspect: How names are compared**
+
+* **Alternative 1 (current choice):** Ignoring case and extra spaces.
+  * Pros: Real names are not case-sensitive, so `john tan` and `John Tan` should be the same student. It also prevents accidental near-duplicates.
+  * Cons: Two genuinely different students whose names differ only in case cannot both be stored. This is very unlikely for one tutor.
+* **Alternative 2:** Exactly as typed.
+  * Pros: Simplest to implement.
+  * Cons: The tutor must remember the exact casing, and `john tan` could be added as a second record of the same student.
+
+### Two-word command words
+
+TutorLink's command words name a domain and then an action, e.g. `student add`, `interaction list` and `followup add`. A few app-level commands (`help`, `list`, `find`, `exit`) are one word.
+
+`TutorLinkParser` splits the input into a command word and arguments with one regular expression. The command word is an optional domain (`student`, `interaction` or `followup`) followed by one more word. Matching is case-insensitive, and the command word is normalised to lower case with single spaces before it is compared with each command's `COMMAND_WORD`. So `Student   ADD n/John Tan` is read as `student add` with the arguments ` n/John Tan`.
+
+A domain followed by an unknown action, such as `student fly`, gives `Unknown command.`, the same as any other unknown command.
+
+#### Design considerations
+
+**Aspect: Command word format**
+
+* **Alternative 1 (current choice):** `<domain> <action>`, e.g. `student add`.
+  * Pros: Commands are predictable. Knowing `student add` and `interaction list` suggests `interaction add`. The same action word can be reused for each kind of record without clashing.
+  * Cons: One more word to type than a single-word command.
+* **Alternative 2:** One word per command, e.g. `addstudent` or `addinteraction`.
+  * Pros: Shorter to type.
+  * Cons: Harder to remember and to guess, and the names get long as the number of record types grows.
 
 ### \[Proposed\] Undo/redo feature
 
@@ -521,7 +576,7 @@ testers are expected to do more *exploratory* testing.
    1. Download the JAR file and copy it into an empty folder.
 
    1. Double-click the JAR file.<br>
-      Expected: The GUI opens with a set of sample contacts. The window size may not be optimal.
+      Expected: The GUI opens with a set of sample students. The window size may not be optimal.
 
 1. Saving window preferences
 
@@ -532,27 +587,74 @@ testers are expected to do more *exploratory* testing.
 
 1. _{ more test cases …​ }_
 
-### Deleting a person
+### Adding a student
 
-1. Deleting a person while all persons are being shown
+1. Adding a new student
 
-   1. Prerequisites: List all persons using the `list` command, with multiple persons in the list.
+   1. Test case: `student add n/John Tan s/Math s/Physics`<br>
+      Expected: John Tan appears at the bottom of the student list with subjects Math and Physics, and is shown in the detail panel. The result shows `✔ Student added: John Tan (subjects: Math, Physics)` and the new total.
 
-   1. Test case: `delete 1`<br>
-      Expected: The first contact is deleted from the list. The status message shows the deleted contact's details.
+   1. Test case: `student add n/Aliyah Lim`<br>
+      Expected: Aliyah Lim is added with no subjects.
 
-   1. Test case: `delete 0`<br>
-      Expected: No person is deleted. The status message shows error details.
+1. Adding a duplicate or invalid student
 
-   1. Other incorrect delete commands to try: `delete`, `delete x`, `...` (where x is larger than the list size)<br>
-      Expected: Similar to previous.
+   1. Prerequisites: John Tan exists.
 
-1. _{ more test cases …​ }_
+   1. Test case: `student add n/john tan`<br>
+      Expected: No student is added. The error says a student named `John Tan` already exists.
+
+   1. Test case: `student add n/John Tan s/Math s/math`<br>
+      Expected: No student is added. The error says the subject is specified twice.
+
+   1. Other incorrect commands to try: `student add`, `student add n/`, `student add n/12345`, `student add n/Ann s/Math/Physics`<br>
+      Expected: No student is added. The error explains which value is wrong, or shows the correct command format.
+
+### Viewing a student
+
+1. Prerequisites: John Tan exists.
+
+1. Test case: `student view n/JOHN   tan`<br>
+   Expected: John Tan's name and subjects are shown in the result and the detail panel. His interactions and follow-ups are shown in the panels below.
+
+1. Test case: `student view n/Nobody Here`<br>
+   Expected: The error says no student named `Nobody Here` is found. The panels do not change.
+
+1. Test case: `student view John Tan`<br>
+   Expected: The error shows the correct command format.
+
+### Deleting a student
+
+1. Prerequisites: John Tan exists, has at least one interaction, and is shown in the detail panel (`student view n/John Tan`).
+
+1. Test case: `student delete n/john tan`<br>
+   Expected: John Tan disappears from the student list, and the detail, interaction and follow-up panels go back to their placeholders. The result shows `✔ Student deleted: John Tan` and the new total.
+
+1. Test case: `interaction list n/John Tan`<br>
+   Expected: The error says no student named `John Tan` is found, because his interactions were deleted with him.
+
+1. Other incorrect commands to try: `student delete`, `student delete 1`, `student delete n/Nobody Here`<br>
+   Expected: No student is deleted. The error shows the correct command format, or says no such student is found.
 
 ### Saving data
 
-1. Dealing with missing/corrupted data files
+1. Data is kept after a restart
 
-   1. _{Explain how to simulate missing or corrupted data files and state the expected behavior.}_
+   1. Add a student and an interaction, then close TutorLink with `exit`.
 
-1. _{ more test cases …​ }_
+   1. Relaunch TutorLink.<br>
+      Expected: The student and the interaction are still there.
+
+1. Dealing with a missing data file
+
+   1. Close TutorLink and delete `data/tutorlink.json` in the folder containing the JAR file.
+
+   1. Relaunch TutorLink.<br>
+      Expected: TutorLink starts with the sample students.
+
+1. Dealing with a corrupted data file
+
+   1. Close TutorLink. Open `data/tutorlink.json` in a text editor and break it, e.g. delete the closing `}` or change a student's `"name"` to `"12345"`.
+
+   1. Relaunch TutorLink.<br>
+      Expected: TutorLink starts with no students, and the corrupted file is left on disk until the next command that changes data overwrites it.

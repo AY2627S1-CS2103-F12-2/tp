@@ -1,0 +1,76 @@
+@startuml
+!include style.puml
+skinparam ArrowFontStyle plain
+
+box Logic LOGIC_COLOR_T1
+participant ":LogicManager" as LogicManager LOGIC_COLOR
+participant ":TutorLinkParser" as TutorLinkParser LOGIC_COLOR
+participant ":ViewStudentCommandParser" as ViewStudentCommandParser LOGIC_COLOR
+participant "v:ViewStudentCommand" as ViewStudentCommand LOGIC_COLOR
+participant "r:CommandResult" as CommandResult LOGIC_COLOR
+end box
+
+box Model MODEL_COLOR_T1
+participant "m:Model" as Model MODEL_COLOR
+end box
+
+[-> LogicManager : execute("student view n/john tan")
+activate LogicManager
+
+LogicManager -> TutorLinkParser : parseCommand("student view n/john tan")
+activate TutorLinkParser
+
+create ViewStudentCommandParser
+TutorLinkParser -> ViewStudentCommandParser
+activate ViewStudentCommandParser
+
+ViewStudentCommandParser --> TutorLinkParser
+deactivate ViewStudentCommandParser
+
+TutorLinkParser -> ViewStudentCommandParser : parse(" n/john tan")
+activate ViewStudentCommandParser
+
+create ViewStudentCommand
+ViewStudentCommandParser -> ViewStudentCommand
+activate ViewStudentCommand
+
+ViewStudentCommand --> ViewStudentCommandParser
+deactivate ViewStudentCommand
+
+ViewStudentCommandParser --> TutorLinkParser : v
+deactivate ViewStudentCommandParser
+'Hidden arrow to position the destroy marker below the end of the activation bar.
+ViewStudentCommandParser -[hidden]-> TutorLinkParser
+destroy ViewStudentCommandParser
+
+TutorLinkParser --> LogicManager : v
+deactivate TutorLinkParser
+
+LogicManager -> ViewStudentCommand : execute(m)
+activate ViewStudentCommand
+
+ViewStudentCommand -> Model : findStudentByName(john tan)
+activate Model
+
+Model --> ViewStudentCommand : Optional[John Tan]
+deactivate Model
+
+ViewStudentCommand -> Model : setSelectedStudent(John Tan)
+activate Model
+
+Model --> ViewStudentCommand
+deactivate Model
+
+create CommandResult
+ViewStudentCommand -> CommandResult
+activate CommandResult
+
+CommandResult --> ViewStudentCommand
+deactivate CommandResult
+
+ViewStudentCommand --> LogicManager : r
+deactivate ViewStudentCommand
+
+[<--LogicManager
+deactivate LogicManager
+@enduml
