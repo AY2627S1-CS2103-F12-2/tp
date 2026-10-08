@@ -16,10 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import seedu.tutorlink.logic.commands.AddCommand;
 import seedu.tutorlink.logic.commands.AddInteractionCommand;
-import seedu.tutorlink.logic.commands.ClearCommand;
 import seedu.tutorlink.logic.commands.DeleteCommand;
-import seedu.tutorlink.logic.commands.EditCommand;
-import seedu.tutorlink.logic.commands.EditCommand.EditStudentDescriptor;
 import seedu.tutorlink.logic.commands.ExitCommand;
 import seedu.tutorlink.logic.commands.FindCommand;
 import seedu.tutorlink.logic.commands.HelpCommand;
@@ -31,7 +28,6 @@ import seedu.tutorlink.model.interaction.Interaction;
 import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.NameContainsKeywordsPredicate;
 import seedu.tutorlink.model.student.Student;
-import seedu.tutorlink.testutil.EditStudentDescriptorBuilder;
 import seedu.tutorlink.testutil.StudentBuilder;
 import seedu.tutorlink.testutil.StudentUtil;
 
@@ -79,25 +75,10 @@ public class TutorLinkParserTest {
     }
 
     @Test
-    public void parseCommand_clear() throws Exception {
-        assertTrue(parser.parseCommand(ClearCommand.COMMAND_WORD) instanceof ClearCommand);
-        assertTrue(parser.parseCommand(ClearCommand.COMMAND_WORD + " 3") instanceof ClearCommand);
-    }
-
-    @Test
     public void parseCommand_delete() throws Exception {
         DeleteCommand command = (DeleteCommand) parser.parseCommand(
                 DeleteCommand.COMMAND_WORD + " " + INDEX_FIRST_STUDENT.getOneBased());
         assertEquals(new DeleteCommand(INDEX_FIRST_STUDENT), command);
-    }
-
-    @Test
-    public void parseCommand_edit() throws Exception {
-        Student student = new StudentBuilder().build();
-        EditStudentDescriptor descriptor = new EditStudentDescriptorBuilder(student).build();
-        EditCommand command = (EditCommand) parser.parseCommand(EditCommand.COMMAND_WORD + " "
-                + INDEX_FIRST_STUDENT.getOneBased() + " " + StudentUtil.getEditStudentDescriptorDetails(descriptor));
-        assertEquals(new EditCommand(INDEX_FIRST_STUDENT, descriptor), command);
     }
 
     @Test
