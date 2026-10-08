@@ -128,7 +128,9 @@ public class LogicManagerTest {
         CommandResult result = logic.execute(ListInteractionsCommand.COMMAND_WORD + " n/Alex Tan");
 
         assertEquals(String.format(ListInteractionsCommand.MESSAGE_SUCCESS, "Alex Tan",
-                "2026-10-01 - Discussed revision plan\n2026-10-02 14:30 - Practised fractions"),
+                2,
+                "1. 2026-10-01 \u2014 Discussed revision plan\n"
+                        + "2. 2026-10-02 14:30 \u2014 Practised fractions"),
                 result.getFeedbackToUser());
     }
 

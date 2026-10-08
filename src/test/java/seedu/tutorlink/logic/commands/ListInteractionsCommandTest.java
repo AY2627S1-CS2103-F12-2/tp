@@ -41,9 +41,10 @@ public class ListInteractionsCommandTest {
         tutorLink.addStudent(student);
         Model model = new ModelManager(tutorLink, new UserPrefs());
         String expectedMessage = String.format(ListInteractionsCommand.MESSAGE_SUCCESS, STUDENT_NAME,
-                "2026-10-01 - Discussed revision plan\n"
-                        + "2026-10-01 09:15 - Reviewed algebra\n"
-                        + "2026-10-02 14:30 - Practised fractions");
+                3,
+                "1. 2026-10-01 \u2014 Discussed revision plan\n"
+                        + "2. 2026-10-01 09:15 \u2014 Reviewed algebra\n"
+                        + "3. 2026-10-02 14:30 \u2014 Practised fractions");
 
         assertCommandSuccess(new ListInteractionsCommand(STUDENT_NAME), model, expectedMessage,
                 new ModelManager(model.getTutorLink(), new UserPrefs()));
