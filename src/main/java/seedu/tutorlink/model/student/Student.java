@@ -154,6 +154,8 @@ public class Student {
         return new ToStringBuilder(this)
                 .add("name", name)
                 .add("subjects", subjects)
+                .add("interactions", interactions)
+                .add("followUps", followUps)
                 .toString();
     }
 
