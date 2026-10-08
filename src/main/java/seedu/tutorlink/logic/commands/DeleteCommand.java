@@ -1,48 +1,48 @@
 package seedu.tutorlink.logic.commands;
 
 import static java.util.Objects.requireNonNull;
+import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_NAME;
 
-import java.util.List;
-
-import seedu.tutorlink.commons.core.index.Index;
 import seedu.tutorlink.commons.util.ToStringBuilder;
 import seedu.tutorlink.logic.Messages;
 import seedu.tutorlink.logic.commands.exceptions.CommandException;
 import seedu.tutorlink.model.Model;
+import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.Student;
 
 /**
- * Deletes a student identified using its displayed index from TutorLink.
+ * Deletes the student whose name matches the given name, ignoring case, together with their records.
  */
 public class DeleteCommand extends Command {
 
-    public static final String COMMAND_WORD = "delete";
+    public static final String COMMAND_WORD = "student delete";
 
-    public static final String MESSAGE_USAGE = COMMAND_WORD
-            + ": Deletes the student identified by the index number used in the displayed student list.\n"
-            + "Parameters: INDEX (must be a positive integer)\n"
-            + "Example: " + COMMAND_WORD + " 1";
+    public static final String MESSAGE_USAGE = "Command format: " + COMMAND_WORD + " "
+            + PREFIX_NAME + "NAME\n"
+            + "Example: " + COMMAND_WORD + " " + PREFIX_NAME + "John Tan";
 
-    public static final String MESSAGE_DELETE_STUDENT_SUCCESS = "Deleted student: %1$s";
+    public static final String MESSAGE_SUCCESS = "✔ Student deleted: %1$s\nTotal students: %2$d";
 
-    private final Index targetIndex;
+    private final Name name;
 
-    public DeleteCommand(Index targetIndex) {
-        this.targetIndex = targetIndex;
+    /**
+     * Creates a DeleteCommand to delete the student with the given {@code name}.
+     */
+    public DeleteCommand(Name name) {
+        requireNonNull(name);
+        this.name = name;
     }
 
     @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
-        List<Student> lastShownList = model.getFilteredStudentList();
 
-        if (targetIndex.getZeroBased() >= lastShownList.size()) {
-            throw new CommandException(Messages.MESSAGE_INVALID_STUDENT_DISPLAYED_INDEX);
-        }
+        Student student = model.findStudentByName(name)
+                .orElseThrow(() -> new CommandException(String.format(Messages.MESSAGE_STUDENT_NOT_FOUND, name)));
+        model.deleteStudent(student);
 
-        Student studentToDelete = lastShownList.get(targetIndex.getZeroBased());
-        model.deleteStudent(studentToDelete);
-        return new CommandResult(String.format(MESSAGE_DELETE_STUDENT_SUCCESS, Messages.format(studentToDelete)));
+        int totalStudents = model.getTutorLink().getStudentList().size();
+        return new CommandResult(String.format(MESSAGE_SUCCESS, student.getName(), totalStudents));
     }
 
     @Override
@@ -56,13 +56,13 @@ public class DeleteCommand extends Command {
             return false;
         }
 
-        return targetIndex.equals(otherDeleteCommand.targetIndex);
+        return name.equals(otherDeleteCommand.name);
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .add("targetIndex", targetIndex)
+                .add("name", name)
                 .toString();
     }
 }
