@@ -174,6 +174,29 @@ public class ParserUtilTest {
     }
 
     @Test
+    public void parseInteractionNote_validBoundaryLengths_returnsTrimmedNote() throws Exception {
+        String oneCharacterNote = "a";
+        String maximumLengthNote = "a".repeat(ParserUtil.MAX_INTERACTION_NOTE_LENGTH);
+
+        assertEquals(oneCharacterNote, ParserUtil.parseInteractionNote(oneCharacterNote));
+        assertEquals(maximumLengthNote, ParserUtil.parseInteractionNote(maximumLengthNote));
+    }
+
+    @Test
+    public void parseInteractionNote_tooLongNote_throwsParseException() {
+        String tooLongNote = "a".repeat(ParserUtil.MAX_INTERACTION_NOTE_LENGTH + 1);
+
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE_LENGTH, () ->
+                ParserUtil.parseInteractionNote(tooLongNote));
+    }
+
+    @Test
+    public void parseInteractionNote_multilineNote_throwsParseException() {
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE_LENGTH, () ->
+                ParserUtil.parseInteractionNote("First line\nSecond line"));
+    }
+
+    @Test
     public void parseName_repeatedSpacesBetweenWords_returnsNameWithSingleSpaces() throws Exception {
         assertEquals(new Name("John Tan"), ParserUtil.parseName("  John   Tan "));
     }
