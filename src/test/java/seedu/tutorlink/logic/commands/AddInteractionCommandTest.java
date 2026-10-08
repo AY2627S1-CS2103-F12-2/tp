@@ -13,6 +13,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
+import seedu.tutorlink.logic.Messages;
 import seedu.tutorlink.model.Model;
 import seedu.tutorlink.model.ModelManager;
 import seedu.tutorlink.model.TutorLink;
@@ -83,7 +84,7 @@ public class AddInteractionCommandTest {
         AddInteractionCommand command = new AddInteractionCommand(new Name("John Tan"), INTERACTION);
 
         assertCommandFailure(command, model,
-                String.format(AddInteractionCommand.MESSAGE_STUDENT_NOT_FOUND, "John Tan"));
+                String.format(Messages.MESSAGE_STUDENT_NOT_FOUND, "John Tan"));
     }
 
     @Test

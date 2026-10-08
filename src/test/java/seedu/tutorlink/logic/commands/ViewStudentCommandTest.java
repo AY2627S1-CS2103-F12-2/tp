@@ -11,6 +11,7 @@ import static seedu.tutorlink.testutil.TypicalStudents.getTypicalTutorLink;
 
 import org.junit.jupiter.api.Test;
 
+import seedu.tutorlink.logic.Messages;
 import seedu.tutorlink.model.Model;
 import seedu.tutorlink.model.ModelManager;
 import seedu.tutorlink.model.UserPrefs;
@@ -49,7 +50,7 @@ public class ViewStudentCommandTest {
     @Test
     public void execute_unknownStudent_throwsCommandException() {
         assertCommandFailure(new ViewStudentCommand(new Name("John Tan")), model,
-                String.format(ViewStudentCommand.MESSAGE_STUDENT_NOT_FOUND, "John Tan"));
+                String.format(Messages.MESSAGE_STUDENT_NOT_FOUND, "John Tan"));
     }
 
     @Test

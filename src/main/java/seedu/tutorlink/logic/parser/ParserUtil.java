@@ -13,6 +13,7 @@ import java.util.List;
 import seedu.tutorlink.commons.core.index.Index;
 import seedu.tutorlink.commons.util.StringUtil;
 import seedu.tutorlink.logic.parser.exceptions.ParseException;
+import seedu.tutorlink.model.interaction.Interaction;
 import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.Subject;
 
@@ -144,7 +145,7 @@ public class ParserUtil {
         }
 
         try {
-            return LocalTime.parse(trimmedInteractionTime, DateTimeFormatter.ofPattern("HH:mm"));
+            return LocalTime.parse(trimmedInteractionTime, Interaction.TIME_FORMATTER);
         } catch (DateTimeParseException e) {
             throw new ParseException(MESSAGE_INVALID_INTERACTION_TIME);
         }

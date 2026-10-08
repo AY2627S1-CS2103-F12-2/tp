@@ -3,9 +3,9 @@ package seedu.tutorlink.logic.commands;
 import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 import seedu.tutorlink.commons.util.ToStringBuilder;
+import seedu.tutorlink.logic.Messages;
 import seedu.tutorlink.logic.commands.exceptions.CommandException;
 import seedu.tutorlink.model.Model;
 import seedu.tutorlink.model.interaction.Interaction;
@@ -27,10 +27,6 @@ public class AddInteractionCommand extends Command {
             + "Total interactions for %1$s: %4$d";
     public static final String MESSAGE_FUTURE_DATE_WARNING =
             "\u26A0 Interaction date %1$s is in the future (today is %2$s); recording it anyway.\n";
-    public static final String MESSAGE_STUDENT_NOT_FOUND = "No student named '%1$s' found.";
-
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
-
     private final Name name;
     private final Interaction interaction;
 
@@ -47,7 +43,7 @@ public class AddInteractionCommand extends Command {
         requireNonNull(model);
 
         Student student = model.findStudentByName(name)
-                .orElseThrow(() -> new CommandException(String.format(MESSAGE_STUDENT_NOT_FOUND, name)));
+                .orElseThrow(() -> new CommandException(String.format(Messages.MESSAGE_STUDENT_NOT_FOUND, name)));
         Student updatedStudent = student.withInteraction(interaction);
         model.setStudent(student, updatedStudent);
 
@@ -56,7 +52,7 @@ public class AddInteractionCommand extends Command {
                 ? String.format(MESSAGE_FUTURE_DATE_WARNING, interaction.getDate(), today)
                 : "";
         String formattedTime = interaction.getTime()
-                .map(time -> " (" + time.format(TIME_FORMATTER) + ")")
+                .map(time -> " (" + time.format(Interaction.TIME_FORMATTER) + ")")
                 .orElse("");
         return new CommandResult(warning + String.format(MESSAGE_SUCCESS, student.getName(),
                 interaction.getDate(), formattedTime, updatedStudent.getInteractions().size()));
