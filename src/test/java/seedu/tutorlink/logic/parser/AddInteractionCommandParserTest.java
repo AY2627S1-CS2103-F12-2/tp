@@ -48,8 +48,14 @@ public class AddInteractionCommandParserTest {
 
     @Test
     public void parse_invalidDate_throwsParseException() {
-        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_DATE, () ->
+        assertThrows(ParseException.class, String.format(ParserUtil.MESSAGE_INVALID_CALENDAR_DATE, "2026-02-30"), () ->
                 parser.parse(" n/Alex Tan d/2026-02-30 note/Discussed revision plan"));
+    }
+
+    @Test
+    public void parse_malformedDate_throwsParseException() {
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_DATE_FORMAT, () ->
+                parser.parse(" n/Alex Tan d/2026/10/01 note/Discussed revision plan"));
     }
 
     @Test
