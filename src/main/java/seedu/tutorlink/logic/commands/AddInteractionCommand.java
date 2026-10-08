@@ -2,6 +2,8 @@ package seedu.tutorlink.logic.commands;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.LocalDate;
+
 import seedu.tutorlink.commons.util.ToStringBuilder;
 import seedu.tutorlink.logic.commands.exceptions.CommandException;
 import seedu.tutorlink.model.Model;
@@ -21,6 +23,8 @@ public class AddInteractionCommand extends Command {
             + "Example: " + COMMAND_WORD + " "
             + "n/Alex Tan d/2026-10-01 t/14:30 note/Practised algebraic fractions";
     public static final String MESSAGE_SUCCESS = "\u2714 Interaction recorded for %1$s.";
+    public static final String MESSAGE_FUTURE_DATE_WARNING =
+            "\u26A0 Interaction date %1$s is in the future (today is %2$s); recording it anyway.\n";
     public static final String MESSAGE_STUDENT_NOT_FOUND = "No student named '%1$s' found.";
 
     private final Name name;
@@ -43,7 +47,11 @@ public class AddInteractionCommand extends Command {
         Student updatedStudent = student.withInteraction(interaction);
         model.setStudent(student, updatedStudent);
 
-        return new CommandResult(String.format(MESSAGE_SUCCESS, student.getName()));
+        LocalDate today = LocalDate.now();
+        String warning = interaction.getDate().isAfter(today)
+                ? String.format(MESSAGE_FUTURE_DATE_WARNING, interaction.getDate(), today)
+                : "";
+        return new CommandResult(warning + String.format(MESSAGE_SUCCESS, student.getName()));
     }
 
     @Override
