@@ -446,6 +446,10 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 
       Use case ends without changing any stored data.
 
+* 1c. The interaction date is later than today.
+
+    * 1c1. TutorLink warns the tutor that the date is in the future and records the interaction.
+
 **Use case: View a student's interaction history**
 
 **MSS**
@@ -496,7 +500,7 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 * **Review date**: The date on which the tutor intends to review a follow-up, in `yyyy-MM-dd` format. It is not necessarily the date of a lesson.
 * **Outstanding follow-up**: A follow-up that has not been completed or cancelled. Until TutorLink supports completing or cancelling follow-ups, every recorded follow-up is outstanding.
 * **Interaction**: A dated record of a lesson or other discussion with a student. Each interaction belongs to exactly one student and contains a concise note and, optionally, a time.
-* **Interaction date**: The date on which an interaction occurred, in `yyyy-MM-dd` format.
+* **Interaction date**: The date on which an interaction occurred, in `yyyy-MM-dd` format. Future dates are allowed but trigger a warning.
 * **Concise note**: Brief text recorded with an interaction to summarise what happened.
 
 --------------------------------------------------------------------------------------------------------------------
