@@ -85,11 +85,12 @@ public class LogicManagerTest {
                 + " n/Alex Tan d/2026-10-01 t/14:30 note/Practised algebraic fractions";
         CommandResult result = logic.execute(interactionCommand);
 
-        assertEquals(String.format(AddInteractionCommand.MESSAGE_SUCCESS, "Alex Tan"),
-                result.getFeedbackToUser());
-
         Interaction expectedInteraction = new Interaction(LocalDate.of(2026, 10, 1),
                 Optional.of(LocalTime.of(14, 30)), "Practised algebraic fractions");
+        assertEquals(String.format(AddInteractionCommand.MESSAGE_SUCCESS, "Alex Tan",
+                expectedInteraction.getDate(), " (14:30)", 1),
+                result.getFeedbackToUser());
+
         Student student = model.findStudentByName(new Name("Alex Tan")).orElseThrow();
         assertEquals(List.of(expectedInteraction), student.getInteractions());
 
@@ -109,12 +110,26 @@ public class LogicManagerTest {
 
         String expectedMessage = String.format(AddInteractionCommand.MESSAGE_FUTURE_DATE_WARNING,
                 futureDate, LocalDate.now())
-                + String.format(AddInteractionCommand.MESSAGE_SUCCESS, "Alex Tan");
+                + String.format(AddInteractionCommand.MESSAGE_SUCCESS, "Alex Tan", futureDate, "", 1);
         assertEquals(expectedMessage, result.getFeedbackToUser());
 
         Interaction expectedInteraction = new Interaction(futureDate, Optional.empty(), "Planned lesson");
         Student student = model.findStudentByName(new Name("Alex Tan")).orElseThrow();
         assertEquals(List.of(expectedInteraction), student.getInteractions());
+    }
+
+    @Test
+    public void execute_addInteraction_reportsUpdatedInteractionCount() throws Exception {
+        logic.execute(AddCommand.COMMAND_WORD + " n/Alex Tan");
+        logic.execute(AddInteractionCommand.COMMAND_WORD
+                + " n/Alex Tan d/2026-10-01 note/First lesson");
+
+        LocalDate secondDate = LocalDate.of(2026, 10, 2);
+        CommandResult result = logic.execute(AddInteractionCommand.COMMAND_WORD
+                + " n/Alex Tan d/" + secondDate + " note/Second lesson");
+
+        assertEquals(String.format(AddInteractionCommand.MESSAGE_SUCCESS, "Alex Tan", secondDate, "", 2),
+                result.getFeedbackToUser());
     }
 
     @Test

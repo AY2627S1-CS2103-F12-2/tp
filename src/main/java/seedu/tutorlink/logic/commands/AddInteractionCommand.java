@@ -3,6 +3,7 @@ package seedu.tutorlink.logic.commands;
 import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import seedu.tutorlink.commons.util.ToStringBuilder;
 import seedu.tutorlink.logic.commands.exceptions.CommandException;
@@ -22,10 +23,13 @@ public class AddInteractionCommand extends Command {
             + "n/NAME d/DATE [t/TIME] note/TEXT\n"
             + "Example: " + COMMAND_WORD + " "
             + "n/Alex Tan d/2026-10-01 t/14:30 note/Practised algebraic fractions";
-    public static final String MESSAGE_SUCCESS = "\u2714 Interaction recorded for %1$s.";
+    public static final String MESSAGE_SUCCESS = "\u2714 Interaction recorded for %1$s on %2$s%3$s.\n"
+            + "Total interactions for %1$s: %4$d";
     public static final String MESSAGE_FUTURE_DATE_WARNING =
             "\u26A0 Interaction date %1$s is in the future (today is %2$s); recording it anyway.\n";
     public static final String MESSAGE_STUDENT_NOT_FOUND = "No student named '%1$s' found.";
+
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     private final Name name;
     private final Interaction interaction;
@@ -51,7 +55,11 @@ public class AddInteractionCommand extends Command {
         String warning = interaction.getDate().isAfter(today)
                 ? String.format(MESSAGE_FUTURE_DATE_WARNING, interaction.getDate(), today)
                 : "";
-        return new CommandResult(warning + String.format(MESSAGE_SUCCESS, student.getName()));
+        String formattedTime = interaction.getTime()
+                .map(time -> " (" + time.format(TIME_FORMATTER) + ")")
+                .orElse("");
+        return new CommandResult(warning + String.format(MESSAGE_SUCCESS, student.getName(),
+                interaction.getDate(), formattedTime, updatedStudent.getInteractions().size()));
     }
 
     @Override
