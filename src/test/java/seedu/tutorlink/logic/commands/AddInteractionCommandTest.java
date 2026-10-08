@@ -39,7 +39,8 @@ public class AddInteractionCommandTest {
         expectedModel.setStudent(expectedTarget, updatedStudent);
 
         AddInteractionCommand command = new AddInteractionCommand(BENSON.getName(), INTERACTION);
-        String expectedMessage = String.format(AddInteractionCommand.MESSAGE_SUCCESS, BENSON.getName());
+        String expectedMessage = String.format(AddInteractionCommand.MESSAGE_SUCCESS, BENSON.getName(),
+                INTERACTION.getDate(), " (14:30)", 1);
 
         assertCommandSuccess(command, model, expectedMessage, expectedModel);
     }
@@ -53,7 +54,8 @@ public class AddInteractionCommandTest {
         expectedModel.setStudent(expectedTarget, updatedStudent);
 
         AddInteractionCommand command = new AddInteractionCommand(BENSON.getName(), todayInteraction);
-        String expectedMessage = String.format(AddInteractionCommand.MESSAGE_SUCCESS, BENSON.getName());
+        String expectedMessage = String.format(AddInteractionCommand.MESSAGE_SUCCESS, BENSON.getName(),
+                todayInteraction.getDate(), "", 1);
 
         assertCommandSuccess(command, model, expectedMessage, expectedModel);
     }
@@ -70,7 +72,8 @@ public class AddInteractionCommandTest {
         AddInteractionCommand command = new AddInteractionCommand(BENSON.getName(), futureInteraction);
         String expectedMessage = String.format(AddInteractionCommand.MESSAGE_FUTURE_DATE_WARNING,
                 futureInteraction.getDate(), LocalDate.now())
-                + String.format(AddInteractionCommand.MESSAGE_SUCCESS, BENSON.getName());
+                + String.format(AddInteractionCommand.MESSAGE_SUCCESS, BENSON.getName(),
+                        futureInteraction.getDate(), "", 1);
 
         assertCommandSuccess(command, model, expectedMessage, expectedModel);
     }
