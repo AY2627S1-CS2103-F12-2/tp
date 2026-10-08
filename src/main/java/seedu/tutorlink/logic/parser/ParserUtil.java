@@ -29,7 +29,10 @@ public class ParserUtil {
             "Interaction date must be a valid date in yyyy-MM-dd format.";
     public static final String MESSAGE_INVALID_INTERACTION_TIME =
             "Interaction time must be a valid time in HH:mm format.";
-    public static final String MESSAGE_INVALID_INTERACTION_NOTE = "Interaction note must not be blank.";
+    public static final int MAX_INTERACTION_NOTE_LENGTH = 500;
+    public static final String MESSAGE_INVALID_INTERACTION_NOTE = "Note cannot be empty.";
+    public static final String MESSAGE_INVALID_INTERACTION_NOTE_LENGTH =
+            "Note must be 500 characters or fewer.";
 
     /**
      * Parses {@code oneBasedIndex} into an {@code Index} and returns it. Leading and trailing whitespaces will be
@@ -156,13 +159,18 @@ public class ParserUtil {
     /**
      * Parses an interaction note, trimming leading and trailing whitespaces.
      *
-     * @throws ParseException if the interaction note is blank.
+     * @throws ParseException if the interaction note is blank, too long, or contains a newline.
      */
     public static String parseInteractionNote(String interactionNote) throws ParseException {
         requireNonNull(interactionNote);
         String trimmedInteractionNote = interactionNote.trim();
         if (trimmedInteractionNote.isBlank()) {
             throw new ParseException(MESSAGE_INVALID_INTERACTION_NOTE);
+        }
+        if (trimmedInteractionNote.length() > MAX_INTERACTION_NOTE_LENGTH
+                || trimmedInteractionNote.contains("\n")
+                || trimmedInteractionNote.contains("\r")) {
+            throw new ParseException(MESSAGE_INVALID_INTERACTION_NOTE_LENGTH);
         }
         return trimmedInteractionNote;
     }
