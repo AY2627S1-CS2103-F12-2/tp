@@ -192,7 +192,7 @@ public class ParserUtilTest {
 
     @Test
     public void parseInteractionNote_multilineNote_throwsParseException() {
-        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE_LENGTH, () ->
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE_MULTILINE, () ->
                 ParserUtil.parseInteractionNote("First line\nSecond line"));
     }
 
