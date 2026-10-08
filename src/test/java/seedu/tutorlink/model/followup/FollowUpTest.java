@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static seedu.tutorlink.testutil.Assert.assertThrows;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 
@@ -56,5 +58,15 @@ public class FollowUpTest {
         FollowUp followUp = new FollowUp("Revise fractions", REVIEW_DATE);
 
         assertEquals(followUp.hashCode(), new FollowUp("Revise fractions", REVIEW_DATE).hashCode());
+    }
+
+    @Test
+    public void reviewDateOrder_mixedDates_earliestFirstAndTiesKeepOrderAdded() {
+        FollowUp later = new FollowUp("Later", REVIEW_DATE.plusDays(1));
+        FollowUp firstAdded = new FollowUp("First added", REVIEW_DATE);
+        FollowUp secondAdded = new FollowUp("Second added", REVIEW_DATE);
+
+        assertEquals(List.of(firstAdded, secondAdded, later),
+                Stream.of(later, firstAdded, secondAdded).sorted(FollowUp.REVIEW_DATE_ORDER).toList());
     }
 }

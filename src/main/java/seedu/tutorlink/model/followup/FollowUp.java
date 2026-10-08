@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static seedu.tutorlink.commons.util.AppUtil.checkArgument;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.Objects;
 
 import seedu.tutorlink.commons.util.ToStringBuilder;
@@ -15,6 +16,9 @@ import seedu.tutorlink.commons.util.ToStringBuilder;
 public class FollowUp {
 
     public static final String MESSAGE_DESCRIPTION_CONSTRAINTS = "Follow-up descriptions should not be blank.";
+
+    /** Orders follow-ups by review date, earliest first. The sort is stable, so ties keep the order added. */
+    public static final Comparator<FollowUp> REVIEW_DATE_ORDER = Comparator.comparing(FollowUp::getReviewDate);
 
     private final String description;
     private final LocalDate reviewDate;
