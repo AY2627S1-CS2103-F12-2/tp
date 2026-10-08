@@ -44,8 +44,8 @@ public class InteractionPanel extends UiPart<Region> {
     private void show(Student student) {
         entries.getChildren().clear();
         boolean hasInteractions = student != null && !student.getInteractions().isEmpty();
-        setShown(placeholder, !hasInteractions);
-        setShown(entriesScrollPane, hasInteractions);
+        PanelEntries.setShown(placeholder, !hasInteractions);
+        PanelEntries.setShown(entriesScrollPane, hasInteractions);
         if (!hasInteractions) {
             placeholder.setText(student == null
                     ? MESSAGE_NO_STUDENT
@@ -60,19 +60,6 @@ public class InteractionPanel extends UiPart<Region> {
     }
 
     private static VBox createEntry(Interaction interaction) {
-        Label when = new Label(describeWhen(interaction));
-        when.getStyleClass().add("entry-when");
-        Label note = new Label(interaction.getNote());
-        note.getStyleClass().add("entry-text");
-        note.setWrapText(true);
-
-        VBox entry = new VBox(2, when, note);
-        entry.getStyleClass().add("entry");
-        return entry;
-    }
-
-    private static void setShown(Region region, boolean isShown) {
-        region.setVisible(isShown);
-        region.setManaged(isShown);
+        return PanelEntries.createEntry(describeWhen(interaction), interaction.getNote());
     }
 }

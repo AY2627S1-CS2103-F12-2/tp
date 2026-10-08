@@ -36,8 +36,8 @@ public class StudentDetailPanel extends UiPart<Region> {
 
     private void show(Student student) {
         boolean hasStudent = student != null;
-        setShown(placeholder, !hasStudent);
-        setShown(details, hasStudent);
+        PanelEntries.setShown(placeholder, !hasStudent);
+        PanelEntries.setShown(details, hasStudent);
         subjects.getChildren().clear();
         if (!hasStudent) {
             return;
@@ -50,10 +50,5 @@ public class StudentDetailPanel extends UiPart<Region> {
             chip.getStyleClass().add("subject-chip");
             subjects.getChildren().add(chip);
         });
-    }
-
-    private static void setShown(Region region, boolean isShown) {
-        region.setVisible(isShown);
-        region.setManaged(isShown);
     }
 }
