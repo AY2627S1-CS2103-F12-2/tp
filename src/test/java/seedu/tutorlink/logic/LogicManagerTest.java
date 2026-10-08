@@ -99,6 +99,25 @@ public class LogicManagerTest {
     }
 
     @Test
+    public void execute_addFutureInteraction_warnsAndRecordsInteraction() throws Exception {
+        logic.execute(AddCommand.COMMAND_WORD + " n/Alex Tan");
+
+        LocalDate futureDate = LocalDate.now().plusDays(1);
+        String interactionCommand = AddInteractionCommand.COMMAND_WORD
+                + " n/Alex Tan d/" + futureDate + " note/Planned lesson";
+        CommandResult result = logic.execute(interactionCommand);
+
+        String expectedMessage = String.format(AddInteractionCommand.MESSAGE_FUTURE_DATE_WARNING,
+                futureDate, LocalDate.now())
+                + String.format(AddInteractionCommand.MESSAGE_SUCCESS, "Alex Tan");
+        assertEquals(expectedMessage, result.getFeedbackToUser());
+
+        Interaction expectedInteraction = new Interaction(futureDate, Optional.empty(), "Planned lesson");
+        Student student = model.findStudentByName(new Name("Alex Tan")).orElseThrow();
+        assertEquals(List.of(expectedInteraction), student.getInteractions());
+    }
+
+    @Test
     public void execute_listInteractions_returnsChronologicalHistory() throws Exception {
         logic.execute(AddCommand.COMMAND_WORD + " n/Alex Tan");
         logic.execute(AddInteractionCommand.COMMAND_WORD

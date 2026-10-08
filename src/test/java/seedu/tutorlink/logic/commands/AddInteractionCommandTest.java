@@ -45,6 +45,37 @@ public class AddInteractionCommandTest {
     }
 
     @Test
+    public void execute_todayDate_successWithoutWarning() {
+        Interaction todayInteraction = new Interaction(LocalDate.now(), Optional.empty(), "Today's lesson");
+        Student updatedStudent = BENSON.withInteraction(todayInteraction);
+        Model expectedModel = new ModelManager(new TutorLink(model.getTutorLink()), new UserPrefs());
+        Student expectedTarget = expectedModel.findStudentByName(BENSON.getName()).orElseThrow();
+        expectedModel.setStudent(expectedTarget, updatedStudent);
+
+        AddInteractionCommand command = new AddInteractionCommand(BENSON.getName(), todayInteraction);
+        String expectedMessage = String.format(AddInteractionCommand.MESSAGE_SUCCESS, BENSON.getName());
+
+        assertCommandSuccess(command, model, expectedMessage, expectedModel);
+    }
+
+    @Test
+    public void execute_futureDate_successWithWarning() {
+        Interaction futureInteraction = new Interaction(LocalDate.now().plusDays(1), Optional.empty(),
+                "Planned lesson");
+        Student updatedStudent = BENSON.withInteraction(futureInteraction);
+        Model expectedModel = new ModelManager(new TutorLink(model.getTutorLink()), new UserPrefs());
+        Student expectedTarget = expectedModel.findStudentByName(BENSON.getName()).orElseThrow();
+        expectedModel.setStudent(expectedTarget, updatedStudent);
+
+        AddInteractionCommand command = new AddInteractionCommand(BENSON.getName(), futureInteraction);
+        String expectedMessage = String.format(AddInteractionCommand.MESSAGE_FUTURE_DATE_WARNING,
+                futureInteraction.getDate(), LocalDate.now())
+                + String.format(AddInteractionCommand.MESSAGE_SUCCESS, BENSON.getName());
+
+        assertCommandSuccess(command, model, expectedMessage, expectedModel);
+    }
+
+    @Test
     public void execute_unknownStudent_throwsCommandException() {
         AddInteractionCommand command = new AddInteractionCommand(new Name("John Tan"), INTERACTION);
 
