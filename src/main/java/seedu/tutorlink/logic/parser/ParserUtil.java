@@ -24,9 +24,9 @@ public class ParserUtil {
     public static final String MESSAGE_INVALID_INDEX = "Index must be a positive integer.";
     public static final String MESSAGE_INVALID_SUBJECT = "Subject '%1$s' is not valid. %2$s";
     public static final String MESSAGE_DUPLICATE_SUBJECT = "Subject '%1$s' is specified twice for the same student.";
-    public static final String MESSAGE_INVALID_REVIEW_DATE = "Review date must be a valid date in yyyy-MM-dd format.";
-    public static final String MESSAGE_INVALID_INTERACTION_DATE =
-            "Interaction date must be a valid date in yyyy-MM-dd format.";
+    public static final String MESSAGE_INVALID_DATE_FORMAT =
+            "Date must be in format yyyy-MM-dd (e.g. 2026-09-14).";
+    public static final String MESSAGE_INVALID_CALENDAR_DATE = "'%1$s' is not a valid calendar date.";
     public static final String MESSAGE_INVALID_INTERACTION_TIME =
             "Interaction time must be a valid time in HH:mm format.";
     public static final String MESSAGE_INVALID_INTERACTION_NOTE = "Interaction note must not be blank.";
@@ -101,16 +101,7 @@ public class ParserUtil {
      */
     public static LocalDate parseReviewDate(String reviewDate) throws ParseException {
         requireNonNull(reviewDate);
-        String trimmedReviewDate = reviewDate.trim();
-        if (!trimmedReviewDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
-            throw new ParseException(MESSAGE_INVALID_REVIEW_DATE);
-        }
-
-        try {
-            return LocalDate.parse(trimmedReviewDate, DateTimeFormatter.ISO_LOCAL_DATE);
-        } catch (DateTimeParseException e) {
-            throw new ParseException(MESSAGE_INVALID_REVIEW_DATE);
-        }
+        return parseDate(reviewDate);
     }
 
     /**
@@ -121,15 +112,18 @@ public class ParserUtil {
      */
     public static LocalDate parseInteractionDate(String interactionDate) throws ParseException {
         requireNonNull(interactionDate);
-        String trimmedInteractionDate = interactionDate.trim();
-        if (!trimmedInteractionDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
-            throw new ParseException(MESSAGE_INVALID_INTERACTION_DATE);
-        }
+        return parseDate(interactionDate);
+    }
 
+    private static LocalDate parseDate(String date) throws ParseException {
+        String trimmedDate = date.trim();
+        if (!trimmedDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            throw new ParseException(MESSAGE_INVALID_DATE_FORMAT);
+        }
         try {
-            return LocalDate.parse(trimmedInteractionDate, DateTimeFormatter.ISO_LOCAL_DATE);
+            return LocalDate.parse(trimmedDate, DateTimeFormatter.ISO_LOCAL_DATE);
         } catch (DateTimeParseException e) {
-            throw new ParseException(MESSAGE_INVALID_INTERACTION_DATE);
+            throw new ParseException(String.format(MESSAGE_INVALID_CALENDAR_DATE, trimmedDate));
         }
     }
 

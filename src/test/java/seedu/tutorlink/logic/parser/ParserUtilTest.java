@@ -3,8 +3,9 @@ package seedu.tutorlink.logic.parser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.tutorlink.logic.parser.ParserUtil.MESSAGE_DUPLICATE_SUBJECT;
+import static seedu.tutorlink.logic.parser.ParserUtil.MESSAGE_INVALID_CALENDAR_DATE;
+import static seedu.tutorlink.logic.parser.ParserUtil.MESSAGE_INVALID_DATE_FORMAT;
 import static seedu.tutorlink.logic.parser.ParserUtil.MESSAGE_INVALID_INDEX;
-import static seedu.tutorlink.logic.parser.ParserUtil.MESSAGE_INVALID_REVIEW_DATE;
 import static seedu.tutorlink.logic.parser.ParserUtil.MESSAGE_INVALID_SUBJECT;
 import static seedu.tutorlink.testutil.Assert.assertThrows;
 import static seedu.tutorlink.testutil.TypicalIndexes.INDEX_FIRST_STUDENT;
@@ -123,15 +124,17 @@ public class ParserUtilTest {
 
     @Test
     public void parseReviewDate_malformedDate_throwsParseException() {
-        assertThrows(ParseException.class, MESSAGE_INVALID_REVIEW_DATE, () -> ParserUtil.parseReviewDate(""));
-        assertThrows(ParseException.class, MESSAGE_INVALID_REVIEW_DATE, () -> ParserUtil.parseReviewDate("2026-1-08"));
-        assertThrows(ParseException.class, MESSAGE_INVALID_REVIEW_DATE, () -> ParserUtil.parseReviewDate("2026/10/08"));
+        assertThrows(ParseException.class, MESSAGE_INVALID_DATE_FORMAT, () -> ParserUtil.parseReviewDate(""));
+        assertThrows(ParseException.class, MESSAGE_INVALID_DATE_FORMAT, () -> ParserUtil.parseReviewDate("2026-1-08"));
+        assertThrows(ParseException.class, MESSAGE_INVALID_DATE_FORMAT, () -> ParserUtil.parseReviewDate("2026/10/08"));
     }
 
     @Test
     public void parseReviewDate_nonexistentDate_throwsParseException() {
-        assertThrows(ParseException.class, MESSAGE_INVALID_REVIEW_DATE, () -> ParserUtil.parseReviewDate("2026-02-30"));
-        assertThrows(ParseException.class, MESSAGE_INVALID_REVIEW_DATE, () -> ParserUtil.parseReviewDate("2025-02-29"));
+        String invalidDateMessage = String.format(MESSAGE_INVALID_CALENDAR_DATE, "2026-02-30");
+        assertThrows(ParseException.class, invalidDateMessage, () -> ParserUtil.parseReviewDate("2026-02-30"));
+        invalidDateMessage = String.format(MESSAGE_INVALID_CALENDAR_DATE, "2025-02-29");
+        assertThrows(ParseException.class, invalidDateMessage, () -> ParserUtil.parseReviewDate("2025-02-29"));
     }
 
     @Test
@@ -144,6 +147,19 @@ public class ParserUtilTest {
     @Test
     public void parseInteractionDate_validDate_returnsLocalDate() throws Exception {
         assertEquals(LocalDate.of(2026, 10, 1), ParserUtil.parseInteractionDate(" 2026-10-01 "));
+    }
+
+    @Test
+    public void parseInteractionDate_malformedDate_throwsParseException() {
+        assertThrows(ParseException.class, MESSAGE_INVALID_DATE_FORMAT, () -> ParserUtil.parseInteractionDate(
+                "2026/10/01"));
+    }
+
+    @Test
+    public void parseInteractionDate_nonexistentDate_throwsParseException() {
+        String invalidDateMessage = String.format(MESSAGE_INVALID_CALENDAR_DATE, "2026-02-30");
+        assertThrows(ParseException.class, invalidDateMessage, () -> ParserUtil.parseInteractionDate(
+                "2026-02-30"));
     }
 
     @Test
