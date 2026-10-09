@@ -32,8 +32,10 @@ public class ParserUtil {
             "Interaction time must be a valid time in HH:mm format.";
     public static final int MAX_INTERACTION_NOTE_LENGTH = 500;
     public static final String MESSAGE_INVALID_INTERACTION_NOTE = "Note cannot be empty.";
+    public static final String MESSAGE_INVALID_INTERACTION_NOTE_MULTILINE =
+            "Note must be on a single line.";
     public static final String MESSAGE_INVALID_INTERACTION_NOTE_LENGTH =
-            "Note must be 500 characters or fewer.";
+            String.format("Note must be %d characters or fewer.", MAX_INTERACTION_NOTE_LENGTH);
 
     /**
      * Parses {@code oneBasedIndex} into an {@code Index} and returns it. Leading and trailing whitespaces will be
@@ -162,9 +164,10 @@ public class ParserUtil {
         if (trimmedInteractionNote.isBlank()) {
             throw new ParseException(MESSAGE_INVALID_INTERACTION_NOTE);
         }
-        if (trimmedInteractionNote.length() > MAX_INTERACTION_NOTE_LENGTH
-                || trimmedInteractionNote.contains("\n")
-                || trimmedInteractionNote.contains("\r")) {
+        if (trimmedInteractionNote.contains("\n") || trimmedInteractionNote.contains("\r")) {
+            throw new ParseException(MESSAGE_INVALID_INTERACTION_NOTE_MULTILINE);
+        }
+        if (trimmedInteractionNote.length() > MAX_INTERACTION_NOTE_LENGTH) {
             throw new ParseException(MESSAGE_INVALID_INTERACTION_NOTE_LENGTH);
         }
         return trimmedInteractionNote;

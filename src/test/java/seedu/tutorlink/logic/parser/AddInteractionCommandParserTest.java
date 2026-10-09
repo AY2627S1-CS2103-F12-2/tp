@@ -80,7 +80,7 @@ public class AddInteractionCommandParserTest {
 
     @Test
     public void parse_multilineNote_throwsParseException() {
-        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE_LENGTH, () ->
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE_MULTILINE, () ->
                 parser.parse(" n/Alex Tan d/2026-10-01 note/First line\nSecond line"));
     }
 }
