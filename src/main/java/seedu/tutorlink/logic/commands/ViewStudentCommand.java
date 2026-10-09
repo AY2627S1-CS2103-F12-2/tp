@@ -22,7 +22,6 @@ public class ViewStudentCommand extends Command {
             + "Example: " + COMMAND_WORD + " " + PREFIX_NAME + "John Tan";
 
     public static final String MESSAGE_SUCCESS = "Student: %1$s\nSubjects: %2$s";
-    public static final String MESSAGE_STUDENT_NOT_FOUND = "No student named '%1$s' found.";
 
     private final Name name;
 
@@ -39,7 +38,7 @@ public class ViewStudentCommand extends Command {
         requireNonNull(model);
 
         Student student = model.findStudentByName(name)
-                .orElseThrow(() -> new CommandException(String.format(MESSAGE_STUDENT_NOT_FOUND, name)));
+                .orElseThrow(() -> new CommandException(String.format(Messages.MESSAGE_STUDENT_NOT_FOUND, name)));
         model.setSelectedStudent(student);
 
         return new CommandResult(String.format(MESSAGE_SUCCESS, student.getName(),

@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
+import seedu.tutorlink.logic.Messages;
 import seedu.tutorlink.model.Model;
 import seedu.tutorlink.model.ModelManager;
 import seedu.tutorlink.model.TutorLink;
@@ -66,7 +67,7 @@ public class ListInteractionsCommandTest {
         Model model = new ModelManager(new TutorLink(), new UserPrefs());
 
         assertCommandFailure(new ListInteractionsCommand(STUDENT_NAME), model,
-                String.format(ListInteractionsCommand.MESSAGE_STUDENT_NOT_FOUND, STUDENT_NAME));
+                String.format(Messages.MESSAGE_STUDENT_NOT_FOUND, STUDENT_NAME));
     }
 
     @Test

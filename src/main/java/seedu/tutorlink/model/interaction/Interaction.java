@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,6 +18,8 @@ import seedu.tutorlink.commons.util.ToStringBuilder;
 public class Interaction {
 
     public static final String MESSAGE_NOTE_CONSTRAINTS = "Interaction notes should not be blank.";
+    /** Formats interaction times for commands and persisted data. */
+    public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     /** Orders interactions oldest first; an interaction without a time comes before timed ones on the same date. */
     public static final Comparator<Interaction> CHRONOLOGICAL_ORDER = Comparator

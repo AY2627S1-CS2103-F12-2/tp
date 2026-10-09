@@ -69,7 +69,7 @@ class JsonAdaptedInteraction {
         Optional<LocalTime> modelTime = Optional.empty();
         if (time != null) {
             try {
-                modelTime = Optional.of(LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm")));
+                modelTime = Optional.of(LocalTime.parse(time, Interaction.TIME_FORMATTER));
             } catch (DateTimeException exception) {
                 throw new IllegalValueException(INVALID_TIME_MESSAGE);
             }
@@ -83,6 +83,6 @@ class JsonAdaptedInteraction {
     }
 
     private static String formatTime(LocalTime time) {
-        return time.format(DateTimeFormatter.ofPattern("HH:mm"));
+        return time.format(Interaction.TIME_FORMATTER);
     }
 }
