@@ -1,0 +1,4 @@
+# GUI classes are not covered by automated tests, so they are left out of coverage
+# to keep the coverage checks meaningful for logic, model, parser and storage code.
+ignore:
+  - "src/main/java/seedu/tutorlink/ui"
