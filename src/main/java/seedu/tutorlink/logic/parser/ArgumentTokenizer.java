@@ -29,6 +29,29 @@ public class ArgumentTokenizer {
     }
 
     /**
+     * Tokenizes arguments with a final free-text prefix whose value consumes the rest of the input.
+     *
+     * @param argsString Arguments string to tokenize.
+     * @param trailingPrefix Prefix whose value extends to the end of the input.
+     * @param prefixes Other prefixes to tokenize before the trailing prefix.
+     * @return ArgumentMultimap containing the tokenized arguments.
+     */
+    public static ArgumentMultimap tokenizeWithTrailingPrefix(String argsString,
+            Prefix trailingPrefix, Prefix... prefixes) {
+        int trailingPrefixPosition = findPrefixPosition(argsString, trailingPrefix.getPrefix(), 0);
+        if (trailingPrefixPosition == -1) {
+            return tokenize(argsString, prefixes);
+        }
+
+        String argumentsBeforeTrailingPrefix = argsString.substring(0, trailingPrefixPosition);
+        ArgumentMultimap argMultimap = tokenize(argumentsBeforeTrailingPrefix, prefixes);
+        String trailingValue = argsString.substring(trailingPrefixPosition + trailingPrefix.getPrefix().length())
+                .trim();
+        argMultimap.put(trailingPrefix, trailingValue);
+        return argMultimap;
+    }
+
+    /**
      * Finds all zero-based prefix positions in the given arguments string.
      *
      * @param argsString Arguments string of the form: {@code preamble <prefix>value <prefix>value ...}

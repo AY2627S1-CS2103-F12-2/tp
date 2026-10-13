@@ -38,6 +38,21 @@ public class AddInteractionCommandParserTest {
     }
 
     @Test
+    public void parse_noteContainsPrefixLikeText_returnsCompleteNote() throws Exception {
+        AddInteractionCommand expected = new AddInteractionCommand(new Name("Alex Yeoh"),
+                new Interaction(LocalDate.of(2026, 10, 10), Optional.empty(), "Discussed n/next steps"));
+
+        assertEquals(expected, parser.parse(
+                " n/Alex Yeoh d/2026-10-10 note/Discussed n/next steps"));
+    }
+
+    @Test
+    public void parse_duplicatePrefixBeforeNote_throwsParseException() {
+        assertThrows(ParseException.class, () -> parser.parse(
+                " n/Alex Yeoh n/Bernice Yu d/2026-10-10 note/Discussed next steps"));
+    }
+
+    @Test
     public void parse_missingRequiredField_throwsParseException() {
         String expectedMessage = String.format(MESSAGE_INVALID_COMMAND_FORMAT,
                 AddInteractionCommand.MESSAGE_USAGE);
@@ -82,5 +97,8 @@ public class AddInteractionCommandParserTest {
     public void parse_multilineNote_throwsParseException() {
         assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE_MULTILINE, () ->
                 parser.parse(" n/Alex Tan d/2026-10-01 note/First line\nSecond line"));
+
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE_MULTILINE, () ->
+                parser.parse(" n/Alex Tan d/2026-10-01 note/First line\n\n\nSecond line"));
     }
 }

@@ -137,6 +137,17 @@ public class ArgumentTokenizerTest {
     }
 
     @Test
+    public void tokenizeWithTrailingPrefix_keepsPrefixLikeTextInTrailingValue() {
+        String argsString = " n/Alex Yeoh note/Discussed n/next steps";
+        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenizeWithTrailingPrefix(
+                argsString, new Prefix("note/"), new Prefix("n/"));
+
+        assertPreambleEmpty(argMultimap);
+        assertArgumentPresent(argMultimap, new Prefix("n/"), "Alex Yeoh");
+        assertArgumentPresent(argMultimap, new Prefix("note/"), "Discussed n/next steps");
+    }
+
+    @Test
     public void equalsMethod() {
         Prefix aaa = new Prefix("aaa");
 

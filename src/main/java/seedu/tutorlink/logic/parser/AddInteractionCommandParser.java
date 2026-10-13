@@ -27,8 +27,8 @@ public class AddInteractionCommandParser implements Parser<AddInteractionCommand
      */
     @Override
     public AddInteractionCommand parse(String args) throws ParseException {
-        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(args,
-                PREFIX_NAME, PREFIX_DATE, PREFIX_TIME, PREFIX_NOTE);
+        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenizeWithTrailingPrefix(args, PREFIX_NOTE,
+                PREFIX_NAME, PREFIX_DATE, PREFIX_TIME);
 
         if (argMultimap.getValue(PREFIX_NAME).isEmpty()
                 || argMultimap.getValue(PREFIX_DATE).isEmpty()
