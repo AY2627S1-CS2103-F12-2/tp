@@ -134,7 +134,67 @@ Examples:
 
 <!-- Interaction commands (interaction add, interaction list): @Dancodes2 -->
 
-<!-- Follow-up commands (followup add, followup list): @elhanannw -->
+### Adding a follow-up: `followup add`
+
+Records something you intend to revisit with an existing student, with a review date.
+
+Format: `followup add n/NAME desc/TEXT review/DATE`
+
+* `NAME` identifies an existing student by their full name, ignoring case.
+* `TEXT` is 1 to 200 characters long after leading and trailing whitespace is removed. It must not be blank and must be on a single line.
+* `DATE` must be a real calendar date in `yyyy-MM-dd` format, such as `2026-10-15`. Past, present and future review dates are allowed.
+* Give each parameter exactly once. Missing parameters or repeated prefixes are rejected.
+* A follow-up belongs to the student. It does not need to be linked to an interaction.
+* A duplicate with the same description and review date for the same student is rejected. Descriptions are compared after trimming and are case-sensitive: `Review algebra` and `review algebra` are different descriptions.
+* A failed command leaves your stored data unchanged.
+
+Examples (after adding John Tan):
+
+* `followup add n/John Tan desc/Review algebra review/2026-10-15`
+* `followup add n/john tan desc/Check in on extra drills review/2026-10-14`
+
+After the first example, if John Tan has no other follow-ups, TutorLink shows:
+
+```text
+✔ Follow-up added for John Tan — review on 2026-10-15: "Review algebra"
+Total outstanding follow-ups for John Tan: 1
+```
+
+Use `student view n/John Tan` to show John's follow-ups in the outstanding follow-ups panel. If John is already selected, the panel updates when you add a follow-up. Follow-ups are saved automatically and remain available after restarting TutorLink.
+
+Invalid input examples:
+
+* `desc/` with no text is rejected with `Description cannot be empty.`
+* A description longer than 200 characters is rejected with `Description must be 200 characters or fewer.`
+* A description containing a line break is rejected with `Description must be on a single line.`
+* `review/15-10-2026` is rejected because the required format is `yyyy-MM-dd`.
+* `review/2026-02-30` is rejected because February does not have 30 days.
+* An unknown student is rejected with `No student named 'NAME' found.`
+
+### Viewing outstanding follow-ups: `followup list`
+
+Shows a student's outstanding follow-ups in the command result area.
+
+Format: `followup list n/NAME`
+
+* Give the full name of an existing student, ignoring case, with `n/` exactly once.
+* Follow-ups are numbered and sorted by review date, earliest first. Follow-ups with the same review date remain in the order they were added. The outstanding follow-ups panel uses the same ordering.
+* Every recorded follow-up counts as **outstanding**, including those with past review dates. TutorLink does not yet have a command to complete or cancel a follow-up; passing its review date does not remove it.
+* Listing follow-ups does not change stored data or select a different student in the panels. Use `student view n/NAME` to select a student.
+
+Example:
+
+* `followup list n/John Tan`
+
+After adding the two examples above, the result is:
+
+```text
+Outstanding follow-ups for John Tan (2):
+1. 2026-10-14 — Check in on extra drills
+2. 2026-10-15 — Review algebra
+```
+
+If John has no follow-ups, TutorLink shows `ℹ No outstanding follow-ups for John Tan.` An unknown student gives `No student named 'NAME' found.` Missing or repeated `n/` parameters are rejected.
 
 ### Deleting a student: `student delete`
 
@@ -201,6 +261,8 @@ Action | Format, Examples
 **View student** | `student view n/NAME`<br> e.g., `student view n/John Tan`
 **List students** | `list`
 **Find students** | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find tan lim`
+**Add follow-up** | `followup add n/NAME desc/TEXT review/DATE`<br> e.g., `followup add n/John Tan desc/Review algebra review/2026-10-15`
+**View follow-ups** | `followup list n/NAME`<br> e.g., `followup list n/John Tan`
 **Delete student** | `student delete n/NAME`<br> e.g., `student delete n/John Tan`
 **Help** | `help`
 **Exit** | `exit`
