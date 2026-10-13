@@ -20,6 +20,7 @@ class JsonAdaptedInteraction {
     public static final String MISSING_FIELD_MESSAGE_FORMAT = "Interaction's %s field is missing!";
     public static final String INVALID_DATE_MESSAGE = "Interaction date must be a valid date.";
     public static final String INVALID_TIME_MESSAGE = "Interaction time must be a valid time in HH:mm format.";
+    public static final String INVALID_NOTE_MULTILINE_MESSAGE = "Note must be on a single line.";
 
     private final String date;
     private final String time;
@@ -57,6 +58,9 @@ class JsonAdaptedInteraction {
         }
         if (note == null) {
             throw new IllegalValueException(String.format(MISSING_FIELD_MESSAGE_FORMAT, "note"));
+        }
+        if (note.contains("\n") || note.contains("\r")) {
+            throw new IllegalValueException(INVALID_NOTE_MULTILINE_MESSAGE);
         }
 
         LocalDate modelDate;
