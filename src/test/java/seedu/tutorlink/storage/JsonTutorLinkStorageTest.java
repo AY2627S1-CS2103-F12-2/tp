@@ -9,8 +9,11 @@ import static seedu.tutorlink.testutil.TypicalStudents.IDA;
 import static seedu.tutorlink.testutil.TypicalStudents.getTypicalTutorLink;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -18,12 +21,51 @@ import org.junit.jupiter.api.io.TempDir;
 import seedu.tutorlink.commons.exceptions.DataLoadingException;
 import seedu.tutorlink.model.ReadOnlyTutorLink;
 import seedu.tutorlink.model.TutorLink;
+import seedu.tutorlink.model.followup.FollowUp;
+import seedu.tutorlink.model.student.Name;
+import seedu.tutorlink.model.student.Student;
 
 public class JsonTutorLinkStorageTest {
     private static final Path TEST_DATA_FOLDER = Paths.get("src", "test", "data", "JsonTutorLinkStorageTest");
 
     @TempDir
     public Path testFolder;
+
+    @Test
+    public void saveAndReload_followUps_preservesRecordsAndOrder() throws Exception {
+        Path path = testFolder.resolve("followUps.json");
+        TutorLink original = getTypicalTutorLink();
+        Student student = ALICE.withFollowUp(new FollowUp("Later", LocalDate.of(2026, 10, 15)))
+                .withFollowUp(new FollowUp("Earlier", LocalDate.of(2026, 10, 14)));
+        original.setStudent(ALICE, student);
+        new JsonTutorLinkStorage(path).saveTutorLink(original);
+
+        ReadOnlyTutorLink restored = new JsonTutorLinkStorage(path).readTutorLink().orElseThrow();
+        assertEquals(original, new TutorLink(restored));
+
+        Student updated = student.withFollowUp(new FollowUp("Another", LocalDate.of(2026, 10, 14)));
+        original.setStudent(student, updated);
+        new JsonTutorLinkStorage(path).saveTutorLink(original);
+        assertEquals(original, new TutorLink(new JsonTutorLinkStorage(path).readTutorLink().orElseThrow()));
+    }
+
+    @Test
+    public void read_legacyFileWithoutFollowUps_loadsStudent() throws Exception {
+        Path path = testFolder.resolve("legacy.json");
+        Files.writeString(path, "{\"students\":[{\"name\":\"John Tan\",\"subjects\":[],\"interactions\":[]}]}");
+        ReadOnlyTutorLink restored = new JsonTutorLinkStorage(path).readTutorLink().orElseThrow();
+        assertEquals(List.of(new Student(new Name("John Tan"), List.of())), restored.getStudentList());
+    }
+
+    @Test
+    public void read_invalidStoredFollowUp_throwsDataLoadingException() throws Exception {
+        Path path = testFolder.resolve("invalidFollowUp.json");
+        for (String entry : new String[]{"{\"description\":\"\",\"reviewDate\":\"2026-10-15\"}",
+            "{\"description\":\"Review\",\"reviewDate\":\"2026-02-30\"}", "null"}) {
+            Files.writeString(path, "{\"students\":[{\"name\":\"John Tan\",\"followUps\":[" + entry + "]}]}");
+            assertThrows(DataLoadingException.class, () -> new JsonTutorLinkStorage(path).readTutorLink());
+        }
+    }
 
     @Test
     public void readTutorLink_nullFilePath_throwsNullPointerException() {

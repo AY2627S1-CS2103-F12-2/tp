@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import seedu.tutorlink.commons.exceptions.IllegalValueException;
+import seedu.tutorlink.model.followup.FollowUp;
 import seedu.tutorlink.model.interaction.Interaction;
 import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.Student;
@@ -22,6 +23,7 @@ class JsonAdaptedStudent {
     private final String name;
     private final List<String> subjects = new ArrayList<>();
     private final List<JsonAdaptedInteraction> interactions = new ArrayList<>();
+    private final List<JsonAdaptedFollowUp> followUps = new ArrayList<>();
 
     /**
      * Constructs a {@code JsonAdaptedStudent} with the given student details.
@@ -29,7 +31,8 @@ class JsonAdaptedStudent {
     @JsonCreator
     public JsonAdaptedStudent(@JsonProperty("name") String name,
             @JsonProperty("subjects") List<String> subjects,
-            @JsonProperty("interactions") List<JsonAdaptedInteraction> interactions) {
+            @JsonProperty("interactions") List<JsonAdaptedInteraction> interactions,
+            @JsonProperty("followUps") List<JsonAdaptedFollowUp> followUps) {
         this.name = name;
         if (subjects != null) {
             this.subjects.addAll(subjects);
@@ -37,6 +40,16 @@ class JsonAdaptedStudent {
         if (interactions != null) {
             this.interactions.addAll(interactions);
         }
+        if (followUps != null) {
+            this.followUps.addAll(followUps);
+        }
+    }
+
+    /**
+     * Constructs a student adapter without follow-ups for backward compatibility with existing callers.
+     */
+    public JsonAdaptedStudent(String name, List<String> subjects, List<JsonAdaptedInteraction> interactions) {
+        this(name, subjects, interactions, null);
     }
 
     /**
@@ -53,6 +66,7 @@ class JsonAdaptedStudent {
         name = source.getName().fullName;
         source.getSubjects().forEach(subject -> subjects.add(subject.subjectName));
         source.getInteractions().forEach(interaction -> interactions.add(new JsonAdaptedInteraction(interaction)));
+        source.getFollowUps().forEach(followUp -> followUps.add(new JsonAdaptedFollowUp(followUp)));
     }
 
     /**
@@ -82,7 +96,15 @@ class JsonAdaptedStudent {
             modelInteractions.add(interaction.toModelType());
         }
 
-        return new Student(modelName, modelSubjects, modelInteractions);
+        final List<FollowUp> modelFollowUps = new ArrayList<>();
+        for (JsonAdaptedFollowUp followUp : followUps) {
+            if (followUp == null) {
+                throw new IllegalValueException("Student's follow-up entry must not be null.");
+            }
+            modelFollowUps.add(followUp.toModelType());
+        }
+
+        return new Student(modelName, modelSubjects, modelInteractions, modelFollowUps);
     }
 
 }
