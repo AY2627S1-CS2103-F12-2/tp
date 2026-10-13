@@ -68,6 +68,17 @@ public class JsonTutorLinkStorageTest {
     }
 
     @Test
+    public void read_overlongStoredInteraction_throwsDataLoadingException() throws Exception {
+        Path path = testFolder.resolve("overlongInteraction.json");
+        String note = "A".repeat(JsonAdaptedInteraction.MAX_NOTE_LENGTH + 1);
+        String json = "{\"students\":[{\"name\":\"John Tan\",\"interactions\":[{"
+                + "\"date\":\"2026-10-10\",\"note\":\"" + note + "\"}]}]}";
+        Files.writeString(path, json);
+
+        assertThrows(DataLoadingException.class, () -> new JsonTutorLinkStorage(path).readTutorLink());
+    }
+
+    @Test
     public void readTutorLink_nullFilePath_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> readTutorLink(null));
     }
