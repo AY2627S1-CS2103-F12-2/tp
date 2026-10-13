@@ -23,6 +23,10 @@ import seedu.tutorlink.model.student.Subject;
 public class ParserUtil {
 
     public static final String MESSAGE_INVALID_INDEX = "Index must be a positive integer.";
+    public static final int MAX_FOLLOW_UP_DESCRIPTION_LENGTH = 200;
+    public static final String MESSAGE_EMPTY_FOLLOW_UP_DESCRIPTION = "Description cannot be empty.";
+    public static final String MESSAGE_LONG_FOLLOW_UP_DESCRIPTION = "Description must be 200 characters or fewer.";
+    public static final String MESSAGE_MULTILINE_FOLLOW_UP_DESCRIPTION = "Description must be on a single line.";
     public static final String MESSAGE_INVALID_SUBJECT = "Subject '%1$s' is not valid. %2$s";
     public static final String MESSAGE_DUPLICATE_SUBJECT = "Subject '%1$s' is specified twice for the same student.";
     public static final String MESSAGE_INVALID_DATE_FORMAT =
@@ -108,6 +112,26 @@ public class ParserUtil {
     public static LocalDate parseReviewDate(String reviewDate) throws ParseException {
         requireNonNull(reviewDate);
         return parseDate(reviewDate);
+    }
+
+    /**
+     * Parses a follow-up description, stripping leading and trailing whitespace.
+     *
+     * @throws ParseException if the description is blank, longer than 200 characters, or contains a line break.
+     */
+    public static String parseFollowUpDescription(String description) throws ParseException {
+        requireNonNull(description);
+        String strippedDescription = description.strip();
+        if (strippedDescription.isEmpty()) {
+            throw new ParseException(MESSAGE_EMPTY_FOLLOW_UP_DESCRIPTION);
+        }
+        if (strippedDescription.length() > MAX_FOLLOW_UP_DESCRIPTION_LENGTH) {
+            throw new ParseException(MESSAGE_LONG_FOLLOW_UP_DESCRIPTION);
+        }
+        if (strippedDescription.contains("\n") || strippedDescription.contains("\r")) {
+            throw new ParseException(MESSAGE_MULTILINE_FOLLOW_UP_DESCRIPTION);
+        }
+        return strippedDescription;
     }
 
     /**
