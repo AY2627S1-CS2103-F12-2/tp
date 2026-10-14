@@ -59,4 +59,23 @@ public class JsonAdaptedInteractionTest {
                 String.format(JsonAdaptedInteraction.MISSING_FIELD_MESSAGE_FORMAT, "note"),
                 adaptedInteraction::toModelType);
     }
+
+    @Test
+    public void toModelType_maxLengthNote_returnsInteraction() throws Exception {
+        String maximumLengthNote = "A".repeat(JsonAdaptedInteraction.MAX_NOTE_LENGTH);
+        JsonAdaptedInteraction adaptedInteraction = new JsonAdaptedInteraction(
+                "2026-10-01", "14:30", maximumLengthNote);
+
+        assertEquals(maximumLengthNote, adaptedInteraction.toModelType().getNote());
+    }
+
+    @Test
+    public void toModelType_overlongNote_throwsIllegalValueException() {
+        String overlongNote = "A".repeat(JsonAdaptedInteraction.MAX_NOTE_LENGTH + 1);
+        JsonAdaptedInteraction adaptedInteraction = new JsonAdaptedInteraction(
+                "2026-10-01", "14:30", overlongNote);
+
+        assertThrows(IllegalValueException.class, JsonAdaptedInteraction.INVALID_NOTE_LENGTH_MESSAGE,
+                adaptedInteraction::toModelType);
+    }
 }
