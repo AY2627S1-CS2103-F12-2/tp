@@ -79,6 +79,22 @@ public class JsonTutorLinkStorageTest {
     }
 
     @Test
+    public void read_invalidStoredStudent_throwsDataLoadingException() throws Exception {
+        Path path = testFolder.resolve("invalidStudent.json");
+        Files.writeString(path, "{\"students\":[null]}");
+
+        assertThrows(DataLoadingException.class, () -> new JsonTutorLinkStorage(path).readTutorLink());
+    }
+
+    @Test
+    public void read_invalidStoredInteraction_throwsDataLoadingException() throws Exception {
+        Path path = testFolder.resolve("invalidInteraction.json");
+        Files.writeString(path, "{\"students\":[{\"name\":\"John Tan\",\"interactions\":[null]}]}");
+
+        assertThrows(DataLoadingException.class, () -> new JsonTutorLinkStorage(path).readTutorLink());
+    }
+
+    @Test
     public void readTutorLink_nullFilePath_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> readTutorLink(null));
     }

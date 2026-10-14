@@ -19,6 +19,7 @@ import seedu.tutorlink.model.student.Subject;
 class JsonAdaptedStudent {
 
     public static final String MISSING_FIELD_MESSAGE_FORMAT = "Student's %s field is missing!";
+    public static final String NULL_INTERACTION_MESSAGE = "Student's interaction entry must not be null.";
 
     private final String name;
     private final List<String> subjects = new ArrayList<>();
@@ -93,6 +94,9 @@ class JsonAdaptedStudent {
 
         final List<Interaction> modelInteractions = new ArrayList<>();
         for (JsonAdaptedInteraction interaction : interactions) {
+            if (interaction == null) {
+                throw new IllegalValueException(NULL_INTERACTION_MESSAGE);
+            }
             modelInteractions.add(interaction.toModelType());
         }
 
