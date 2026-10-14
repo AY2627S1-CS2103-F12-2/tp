@@ -53,6 +53,12 @@ class JsonAdaptedFollowUp {
         if (description.isBlank()) {
             throw new IllegalValueException(FollowUp.MESSAGE_DESCRIPTION_CONSTRAINTS);
         }
+        if (description.strip().length() > FollowUp.MAX_DESCRIPTION_LENGTH) {
+            throw new IllegalValueException(FollowUp.MESSAGE_LONG_DESCRIPTION);
+        }
+        if (description.contains("\n") || description.contains("\r")) {
+            throw new IllegalValueException(FollowUp.MESSAGE_MULTILINE_DESCRIPTION);
+        }
         if (!reviewDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
             throw new IllegalValueException(INVALID_REVIEW_DATE_MESSAGE);
         }

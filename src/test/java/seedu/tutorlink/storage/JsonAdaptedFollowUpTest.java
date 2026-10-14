@@ -38,6 +38,23 @@ public class JsonAdaptedFollowUpTest {
     }
 
     @Test
+    public void toModelType_descriptionLength_maxAcceptedAndOverlongRejected() throws Exception {
+        String maxLength = "x".repeat(FollowUp.MAX_DESCRIPTION_LENGTH);
+        assertEquals(maxLength, new JsonAdaptedFollowUp(" " + maxLength + " ", "2026-10-15")
+                .toModelType().getDescription());
+        assertThrows(IllegalValueException.class, FollowUp.MESSAGE_LONG_DESCRIPTION, () ->
+                new JsonAdaptedFollowUp(maxLength + "x", "2026-10-15").toModelType());
+    }
+
+    @Test
+    public void toModelType_multilineDescription_throwsIllegalValueException() {
+        for (String description : new String[]{"Review\nalgebra", "Review\ralgebra", "Review\r\nalgebra"}) {
+            assertThrows(IllegalValueException.class, FollowUp.MESSAGE_MULTILINE_DESCRIPTION, () ->
+                    new JsonAdaptedFollowUp(description, "2026-10-15").toModelType());
+        }
+    }
+
+    @Test
     public void toModelType_invalidReviewDate_throwsIllegalValueException() {
         for (String date : new String[]{"", "2026/10/15", "2026-2-01", "2026-02-30", "2026-13-01"}) {
             assertThrows(IllegalValueException.class, JsonAdaptedFollowUp.INVALID_REVIEW_DATE_MESSAGE, () ->
