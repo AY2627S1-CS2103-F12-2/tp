@@ -21,6 +21,9 @@ public class AddInteractionCommand extends Command {
 
     public static final String MESSAGE_USAGE = "Command format: " + COMMAND_WORD + " "
             + "n/NAME d/DATE [t/TIME] note/TEXT\n"
+            + "The n/, d/ and t/ prefixes may appear in any order before note/. "
+            + "The first note/ is the final structured prefix; everything after it is note text. "
+            + "Duplicate structured prefixes before note/ are rejected.\n"
             + "Example: " + COMMAND_WORD + " "
             + "n/Alex Tan d/2026-10-01 t/14:30 note/Practised algebraic fractions";
     public static final String MESSAGE_SUCCESS = "\u2714 Interaction recorded for %1$s on %2$s%3$s.\n"

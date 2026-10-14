@@ -47,6 +47,32 @@ public class AddInteractionCommandParserTest {
     }
 
     @Test
+    public void parse_repeatedNotePrefixAfterNote_returnsCompleteNote() throws Exception {
+        AddInteractionCommand expected = new AddInteractionCommand(new Name("Alex Yeoh"),
+                new Interaction(LocalDate.of(2026, 10, 10), Optional.empty(),
+                        "Discussed note/next steps n/Bernice Yu"));
+
+        assertEquals(expected, parser.parse(
+                " n/Alex Yeoh d/2026-10-10 note/Discussed note/next steps n/Bernice Yu"));
+    }
+
+    @Test
+    public void parse_timeAfterNote_treatsTimeAsNoteText() throws Exception {
+        AddInteractionCommand expected = new AddInteractionCommand(new Name("Alex Yeoh"),
+                new Interaction(LocalDate.of(2026, 10, 10), Optional.empty(),
+                        "Discussed graphs t/14:30"));
+
+        assertEquals(expected, parser.parse(
+                " n/Alex Yeoh d/2026-10-10 note/Discussed graphs t/14:30"));
+    }
+
+    @Test
+    public void parse_dateAfterNote_doesNotSatisfyRequiredDate() {
+        assertThrows(ParseException.class, () -> parser.parse(
+                " n/Alex Yeoh note/Discussed graphs d/2026-10-10"));
+    }
+
+    @Test
     public void parse_duplicatePrefixBeforeNote_throwsParseException() {
         assertThrows(ParseException.class, () -> parser.parse(
                 " n/Alex Yeoh n/Bernice Yu d/2026-10-10 note/Discussed next steps"));
