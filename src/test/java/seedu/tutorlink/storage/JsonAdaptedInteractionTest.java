@@ -5,6 +5,7 @@ import static seedu.tutorlink.testutil.Assert.assertThrows;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -58,6 +59,17 @@ public class JsonAdaptedInteractionTest {
         assertThrows(IllegalValueException.class,
                 String.format(JsonAdaptedInteraction.MISSING_FIELD_MESSAGE_FORMAT, "note"),
                 adaptedInteraction::toModelType);
+    }
+
+    @Test
+    public void toModelType_multilineNote_throwsIllegalValueException() {
+        for (String multilineNote : List.of("First line\nSecond line", "First line\rSecond line")) {
+            JsonAdaptedInteraction adaptedInteraction = new JsonAdaptedInteraction(
+                    "2026-10-01", "14:30", multilineNote);
+
+            assertThrows(IllegalValueException.class, JsonAdaptedInteraction.INVALID_NOTE_MULTILINE_MESSAGE,
+                    adaptedInteraction::toModelType);
+        }
     }
 
     @Test
