@@ -90,4 +90,25 @@ public class JsonAdaptedInteractionTest {
         assertThrows(IllegalValueException.class, JsonAdaptedInteraction.INVALID_NOTE_LENGTH_MESSAGE,
                 adaptedInteraction::toModelType);
     }
+
+    @Test
+    public void toModelType_maximumEmojiNote_returnsInteraction() throws Exception {
+        String emoji = String.valueOf(Character.toChars(0x1F600));
+        String maximumEmojiNote = emoji.repeat(JsonAdaptedInteraction.MAX_NOTE_LENGTH);
+        JsonAdaptedInteraction adaptedInteraction = new JsonAdaptedInteraction(
+                "2026-10-01", "14:30", maximumEmojiNote);
+
+        assertEquals(maximumEmojiNote, adaptedInteraction.toModelType().getNote());
+    }
+
+    @Test
+    public void toModelType_overlongEmojiNote_throwsIllegalValueException() {
+        String emoji = String.valueOf(Character.toChars(0x1F600));
+        String overlongEmojiNote = emoji.repeat(JsonAdaptedInteraction.MAX_NOTE_LENGTH + 1);
+        JsonAdaptedInteraction adaptedInteraction = new JsonAdaptedInteraction(
+                "2026-10-01", "14:30", overlongEmojiNote);
+
+        assertThrows(IllegalValueException.class, JsonAdaptedInteraction.INVALID_NOTE_LENGTH_MESSAGE,
+                adaptedInteraction::toModelType);
+    }
 }

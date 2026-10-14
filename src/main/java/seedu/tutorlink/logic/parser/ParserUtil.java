@@ -192,7 +192,8 @@ public class ParserUtil {
         if (trimmedInteractionNote.contains("\n") || trimmedInteractionNote.contains("\r")) {
             throw new ParseException(MESSAGE_INVALID_INTERACTION_NOTE_MULTILINE);
         }
-        if (trimmedInteractionNote.length() > MAX_INTERACTION_NOTE_LENGTH) {
+        if (trimmedInteractionNote.codePointCount(0, trimmedInteractionNote.length())
+                > MAX_INTERACTION_NOTE_LENGTH) {
             throw new ParseException(MESSAGE_INVALID_INTERACTION_NOTE_LENGTH);
         }
         return trimmedInteractionNote;

@@ -191,6 +191,23 @@ public class ParserUtilTest {
     }
 
     @Test
+    public void parseInteractionNote_maximumEmojiNote_returnsNote() throws Exception {
+        String emoji = String.valueOf(Character.toChars(0x1F600));
+        String maximumEmojiNote = emoji.repeat(ParserUtil.MAX_INTERACTION_NOTE_LENGTH);
+
+        assertEquals(maximumEmojiNote, ParserUtil.parseInteractionNote(maximumEmojiNote));
+    }
+
+    @Test
+    public void parseInteractionNote_overlongEmojiNote_throwsParseException() {
+        String emoji = String.valueOf(Character.toChars(0x1F600));
+        String overlongEmojiNote = emoji.repeat(ParserUtil.MAX_INTERACTION_NOTE_LENGTH + 1);
+
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE_LENGTH, () ->
+                ParserUtil.parseInteractionNote(overlongEmojiNote));
+    }
+
+    @Test
     public void parseInteractionNote_multilineNote_throwsParseException() {
         assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE_MULTILINE, () ->
                 ParserUtil.parseInteractionNote("First line\nSecond line"));
