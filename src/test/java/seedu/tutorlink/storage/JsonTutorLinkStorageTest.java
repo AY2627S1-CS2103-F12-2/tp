@@ -89,6 +89,15 @@ public class JsonTutorLinkStorageTest {
     }
 
     @Test
+    public void read_duplicateStoredSubjects_throwsDataLoadingException() throws Exception {
+        Path path = testFolder.resolve("duplicateSubjects.json");
+        String json = "{\"students\":[{\"name\":\"John Tan\",\"subjects\":[\"Math\",\"math\"]}]}";
+        Files.writeString(path, json);
+
+        assertThrows(DataLoadingException.class, () -> new JsonTutorLinkStorage(path).readTutorLink());
+    }
+
+    @Test
     public void read_invalidStoredStudent_throwsDataLoadingException() throws Exception {
         Path path = testFolder.resolve("invalidStudent.json");
         Files.writeString(path, "{\"students\":[null]}");

@@ -20,6 +20,8 @@ class JsonAdaptedStudent {
 
     public static final String MISSING_FIELD_MESSAGE_FORMAT = "Student's %s field is missing!";
     public static final String NULL_INTERACTION_MESSAGE = "Student's interaction entry must not be null.";
+    private static final String DUPLICATE_SUBJECT_MESSAGE =
+            "Subject '%1$s' is specified twice for the same student.";
 
     private final String name;
     private final List<String> subjects = new ArrayList<>();
@@ -89,7 +91,11 @@ class JsonAdaptedStudent {
             if (subject == null || !Subject.isValidSubject(subject)) {
                 throw new IllegalValueException(Subject.MESSAGE_CONSTRAINTS);
             }
-            modelSubjects.add(new Subject(subject));
+            Subject modelSubject = new Subject(subject);
+            if (modelSubjects.stream().anyMatch(modelSubject::isSameSubject)) {
+                throw new IllegalValueException(String.format(DUPLICATE_SUBJECT_MESSAGE, subject));
+            }
+            modelSubjects.add(modelSubject);
         }
 
         final List<Interaction> modelInteractions = new ArrayList<>();

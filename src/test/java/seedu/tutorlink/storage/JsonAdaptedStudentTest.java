@@ -111,4 +111,11 @@ public class JsonAdaptedStudentTest {
         assertThrows(IllegalValueException.class, Subject.MESSAGE_CONSTRAINTS, student::toModelType);
     }
 
+    @Test
+    public void toModelType_duplicateSubjectsIgnoringCase_throwsIllegalValueException() {
+        JsonAdaptedStudent student = new JsonAdaptedStudent(VALID_NAME, List.of("Math", "math"));
+
+        assertThrows(IllegalValueException.class, student::toModelType);
+    }
+
 }
