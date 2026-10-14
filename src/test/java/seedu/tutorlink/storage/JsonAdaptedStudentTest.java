@@ -54,6 +54,16 @@ public class JsonAdaptedStudentTest {
     }
 
     @Test
+    public void toModelType_nullInteraction_throwsIllegalValueException() {
+        List<JsonAdaptedInteraction> interactions = new ArrayList<>();
+        interactions.add(null);
+        JsonAdaptedStudent student = new JsonAdaptedStudent(VALID_NAME, VALID_SUBJECTS, interactions);
+
+        assertThrows(IllegalValueException.class, JsonAdaptedStudent.NULL_INTERACTION_MESSAGE,
+                student::toModelType);
+    }
+
+    @Test
     public void toModelType_validStudentDetails_returnsStudent() throws Exception {
         JsonAdaptedStudent student = new JsonAdaptedStudent(BENSON);
         assertEquals(BENSON, student.toModelType());

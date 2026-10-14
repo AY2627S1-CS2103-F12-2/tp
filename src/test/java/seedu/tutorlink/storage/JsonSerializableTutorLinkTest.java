@@ -5,6 +5,8 @@ import static seedu.tutorlink.testutil.Assert.assertThrows;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -42,6 +44,16 @@ public class JsonSerializableTutorLinkTest {
                 JsonSerializableTutorLink.class).get();
         assertThrows(IllegalValueException.class, JsonSerializableTutorLink.MESSAGE_DUPLICATE_STUDENT,
                 dataFromFile::toModelType);
+    }
+
+    @Test
+    public void toModelType_nullStudent_throwsIllegalValueException() {
+        List<JsonAdaptedStudent> students = new ArrayList<>();
+        students.add(null);
+        JsonSerializableTutorLink data = new JsonSerializableTutorLink(students);
+
+        assertThrows(IllegalValueException.class, JsonSerializableTutorLink.NULL_STUDENT_MESSAGE,
+                data::toModelType);
     }
 
 }

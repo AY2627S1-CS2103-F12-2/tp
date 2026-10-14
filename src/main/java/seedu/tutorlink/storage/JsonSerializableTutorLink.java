@@ -20,6 +20,7 @@ import seedu.tutorlink.model.student.Student;
 class JsonSerializableTutorLink {
 
     public static final String MESSAGE_DUPLICATE_STUDENT = "Students list contains duplicate student(s).";
+    public static final String NULL_STUDENT_MESSAGE = "Student entry must not be null.";
 
     private final List<JsonAdaptedStudent> students = new ArrayList<>();
 
@@ -48,6 +49,9 @@ class JsonSerializableTutorLink {
     public TutorLink toModelType() throws IllegalValueException {
         TutorLink tutorLink = new TutorLink();
         for (JsonAdaptedStudent jsonAdaptedStudent : students) {
+            if (jsonAdaptedStudent == null) {
+                throw new IllegalValueException(NULL_STUDENT_MESSAGE);
+            }
             Student student = jsonAdaptedStudent.toModelType();
             if (tutorLink.hasStudent(student)) {
                 throw new IllegalValueException(MESSAGE_DUPLICATE_STUDENT);
