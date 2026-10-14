@@ -13,6 +13,7 @@ import java.util.List;
 import seedu.tutorlink.commons.core.index.Index;
 import seedu.tutorlink.commons.util.StringUtil;
 import seedu.tutorlink.logic.parser.exceptions.ParseException;
+import seedu.tutorlink.model.followup.FollowUp;
 import seedu.tutorlink.model.interaction.Interaction;
 import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.Subject;
@@ -23,10 +24,10 @@ import seedu.tutorlink.model.student.Subject;
 public class ParserUtil {
 
     public static final String MESSAGE_INVALID_INDEX = "Index must be a positive integer.";
-    public static final int MAX_FOLLOW_UP_DESCRIPTION_LENGTH = 200;
+    public static final int MAX_FOLLOW_UP_DESCRIPTION_LENGTH = FollowUp.MAX_DESCRIPTION_LENGTH;
     public static final String MESSAGE_EMPTY_FOLLOW_UP_DESCRIPTION = "Description cannot be empty.";
-    public static final String MESSAGE_LONG_FOLLOW_UP_DESCRIPTION = "Description must be 200 characters or fewer.";
-    public static final String MESSAGE_MULTILINE_FOLLOW_UP_DESCRIPTION = "Description must be on a single line.";
+    public static final String MESSAGE_LONG_FOLLOW_UP_DESCRIPTION = FollowUp.MESSAGE_LONG_DESCRIPTION;
+    public static final String MESSAGE_MULTILINE_FOLLOW_UP_DESCRIPTION = FollowUp.MESSAGE_MULTILINE_DESCRIPTION;
     public static final String MESSAGE_INVALID_SUBJECT = "Subject '%1$s' is not valid. %2$s";
     public static final String MESSAGE_DUPLICATE_SUBJECT = "Subject '%1$s' is specified twice for the same student.";
     public static final String MESSAGE_INVALID_DATE_FORMAT =

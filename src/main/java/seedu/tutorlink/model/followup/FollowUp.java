@@ -16,6 +16,10 @@ import seedu.tutorlink.commons.util.ToStringBuilder;
 public class FollowUp {
 
     public static final String MESSAGE_DESCRIPTION_CONSTRAINTS = "Follow-up descriptions should not be blank.";
+    public static final int MAX_DESCRIPTION_LENGTH = 200;
+    public static final String MESSAGE_LONG_DESCRIPTION =
+            "Description must be " + MAX_DESCRIPTION_LENGTH + " characters or fewer.";
+    public static final String MESSAGE_MULTILINE_DESCRIPTION = "Description must be on a single line.";
 
     /** Orders follow-ups by review date, earliest first. The sort is stable, so ties keep the order added. */
     public static final Comparator<FollowUp> REVIEW_DATE_ORDER = Comparator.comparing(FollowUp::getReviewDate);
