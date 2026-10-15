@@ -1,8 +1,10 @@
 package seedu.tutorlink;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -33,6 +35,12 @@ import seedu.tutorlink.ui.UiManager;
 public class MainApp extends Application {
 
     public static final String VERSION = "V0.5.1";
+    static final String MESSAGE_UNREADABLE_DATA_BACKED_UP = "\u26a0 The data file %1$s could not be read, so "
+            + "TutorLink started with no students.\nA copy of it was saved as %2$s. "
+            + "Your next change will overwrite %1$s.";
+    static final String MESSAGE_UNREADABLE_DATA_NOT_BACKED_UP = "\u26a0 The data file %1$s could not be read, so "
+            + "TutorLink started with no students.\nA backup copy could not be saved. "
+            + "Your next change will overwrite %1$s, so copy it elsewhere first if you want to keep it.";
 
     private static final Logger logger = LogsCenter.getLogger(MainApp.class);
     private static final Path USER_PREFS_FILE_PATH = Paths.get("preferences.json");
@@ -42,6 +50,7 @@ public class MainApp extends Application {
     protected Logic logic;
     protected Storage storage;
     protected Model model;
+    private Optional<String> startupWarning = Optional.empty();
 
     @Override
     public void init() throws Exception {
@@ -57,7 +66,7 @@ public class MainApp extends Application {
 
         logic = new LogicManager(model, storage);
 
-        ui = new UiManager(logic, storage.getTutorLinkFilePath());
+        ui = new UiManager(logic, storage.getTutorLinkFilePath(), startupWarning);
     }
 
     /**
@@ -81,9 +90,29 @@ public class MainApp extends Application {
             logger.warning("Data file at " + storage.getTutorLinkFilePath() + " could not be loaded."
                     + " Will be starting with an empty TutorLink.");
             initialData = new TutorLink();
+            Path dataFile = storage.getTutorLinkFilePath();
+            startupWarning = Optional.of(backUpUnreadableDataFile(dataFile)
+                    .map(backup -> String.format(MESSAGE_UNREADABLE_DATA_BACKED_UP, dataFile, backup))
+                    .orElseGet(() -> String.format(MESSAGE_UNREADABLE_DATA_NOT_BACKED_UP, dataFile)));
         }
 
         return new ModelManager(initialData, userPrefs);
+    }
+
+    /**
+     * Copies {@code dataFile} to a {@code .bak} file next to it, so the unreadable data survives
+     * the next save. Returns the backup path, or an empty Optional if the copy failed.
+     */
+    static Optional<Path> backUpUnreadableDataFile(Path dataFile) {
+        Path backup = dataFile.resolveSibling(dataFile.getFileName() + ".bak");
+        try {
+            Files.copy(dataFile, backup, StandardCopyOption.REPLACE_EXISTING);
+            logger.info("Backed up unreadable data file to " + backup);
+            return Optional.of(backup);
+        } catch (IOException e) {
+            logger.warning("Failed to back up unreadable data file: " + StringUtil.getDetails(e));
+            return Optional.empty();
+        }
     }
 
     /**
