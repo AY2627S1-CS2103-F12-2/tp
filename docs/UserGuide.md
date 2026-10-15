@@ -142,6 +142,7 @@ Format: `followup add n/NAME desc/TEXT review/DATE`
 
 * `NAME` identifies an existing student by their full name, ignoring case.
 * `TEXT` is 1 to 200 characters long after leading and trailing whitespace is removed. It must not be blank and must be on a single line.
+  The limit counts Unicode code points: a simple emoji such as 😀 counts as one. A combined emoji or a letter with a combining accent can contain multiple code points and count as more than one.
 * `DATE` must be a real calendar date in `yyyy-MM-dd` format, such as `2026-10-15`. Past, present and future review dates are allowed.
 * Give each parameter exactly once. Missing parameters or repeated prefixes are rejected.
 * A follow-up belongs to the student. It does not need to be linked to an interaction.

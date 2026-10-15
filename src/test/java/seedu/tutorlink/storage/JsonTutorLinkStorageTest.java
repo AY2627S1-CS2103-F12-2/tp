@@ -32,6 +32,27 @@ public class JsonTutorLinkStorageTest {
     public Path testFolder;
 
     @Test
+    public void saveAndReload_unicodeFollowUp_preservesFullDescription() throws Exception {
+        Path path = testFolder.resolve("unicodeFollowUp.json");
+        String description = "\uD83D\uDE00".repeat(200);
+        TutorLink original = getTypicalTutorLink();
+        original.setStudent(ALICE, ALICE.withFollowUp(new FollowUp(description, LocalDate.of(2026, 10, 15))));
+        new JsonTutorLinkStorage(path).saveTutorLink(original);
+
+        assertEquals(original, new TutorLink(new JsonTutorLinkStorage(path).readTutorLink().orElseThrow()));
+    }
+
+    @Test
+    public void read_overlongUnicodeFollowUp_throwsDataLoadingException() throws Exception {
+        Path path = testFolder.resolve("overlongUnicodeFollowUp.json");
+        String description = "\uD83D\uDE00".repeat(201);
+        Files.writeString(path, "{\"students\":[{\"name\":\"John Tan\",\"followUps\":[{\"description\":\""
+                + description + "\",\"reviewDate\":\"2026-10-15\"}]}]}");
+
+        assertThrows(DataLoadingException.class, () -> new JsonTutorLinkStorage(path).readTutorLink());
+    }
+
+    @Test
     public void saveAndReload_followUps_preservesRecordsAndOrder() throws Exception {
         Path path = testFolder.resolve("followUps.json");
         TutorLink original = getTypicalTutorLink();

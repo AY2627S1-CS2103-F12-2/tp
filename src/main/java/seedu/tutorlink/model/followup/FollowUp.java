@@ -16,6 +16,7 @@ import seedu.tutorlink.commons.util.ToStringBuilder;
 public class FollowUp {
 
     public static final String MESSAGE_DESCRIPTION_CONSTRAINTS = "Follow-up descriptions should not be blank.";
+    /** Maximum number of Unicode code points in a description after surrounding whitespace is removed. */
     public static final int MAX_DESCRIPTION_LENGTH = 200;
     public static final String MESSAGE_LONG_DESCRIPTION =
             "Description must be " + MAX_DESCRIPTION_LENGTH + " characters or fewer.";

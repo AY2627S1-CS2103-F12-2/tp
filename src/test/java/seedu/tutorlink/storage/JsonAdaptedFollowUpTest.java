@@ -47,6 +47,17 @@ public class JsonAdaptedFollowUpTest {
     }
 
     @Test
+    public void toModelType_unicodeDescription_countsCodePointsAfterTrimming() throws Exception {
+        String emoji = "\uD83D\uDE00";
+        for (String description : new String[]{emoji.repeat(200), "a".repeat(199) + emoji}) {
+            assertEquals(description, new JsonAdaptedFollowUp("  " + description + "  ", "2026-10-15")
+                    .toModelType().getDescription());
+            assertThrows(IllegalValueException.class, FollowUp.MESSAGE_LONG_DESCRIPTION, () ->
+                    new JsonAdaptedFollowUp(description + emoji, "2026-10-15").toModelType());
+        }
+    }
+
+    @Test
     public void toModelType_multilineDescription_throwsIllegalValueException() {
         for (String description : new String[]{"Review\nalgebra", "Review\ralgebra", "Review\r\nalgebra"}) {
             assertThrows(IllegalValueException.class, FollowUp.MESSAGE_MULTILINE_DESCRIPTION, () ->
