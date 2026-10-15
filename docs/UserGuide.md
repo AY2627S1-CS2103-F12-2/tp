@@ -146,7 +146,8 @@ Format: `interaction add n/NAME d/DATE [t/TIME] note/TEXT`
   A future date is allowed, but TutorLink warns you before recording it.
 * `TIME` is optional. If given, it must use the 24-hour `HH:mm` format, such as `14:30`.
 * `TEXT` is 1 to 500 characters long after leading and trailing whitespace is removed.
-  It must not be blank and must be on a single line.
+  It must not be blank and must be on a single line. If you paste text containing line breaks, each line break becomes a space,
+  so a pasted `First line⏎Second line` is recorded as `First line Second line`.
   The limit counts Unicode code points: a simple emoji such as 😀 counts as one. A combined emoji or a letter with a combining accent can contain multiple code points and count as more than one.
 * The `n/`, `d/` and optional `t/` parameters may appear in any order before `note/`.
   The `note/` parameter must be last. Everything after `note/` is treated as note text.
@@ -187,7 +188,6 @@ Invalid input examples:
 
 * `note/` with no text is rejected with `Note cannot be empty.`
 * A note longer than 500 characters is rejected with `Note must be 500 characters or fewer.`
-* A note containing a line break is rejected with `Note must be on a single line.`
 * Repeated `n/`, `d/` or `t/` parameters before `note/` are rejected. A `note/` appearing
   after the first `note/` is retained as part of the note text.
 * `d/01-10-2026` is rejected because the required format is `yyyy-MM-dd`.
@@ -232,7 +232,7 @@ Records something you intend to revisit with an existing student, with a review 
 Format: `followup add n/NAME desc/TEXT review/DATE`
 
 * `NAME` identifies an existing student by their full name, ignoring case.
-* `TEXT` is 1 to 200 characters long after leading and trailing whitespace is removed. It must not be blank and must be on a single line.
+* `TEXT` is 1 to 200 characters long after leading and trailing whitespace is removed. It must not be blank and must be on a single line. If you paste text containing line breaks, each line break becomes a space.
   The limit counts Unicode code points: a simple emoji such as 😀 counts as one. A combined emoji or a letter with a combining accent can contain multiple code points and count as more than one.
 * `DATE` must be a real calendar date in `yyyy-MM-dd` format, such as `2026-10-15`. Past, present and future review dates are allowed.
 * Give each parameter exactly once. Missing parameters or repeated prefixes are rejected.
@@ -258,7 +258,6 @@ Invalid input examples:
 
 * `desc/` with no text is rejected with `Description cannot be empty.`
 * A description longer than 200 characters is rejected with `Description must be 200 characters or fewer.`
-* A description containing a line break is rejected with `Description must be on a single line.`
 * `review/15-10-2026` is rejected because the required format is `yyyy-MM-dd`.
 * `review/2026-02-30` is rejected because February does not have 30 days.
 * An unknown student is rejected with `No student named 'NAME' found.`
