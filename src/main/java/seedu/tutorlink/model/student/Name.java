@@ -3,6 +3,7 @@ package seedu.tutorlink.model.student;
 import static java.util.Objects.requireNonNull;
 import static seedu.tutorlink.commons.util.AppUtil.checkArgument;
 
+import java.text.Normalizer;
 import java.util.Locale;
 
 /**
@@ -28,23 +29,33 @@ public class Name {
     public final String fullName;
 
     /**
-     * Constructs a {@code Name}.
+     * Constructs a {@code Name}, stored in Unicode NFC form so that visually identical names
+     * (e.g. a composed é and an e followed by a combining accent) are the same name.
      *
      * @param name A valid name.
      */
     public Name(String name) {
         requireNonNull(name);
-        checkArgument(isValidName(name), MESSAGE_CONSTRAINTS);
-        fullName = name;
+        String composedName = toComposedForm(name);
+        checkArgument(isValidName(composedName), MESSAGE_CONSTRAINTS);
+        fullName = composedName;
     }
 
     /**
-     * Returns true if a given string is a valid name.
+     * Returns true if a given string is a valid name. The length limit applies to the NFC form.
      */
     public static boolean isValidName(String test) {
-        return test.length() <= MAX_LENGTH
-                && test.matches(VALIDATION_REGEX)
-                && test.matches(LETTER_REGEX);
+        String composedTest = toComposedForm(test);
+        return composedTest.length() <= MAX_LENGTH
+                && composedTest.matches(VALIDATION_REGEX)
+                && composedTest.matches(LETTER_REGEX);
+    }
+
+    /**
+     * Returns {@code text} in Unicode NFC form.
+     */
+    public static String toComposedForm(String text) {
+        return Normalizer.normalize(text, Normalizer.Form.NFC);
     }
 
     /**

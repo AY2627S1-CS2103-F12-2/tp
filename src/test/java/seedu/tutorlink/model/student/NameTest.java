@@ -1,5 +1,6 @@
 package seedu.tutorlink.model.student;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.tutorlink.testutil.Assert.assertThrows;
@@ -86,5 +87,24 @@ public class NameTest {
 
         // null -> returns false
         assertFalse(name.isSameName(null));
+    }
+
+    @Test
+    public void constructor_decomposedAccent_storesComposedForm() {
+        String composed = "Jos\u00e9";
+        String decomposed = "Jose\u0301";
+
+        Name fromDecomposed = new Name(decomposed);
+
+        assertEquals(composed, fromDecomposed.fullName);
+        assertEquals(new Name(composed), fromDecomposed);
+        assertTrue(new Name(composed).isSameName(fromDecomposed));
+    }
+
+    @Test
+    public void isValidName_lengthCountedAfterComposition() {
+        // 49 letters + a decomposed e-acute is 51 chars as typed but 50 once composed
+        assertTrue(Name.isValidName("a".repeat(49) + "e\u0301"));
+        assertFalse(Name.isValidName("a".repeat(50) + "e\u0301"));
     }
 }
