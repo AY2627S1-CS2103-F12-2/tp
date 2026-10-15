@@ -3,6 +3,7 @@ package seedu.tutorlink.ui;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.Region;
 import seedu.tutorlink.logic.commands.CommandResult;
 import seedu.tutorlink.logic.commands.exceptions.CommandException;
@@ -29,6 +30,18 @@ public class CommandBox extends UiPart<Region> {
         this.commandExecutor = commandExecutor;
         // calls #setStyleToDefault() whenever there is a change to the text of the command box.
         commandTextField.textProperty().addListener((unused1, unused2, unused3) -> setStyleToDefault());
+        // TextField drops line breaks and joins the words around them, so turn pasted line breaks into spaces first.
+        commandTextField.setTextFormatter(new TextFormatter<String>(change -> {
+            change.setText(replaceLineBreaksWithSpaces(change.getText()));
+            return change;
+        }));
+    }
+
+    /**
+     * Returns {@code text} with each line break ({@code \n}, {@code \r} or {@code \r\n}) replaced by a space.
+     */
+    static String replaceLineBreaksWithSpaces(String text) {
+        return text.replaceAll("\\R", " ");
     }
 
     /**
