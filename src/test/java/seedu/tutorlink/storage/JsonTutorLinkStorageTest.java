@@ -163,6 +163,15 @@ public class JsonTutorLinkStorageTest {
     }
 
     @Test
+    public void read_visuallyIdenticalStoredNames_throwsDataLoadingException() throws Exception {
+        Path path = testFolder.resolve("visuallyIdenticalNames.json");
+        String json = "{\"students\":[{\"name\":\"Jos\u00e9\"},{\"name\":\"Jose\u0301\"}]}";
+        Files.writeString(path, json);
+
+        assertThrows(DataLoadingException.class, () -> new JsonTutorLinkStorage(path).readTutorLink());
+    }
+
+    @Test
     public void readTutorLink_invalidStudentTutorLink_throwDataLoadingException() {
         assertThrows(DataLoadingException.class, () -> readTutorLink("invalidStudentTutorLink.json"));
     }
