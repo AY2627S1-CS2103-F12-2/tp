@@ -112,10 +112,21 @@ public class JsonAdaptedStudentTest {
     }
 
     @Test
-    public void toModelType_duplicateSubjectsIgnoringCase_throwsIllegalValueException() {
-        JsonAdaptedStudent student = new JsonAdaptedStudent(VALID_NAME, List.of("Math", "math"));
+    public void toModelType_duplicateSubjects_throwsIllegalValueException() {
+        for (List<String> duplicates : List.of(List.of("Math", "Math"), List.of("Math", "math"),
+                List.of("Math", "math "), List.of(" Math", "MATH"))) {
+            JsonAdaptedStudent student = new JsonAdaptedStudent(VALID_NAME, duplicates);
 
-        assertThrows(IllegalValueException.class, student::toModelType);
+            assertThrows(IllegalValueException.class, student::toModelType);
+        }
+    }
+
+    @Test
+    public void toModelType_distinctSubjectsWithSurroundingSpaces_trimsAndKeepsOrder() throws Exception {
+        JsonAdaptedStudent student = new JsonAdaptedStudent(VALID_NAME, List.of(" Physics ", "Math", "Chemistry "));
+
+        assertEquals(List.of("Physics", "Math", "Chemistry"), student.toModelType().getSubjects().stream()
+                .map(subject -> subject.subjectName).toList());
     }
 
 }

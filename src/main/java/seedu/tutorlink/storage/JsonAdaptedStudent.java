@@ -88,12 +88,16 @@ class JsonAdaptedStudent {
 
         final List<Subject> modelSubjects = new ArrayList<>();
         for (String subject : subjects) {
-            if (subject == null || !Subject.isValidSubject(subject)) {
+            if (subject == null) {
                 throw new IllegalValueException(Subject.MESSAGE_CONSTRAINTS);
             }
-            Subject modelSubject = new Subject(subject);
+            String trimmedSubject = subject.trim();
+            if (!Subject.isValidSubject(trimmedSubject)) {
+                throw new IllegalValueException(Subject.MESSAGE_CONSTRAINTS);
+            }
+            Subject modelSubject = new Subject(trimmedSubject);
             if (modelSubjects.stream().anyMatch(modelSubject::isSameSubject)) {
-                throw new IllegalValueException(String.format(DUPLICATE_SUBJECT_MESSAGE, subject));
+                throw new IllegalValueException(String.format(DUPLICATE_SUBJECT_MESSAGE, trimmedSubject));
             }
             modelSubjects.add(modelSubject);
         }
