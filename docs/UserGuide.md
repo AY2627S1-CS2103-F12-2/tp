@@ -322,7 +322,7 @@ TutorLink saves your data to your computer after every command that changes it. 
 TutorLink keeps its data in the JSON file `[JAR file location]/data/tutorlink.json`. Advanced users can edit this file directly.
 
 <div markdown="span" class="alert alert-warning">:exclamation: **Caution:**
-If your changes make the data file invalid, TutorLink starts with no students the next time it runs. The invalid file stays on disk until you run a command that changes data, which overwrites it. Back up the file before editing it.<br>
+If your changes make the data file invalid, TutorLink starts with no students the next time it runs and shows a warning. It saves a copy of the invalid file as `data/tutorlink.json.bak` (replacing any earlier copy), because your next command that changes data overwrites `data/tutorlink.json`. To recover, close TutorLink, fix the copy and rename it back to `tutorlink.json`. Back up the file before editing it.<br>
 Some edits can also make TutorLink behave unexpectedly, for example a value outside the accepted range. Edit the data file only if you are confident you can update it correctly.
 </div>
 

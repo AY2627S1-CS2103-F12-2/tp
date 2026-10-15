@@ -121,6 +121,13 @@ public class MainWindow extends UiPart<Stage> {
     }
 
     /**
+     * Shows {@code warning} in the result display, styled as an error.
+     */
+    void showWarning(String warning) {
+        resultDisplay.setErrorToUser(warning);
+    }
+
+    /**
      * Fills up all the placeholders of this window.
      */
     void fillInnerParts() {
