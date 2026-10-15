@@ -56,8 +56,9 @@ TutorLink is for one tutor on one computer. It does not schedule lessons, track 
 * Items followed by `…` can appear any number of times, including zero.<br>
   For example, `[s/SUBJECT]…` can be left out, or written as `s/Math` or `s/Math s/Physics`.
 
-* Parameters can be in any order.<br>
+* Parameters can be in any order unless a command's instructions say otherwise.<br>
   For example, `s/Math n/John Tan` works the same as `n/John Tan s/Math`.
+  For `interaction add`, `note/` must be last because everything after it is note text.
 
 * Command words are not case-sensitive. `Student Add` works the same as `student add`.
 
@@ -133,6 +134,95 @@ Examples:
 * `find john aliyah` shows `John Tan` and `Aliyah Lim`.
 
 <!-- Interaction commands (interaction add, interaction list): @Dancodes2 -->
+
+### Adding an interaction: `interaction add`
+
+Records a dated note about a lesson or other discussion with an existing student.
+
+Format: `interaction add n/NAME d/DATE [t/TIME] note/TEXT`
+
+* `NAME` identifies an existing student by their full name, ignoring case.
+* `DATE` must be a real calendar date in `yyyy-MM-dd` format, such as `2026-10-01`.
+  A future date is allowed, but TutorLink warns you before recording it.
+* `TIME` is optional. If given, it must use the 24-hour `HH:mm` format, such as `14:30`.
+* `TEXT` is 1 to 500 characters long after leading and trailing whitespace is removed.
+  It must not be blank and must be on a single line.
+* The `n/`, `d/` and optional `t/` parameters may appear in any order before `note/`.
+  The `note/` parameter must be last. Everything after `note/` is treated as note text.
+  Missing required parameters (`n/`, `d/`, or `note/`), repeated `n/`, `d/`, or `t/` parameters,
+  and text before the first parameter are rejected.
+* Multiple interactions may have the same date and time. Each note is recorded separately.
+* A failed command leaves your stored data unchanged.
+
+Examples:
+
+* `interaction add n/John Tan d/2026-10-01 note/Discussed revision plan`
+* `interaction add n/john tan d/2026-10-01 t/14:30 note/Practised algebraic fractions`
+* `interaction add n/John Tan d/2026-10-15 note/Reviewed algebraic fractions`
+
+After the first example, TutorLink shows:
+
+```text
+✔ Interaction recorded for John Tan on 2026-10-01.
+Total interactions for John Tan: 1
+```
+
+If the interaction has a time, that time is included in the confirmation:
+
+```text
+✔ Interaction recorded for John Tan on 2026-10-01 (14:30).
+Total interactions for John Tan: 2
+```
+
+If the date is in the future, TutorLink records the interaction and shows a warning first:
+
+```text
+⚠ Interaction date 2026-10-15 is in the future (today is 2026-10-14); recording it anyway.
+✔ Interaction recorded for John Tan on 2026-10-15.
+Total interactions for John Tan: 3
+```
+
+Invalid input examples:
+
+* `note/` with no text is rejected with `Note cannot be empty.`
+* A note longer than 500 characters is rejected with `Note must be 500 characters or fewer.`
+* A note containing a line break is rejected with `Note must be on a single line.`
+* Repeated `n/`, `d/` or `t/` parameters before `note/` are rejected. A `note/` appearing
+  after the first `note/` is retained as part of the note text.
+* `d/01-10-2026` is rejected because the required format is `yyyy-MM-dd`.
+* `d/2026-02-30` is rejected because February does not have 30 days.
+* `t/25:00` is rejected because the time must be valid and use `HH:mm`.
+* An unknown student is rejected with `No student named 'NAME' found.`
+
+### Viewing a student's interactions: `interaction list`
+
+Shows a student's interaction history in chronological order in the command result area.
+
+Format: `interaction list n/NAME`
+
+* Give the full name of an existing student, ignoring case, with `n/` exactly once.
+* Interactions are sorted by date and then time, earliest first. On the same date, an interaction
+  without a time and one at `00:00` share the same ordering position; their relative order follows
+  the order in which they were recorded. Both appear before interactions at later times.
+* Listing interactions does not change stored data or select a different student in the panels.
+  Use `student view n/NAME` to select a student.
+
+Example:
+
+* `interaction list n/John Tan`
+
+After recording the interactions above, the result is:
+
+```text
+Interactions for John Tan (3):
+1. 2026-10-01 — Discussed revision plan
+2. 2026-10-01 14:30 — Practised algebraic fractions
+3. 2026-10-15 — Reviewed algebraic fractions
+```
+
+If John has no interactions, TutorLink shows `ℹ No interactions recorded for John Tan yet.`
+An unknown student gives `No student named 'NAME' found.` Missing or repeated `n/` parameters
+are rejected.
 
 ### Adding a follow-up: `followup add`
 
@@ -261,6 +351,8 @@ Action | Format, Examples
 **View student** | `student view n/NAME`<br> e.g., `student view n/John Tan`
 **List students** | `list`
 **Find students** | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find tan lim`
+**Add interaction** | `interaction add n/NAME d/DATE [t/TIME] note/TEXT`<br> e.g., `interaction add n/John Tan d/2026-10-01 note/Discussed revision plan`
+**List interactions** | `interaction list n/NAME`<br> e.g., `interaction list n/John Tan`
 **Add follow-up** | `followup add n/NAME desc/TEXT review/DATE`<br> e.g., `followup add n/John Tan desc/Review algebra review/2026-10-15`
 **View follow-ups** | `followup list n/NAME`<br> e.g., `followup list n/John Tan`
 **Delete student** | `student delete n/NAME`<br> e.g., `student delete n/John Tan`
