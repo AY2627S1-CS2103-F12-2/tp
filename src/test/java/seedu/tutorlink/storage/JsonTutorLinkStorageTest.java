@@ -110,6 +110,24 @@ public class JsonTutorLinkStorageTest {
     }
 
     @Test
+    public void read_duplicateStoredSubjects_throwsDataLoadingException() throws Exception {
+        Path path = testFolder.resolve("duplicateSubjects.json");
+        String json = "{\"students\":[{\"name\":\"John Tan\",\"subjects\":[\"Math\",\"math\"]}]}";
+        Files.writeString(path, json);
+
+        assertThrows(DataLoadingException.class, () -> new JsonTutorLinkStorage(path).readTutorLink());
+    }
+
+    @Test
+    public void read_duplicateStoredSubjectsWithTrailingSpace_throwsDataLoadingException() throws Exception {
+        Path path = testFolder.resolve("duplicateSubjectsTrailingSpace.json");
+        String json = "{\"students\":[{\"name\":\"John Tan\",\"subjects\":[\"Math\",\"math \"]}]}";
+        Files.writeString(path, json);
+
+        assertThrows(DataLoadingException.class, () -> new JsonTutorLinkStorage(path).readTutorLink());
+    }
+
+    @Test
     public void read_overlongEmojiStoredInteraction_throwsDataLoadingException() throws Exception {
         Path path = testFolder.resolve("overlongEmojiInteraction.json");
         String emoji = String.valueOf(Character.toChars(0x1F600));
