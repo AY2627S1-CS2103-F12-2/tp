@@ -116,9 +116,9 @@ public class ParserUtil {
     }
 
     /**
-     * Parses a follow-up description, stripping leading and trailing whitespace.
+     * Parses a follow-up description, stripping leading and trailing whitespace and counting Unicode code points.
      *
-     * @throws ParseException if the description is blank, longer than 200 characters, or contains a line break.
+     * @throws ParseException if the description is blank, exceeds 200 code points, or contains a line break.
      */
     public static String parseFollowUpDescription(String description) throws ParseException {
         requireNonNull(description);
@@ -126,7 +126,7 @@ public class ParserUtil {
         if (strippedDescription.isEmpty()) {
             throw new ParseException(MESSAGE_EMPTY_FOLLOW_UP_DESCRIPTION);
         }
-        if (strippedDescription.length() > MAX_FOLLOW_UP_DESCRIPTION_LENGTH) {
+        if (strippedDescription.codePointCount(0, strippedDescription.length()) > MAX_FOLLOW_UP_DESCRIPTION_LENGTH) {
             throw new ParseException(MESSAGE_LONG_FOLLOW_UP_DESCRIPTION);
         }
         if (strippedDescription.contains("\n") || strippedDescription.contains("\r")) {
@@ -192,7 +192,8 @@ public class ParserUtil {
         if (trimmedInteractionNote.contains("\n") || trimmedInteractionNote.contains("\r")) {
             throw new ParseException(MESSAGE_INVALID_INTERACTION_NOTE_MULTILINE);
         }
-        if (trimmedInteractionNote.length() > MAX_INTERACTION_NOTE_LENGTH) {
+        if (trimmedInteractionNote.codePointCount(0, trimmedInteractionNote.length())
+                > MAX_INTERACTION_NOTE_LENGTH) {
             throw new ParseException(MESSAGE_INVALID_INTERACTION_NOTE_LENGTH);
         }
         return trimmedInteractionNote;

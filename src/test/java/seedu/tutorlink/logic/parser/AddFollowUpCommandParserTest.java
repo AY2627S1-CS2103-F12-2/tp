@@ -35,6 +35,18 @@ public class AddFollowUpCommandParserTest {
     }
 
     @Test
+    public void parse_unicodeDescription_countsCodePointsAfterTrimming() throws Exception {
+        String emoji = "\uD83D\uDE00";
+        for (String description : new String[]{emoji.repeat(200), "a".repeat(199) + emoji}) {
+            AddFollowUpCommand expected = new AddFollowUpCommand(new Name("John Tan"),
+                    new FollowUp(description, LocalDate.of(2026, 10, 15)));
+            assertEquals(expected, parser.parse(" n/John Tan desc/  " + description + "  review/2026-10-15"));
+            assertThrows(ParseException.class, ParserUtil.MESSAGE_LONG_FOLLOW_UP_DESCRIPTION, () ->
+                    parser.parse(" n/John Tan desc/" + description + emoji + " review/2026-10-15"));
+        }
+    }
+
+    @Test
     public void parse_missingPrefixesOrPreamble_throwsParseException() {
         String message = String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddFollowUpCommand.MESSAGE_USAGE);
         for (String args : new String[]{"", " desc/Review algebra review/2026-10-15",

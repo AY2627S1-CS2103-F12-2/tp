@@ -53,7 +53,8 @@ class JsonAdaptedFollowUp {
         if (description.isBlank()) {
             throw new IllegalValueException(FollowUp.MESSAGE_DESCRIPTION_CONSTRAINTS);
         }
-        if (description.strip().length() > FollowUp.MAX_DESCRIPTION_LENGTH) {
+        String strippedDescription = description.strip();
+        if (strippedDescription.codePointCount(0, strippedDescription.length()) > FollowUp.MAX_DESCRIPTION_LENGTH) {
             throw new IllegalValueException(FollowUp.MESSAGE_LONG_DESCRIPTION);
         }
         if (description.contains("\n") || description.contains("\r")) {
