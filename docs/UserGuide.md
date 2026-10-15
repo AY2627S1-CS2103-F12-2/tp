@@ -147,6 +147,7 @@ Format: `interaction add n/NAME d/DATE [t/TIME] note/TEXT`
 * `TIME` is optional. If given, it must use the 24-hour `HH:mm` format, such as `14:30`.
 * `TEXT` is 1 to 500 characters long after leading and trailing whitespace is removed.
   It must not be blank and must be on a single line.
+  The limit counts Unicode code points: a simple emoji such as 😀 counts as one. A combined emoji or a letter with a combining accent can contain multiple code points and count as more than one.
 * The `n/`, `d/` and optional `t/` parameters may appear in any order before `note/`.
   The `note/` parameter must be last. Everything after `note/` is treated as note text.
   Missing required parameters (`n/`, `d/`, or `note/`), repeated `n/`, `d/`, or `t/` parameters,
