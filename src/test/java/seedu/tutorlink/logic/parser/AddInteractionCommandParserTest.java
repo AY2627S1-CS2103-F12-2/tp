@@ -120,6 +120,16 @@ public class AddInteractionCommandParserTest {
     }
 
     @Test
+    public void parse_maximumEmojiNote_returnsCommand() throws Exception {
+        String emoji = String.valueOf(Character.toChars(0x1F600));
+        String maximumEmojiNote = emoji.repeat(ParserUtil.MAX_INTERACTION_NOTE_LENGTH);
+        AddInteractionCommand expected = new AddInteractionCommand(new Name("Alex Tan"),
+                new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), maximumEmojiNote));
+
+        assertEquals(expected, parser.parse(" n/Alex Tan d/2026-10-01 note/" + maximumEmojiNote));
+    }
+
+    @Test
     public void parse_multilineNote_throwsParseException() {
         assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE_MULTILINE, () ->
                 parser.parse(" n/Alex Tan d/2026-10-01 note/First line\nSecond line"));

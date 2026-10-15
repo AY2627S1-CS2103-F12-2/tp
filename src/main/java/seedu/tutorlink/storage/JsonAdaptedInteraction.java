@@ -65,7 +65,8 @@ class JsonAdaptedInteraction {
         if (note.contains("\n") || note.contains("\r")) {
             throw new IllegalValueException(INVALID_NOTE_MULTILINE_MESSAGE);
         }
-        if (note.trim().length() > MAX_NOTE_LENGTH) {
+        String trimmedNote = note.trim();
+        if (trimmedNote.codePointCount(0, trimmedNote.length()) > MAX_NOTE_LENGTH) {
             throw new IllegalValueException(INVALID_NOTE_LENGTH_MESSAGE);
         }
 
