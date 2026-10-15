@@ -112,6 +112,15 @@ public class JsonAdaptedStudentTest {
     }
 
     @Test
+    public void toModelType_nullSubject_throwsIllegalValueException() {
+        List<String> invalidSubjects = new ArrayList<>(VALID_SUBJECTS);
+        invalidSubjects.add(null);
+        JsonAdaptedStudent student = new JsonAdaptedStudent(VALID_NAME, invalidSubjects);
+
+        assertThrows(IllegalValueException.class, Subject.MESSAGE_CONSTRAINTS, student::toModelType);
+    }
+
+    @Test
     public void toModelType_duplicateSubjects_throwsIllegalValueException() {
         for (List<String> duplicates : List.of(List.of("Math", "Math"), List.of("Math", "math"),
                 List.of("Math", "math "), List.of(" Math", "MATH"))) {
