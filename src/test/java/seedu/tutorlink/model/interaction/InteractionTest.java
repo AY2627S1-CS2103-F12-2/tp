@@ -47,4 +47,24 @@ public class InteractionTest {
         assertEquals(List.of(untimed, timed, laterDay),
                 Stream.of(laterDay, timed, untimed).sorted(Interaction.CHRONOLOGICAL_ORDER).toList());
     }
+
+    @Test
+    public void chronologicalOrder_untimedBeforeMidnight_preservesRecordedOrder() {
+        LocalDate date = LocalDate.of(2026, 10, 1);
+        Interaction untimed = new Interaction(date, Optional.empty(), "Untimed");
+        Interaction midnight = new Interaction(date, Optional.of(LocalTime.MIDNIGHT), "Midnight");
+
+        assertEquals(List.of(untimed, midnight),
+                Stream.of(untimed, midnight).sorted(Interaction.CHRONOLOGICAL_ORDER).toList());
+    }
+
+    @Test
+    public void chronologicalOrder_midnightBeforeUntimed_preservesRecordedOrder() {
+        LocalDate date = LocalDate.of(2026, 10, 1);
+        Interaction midnight = new Interaction(date, Optional.of(LocalTime.MIDNIGHT), "Midnight");
+        Interaction untimed = new Interaction(date, Optional.empty(), "Untimed");
+
+        assertEquals(List.of(midnight, untimed),
+                Stream.of(midnight, untimed).sorted(Interaction.CHRONOLOGICAL_ORDER).toList());
+    }
 }
