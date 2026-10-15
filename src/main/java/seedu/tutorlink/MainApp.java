@@ -35,6 +35,7 @@ import seedu.tutorlink.ui.UiManager;
 public class MainApp extends Application {
 
     public static final String VERSION = "V0.5.1";
+
     static final String MESSAGE_UNREADABLE_DATA_BACKED_UP = "\u26a0 The data file %1$s could not be read, so "
             + "TutorLink started with no students.\nA copy of it was saved as %2$s. "
             + "Your next change will overwrite %1$s.";
