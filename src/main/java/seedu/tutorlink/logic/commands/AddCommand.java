@@ -4,6 +4,9 @@ import static java.util.Objects.requireNonNull;
 import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_SUBJECT;
 
+import java.util.logging.Logger;
+
+import seedu.tutorlink.commons.core.LogsCenter;
 import seedu.tutorlink.commons.util.ToStringBuilder;
 import seedu.tutorlink.logic.Messages;
 import seedu.tutorlink.logic.commands.exceptions.CommandException;
@@ -32,6 +35,8 @@ public class AddCommand extends Command {
     public static final String MESSAGE_DUPLICATE_STUDENT =
             "A student named '%1$s' already exists. Student names must be unique.";
 
+    private static final Logger logger = LogsCenter.getLogger(AddCommand.class);
+
     private final Student toAdd;
 
     /**
@@ -53,6 +58,8 @@ public class AddCommand extends Command {
 
         model.addStudent(toAdd);
         model.setSelectedStudent(toAdd);
+        assert model.hasStudent(toAdd) : "Added student should be stored";
+        logger.info("Added student " + toAdd.getName());
         int totalStudents = model.getTutorLink().getStudentList().size();
         return new CommandResult(String.format(MESSAGE_SUCCESS, toAdd.getName(), describeSubjects(toAdd),
                 totalStudents));
