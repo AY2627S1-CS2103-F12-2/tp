@@ -113,5 +113,15 @@ public class EditStudentCommandTest {
                 new EditStudentCommand(CARL.getName(), Optional.of(NEW_NAME), Optional.empty())));
         assertFalse(renameBenson.equals(
                 new EditStudentCommand(BENSON.getName(), Optional.empty(), Optional.of(NEW_SUBJECTS))));
+        assertFalse(renameBenson.equals(
+                new EditStudentCommand(BENSON.getName(), Optional.of(NEW_NAME), Optional.of(NEW_SUBJECTS))));
+    }
+
+    @Test
+    public void toStringMethod() {
+        EditStudentCommand command = new EditStudentCommand(BENSON.getName(), Optional.of(NEW_NAME), Optional.empty());
+        String expected = EditStudentCommand.class.getCanonicalName() + "{name=" + BENSON.getName()
+                + ", newName=" + Optional.of(NEW_NAME) + ", newSubjects=" + Optional.empty() + "}";
+        assertEquals(expected, command.toString());
     }
 }
