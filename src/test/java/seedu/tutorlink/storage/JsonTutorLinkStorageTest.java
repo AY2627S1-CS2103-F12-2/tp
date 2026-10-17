@@ -22,6 +22,7 @@ import seedu.tutorlink.commons.exceptions.DataLoadingException;
 import seedu.tutorlink.model.ReadOnlyTutorLink;
 import seedu.tutorlink.model.TutorLink;
 import seedu.tutorlink.model.followup.FollowUp;
+import seedu.tutorlink.model.followup.FollowUpStatus;
 import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.Student;
 
@@ -30,6 +31,39 @@ public class JsonTutorLinkStorageTest {
 
     @TempDir
     public Path testFolder;
+
+    @Test
+    public void saveAndReload_followUpStatuses_preservesRecordsAndOrder() throws Exception {
+        Path path = testFolder.resolve("followUpStatuses.json");
+        TutorLink original = getTypicalTutorLink();
+        Student student = ALICE;
+        for (FollowUpStatus status : FollowUpStatus.values()) {
+            student = student.withFollowUp(new FollowUp("Review " + status, LocalDate.of(2026, 10, 15), status));
+        }
+        original.setStudent(ALICE, student);
+        new JsonTutorLinkStorage(path).saveTutorLink(original);
+
+        assertEquals(original, new TutorLink(new JsonTutorLinkStorage(path).readTutorLink().orElseThrow()));
+    }
+
+    @Test
+    public void read_legacyFollowUpWithoutStatus_defaultsToOutstanding() throws Exception {
+        Path path = testFolder.resolve("legacyFollowUp.json");
+        Files.writeString(path, "{\"students\":[{\"name\":\"John Tan\",\"followUps\":["
+                + "{\"description\":\"Review algebra\",\"reviewDate\":\"2026-10-15\"}]}]}");
+
+        Student restored = new JsonTutorLinkStorage(path).readTutorLink().orElseThrow().getStudentList().getFirst();
+        assertEquals(List.of(new FollowUp("Review algebra", LocalDate.of(2026, 10, 15))), restored.getFollowUps());
+    }
+
+    @Test
+    public void read_invalidFollowUpStatus_throwsDataLoadingException() throws Exception {
+        Path path = testFolder.resolve("invalidFollowUpStatus.json");
+        Files.writeString(path, "{\"students\":[{\"name\":\"John Tan\",\"followUps\":["
+                + "{\"description\":\"Review algebra\",\"reviewDate\":\"2026-10-15\",\"status\":\"UNKNOWN\"}]}]}");
+
+        assertThrows(DataLoadingException.class, () -> new JsonTutorLinkStorage(path).readTutorLink());
+    }
 
     @Test
     public void saveAndReload_unicodeFollowUp_preservesFullDescription() throws Exception {

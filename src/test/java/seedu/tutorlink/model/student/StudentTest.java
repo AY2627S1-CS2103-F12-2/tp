@@ -18,6 +18,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 import seedu.tutorlink.model.followup.FollowUp;
+import seedu.tutorlink.model.followup.FollowUpStatus;
 import seedu.tutorlink.model.interaction.Interaction;
 import seedu.tutorlink.testutil.StudentBuilder;
 
@@ -27,6 +28,20 @@ public class StudentTest {
             new FollowUp("Review algebra", LocalDate.of(2026, 10, 8));
     private static final FollowUp SECOND_FOLLOW_UP =
             new FollowUp("Revisit fractions", LocalDate.of(2026, 10, 9));
+
+    @Test
+    public void copyAndWithInteraction_preserveFollowUpStatuses() {
+        Student student = new StudentBuilder().build()
+                .withFollowUp(FIRST_FOLLOW_UP.withStatus(FollowUpStatus.DONE))
+                .withFollowUp(SECOND_FOLLOW_UP.withStatus(FollowUpStatus.CANCELLED));
+        Student copy = new StudentBuilder(student).build();
+        Interaction interaction = new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "Revision lesson");
+
+        assertEquals(student, copy);
+        assertEquals(student.getFollowUps(), student.withInteraction(interaction).getFollowUps());
+        assertFalse(student.equals(new StudentBuilder().build()
+                .withFollowUp(FIRST_FOLLOW_UP).withFollowUp(SECOND_FOLLOW_UP)));
+    }
 
     @Test
     public void constructor_withoutFollowUps_emptyList() {
