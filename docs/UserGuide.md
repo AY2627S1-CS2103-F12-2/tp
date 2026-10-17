@@ -120,7 +120,7 @@ Format: `student edit n/NAME [new/NEW_NAME] [s/SUBJECT]…`
 * Give at least one of `new/` or `s/`.
 * `NEW_NAME` follows the same rules as in [`student add`](#adding-a-student-student-add). Renaming to the name of another existing student, ignoring case, is rejected as a duplicate. Changing only the casing, such as `john tan` to `John Tan`, is allowed.
 * If you give any `s/`, the subjects you give replace **all** the student's existing subjects. Without `s/`, the subjects stay the same.
-* If the student is shown in the panels, the panels update straight away.
+* If the student is shown in the panels, the panels update straight away. If you used `find` and the new name no longer matches it, the student leaves the filtered list and the panels are cleared. Use `list` to see all students again.
 
 Examples:
 * `student edit n/John Tan new/Jonathan Tan` renames John Tan.
@@ -322,7 +322,7 @@ Deleting a student cannot be undone, and it also deletes every interaction and f
 </div>
 
 <div markdown="span" class="alert alert-primary">:bulb: **Tip:**
-To correct a student's name or subjects, delete the student and add them again. This also deletes their interactions and follow-ups.
+To correct a student's name or subjects, use [`student edit`](#editing-a-student-student-edit) instead. It keeps their interactions and follow-ups.
 </div>
 
 Example:

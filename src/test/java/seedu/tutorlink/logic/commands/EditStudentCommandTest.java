@@ -2,6 +2,7 @@ package seedu.tutorlink.logic.commands;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.tutorlink.logic.commands.CommandTestUtil.assertCommandFailure;
 import static seedu.tutorlink.logic.commands.CommandTestUtil.assertCommandSuccess;
@@ -22,6 +23,7 @@ import seedu.tutorlink.model.UserPrefs;
 import seedu.tutorlink.model.followup.FollowUp;
 import seedu.tutorlink.model.interaction.Interaction;
 import seedu.tutorlink.model.student.Name;
+import seedu.tutorlink.model.student.NameContainsKeywordsPredicate;
 import seedu.tutorlink.model.student.Student;
 import seedu.tutorlink.model.student.Subject;
 
@@ -84,6 +86,30 @@ public class EditStudentCommandTest {
         model.setSelectedStudent(BENSON);
         new EditStudentCommand(BENSON.getName(), Optional.of(NEW_NAME), Optional.empty()).execute(model);
         assertEquals(NEW_NAME, model.getSelectedStudent().get().getName());
+    }
+
+    @Test
+    public void execute_renameStillMatchingFind_studentStaysSelected() throws Exception {
+        model.updateFilteredStudentList(new NameContainsKeywordsPredicate(List.of("Benson")));
+        model.setSelectedStudent(BENSON);
+
+        new EditStudentCommand(BENSON.getName(), Optional.of(NEW_NAME), Optional.empty()).execute(model);
+
+        assertEquals(NEW_NAME, model.getSelectedStudent().get().getName());
+        assertEquals(1, model.getFilteredStudentList().size());
+    }
+
+    @Test
+    public void execute_renameNoLongerMatchingFind_selectionCleared() throws Exception {
+        model.updateFilteredStudentList(new NameContainsKeywordsPredicate(List.of("Benson")));
+        model.setSelectedStudent(BENSON);
+
+        new EditStudentCommand(BENSON.getName(), Optional.of(new Name("Zack Meier")), Optional.empty())
+                .execute(model);
+
+        assertNull(model.getSelectedStudent().get());
+        assertTrue(model.getFilteredStudentList().isEmpty());
+        assertTrue(model.findStudentByName(new Name("Zack Meier")).isPresent());
     }
 
     @Test
