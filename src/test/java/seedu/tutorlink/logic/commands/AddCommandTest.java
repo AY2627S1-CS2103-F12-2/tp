@@ -57,6 +57,14 @@ public class AddCommandTest {
     }
 
     @Test
+    public void execute_modelDoesNotStoreStudent_throwsAssertionError() {
+        AddCommand addCommand = new AddCommand(new StudentBuilder().build());
+
+        assertThrows(AssertionError.class, "Added student should be stored", () ->
+                addCommand.execute(new ModelStubDroppingStudentAdded()));
+    }
+
+    @Test
     public void equals() {
         Student alice = new StudentBuilder().withName("Alice").build();
         Student bob = new StudentBuilder().withName("Bob").build();
@@ -212,6 +220,16 @@ public class AddCommandTest {
         @Override
         public ReadOnlyTutorLink getTutorLink() {
             return new TutorLink();
+        }
+    }
+
+    /**
+     * A Model stub that accepts the student being added but never stores it.
+     */
+    private class ModelStubDroppingStudentAdded extends ModelStubAcceptingStudentAdded {
+        @Override
+        public void addStudent(Student student) {
+            requireNonNull(student);
         }
     }
 
