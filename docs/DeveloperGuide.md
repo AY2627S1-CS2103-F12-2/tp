@@ -165,7 +165,7 @@ The sequence diagram below shows how `student view n/john tan` finds and selects
 1. `TutorLinkParser` reads the command word `student view` and passes the rest of the input to a new `ViewStudentCommandParser`.
 1. `ViewStudentCommandParser` checks that exactly one `n/` prefix is present and turns its value into a `Name`, which rejects names that break the naming rules. It returns a `ViewStudentCommand` holding that `Name`.
 1. When executed, `ViewStudentCommand` calls `Model#findStudentByName`. This compares names with `Name#isSameName`, which ignores case and treats runs of spaces as one space, so `john   TAN` finds `John Tan`.
-1. If a student is found, the command calls `Model#setSelectedStudent`. The UI panels observe the selected student, so they show John Tan's details, interactions and follow-ups. If no student is found, the command throws a `CommandException` with `No student named 'john tan' found.` and nothing changes.
+1. If a student is found, the command calls `Model#setSelectedStudent`. The UI panels observe the selected student, so they show John Tan's details, interactions and follow-ups. If an active `find` filter hides John Tan, `setSelectedStudent` first resets the filter to show all students, so the selected student is always in the student list. If no student is found, the command throws a `CommandException` with `No student named 'john tan' found.` and nothing changes.
 
 Names are unique in the same way. `UniqueStudentList` treats two students as duplicates when `Student#isSameStudent` is true, which also uses `Name#isSameName`. So `student add n/john tan` is rejected when `John Tan` exists, and a name lookup can never match two students.
 
@@ -622,6 +622,9 @@ testers are expected to do more *exploratory* testing.
 
 1. Test case: `student view John Tan`<br>
    Expected: The error shows the correct command format.
+
+1. Test case: `find lim`, then `student view n/John Tan`<br>
+   Expected: John Tan is shown in the detail panel. The student list shows all students again, including John Tan.
 
 ### Deleting a student
 
