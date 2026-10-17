@@ -110,6 +110,7 @@ public class ModelManager implements Model {
         tutorLink.setStudent(target, editedStudent);
         if (target.equals(selectedStudent.get())) {
             selectedStudent.set(editedStudent);
+            clearSelectionIfHidden();
         }
     }
 
@@ -140,7 +141,14 @@ public class ModelManager implements Model {
     public void updateFilteredStudentList(Predicate<Student> predicate) {
         requireNonNull(predicate);
         filteredStudents.setPredicate(predicate);
-        // Do not keep showing a student the filter has hidden from the list
+        clearSelectionIfHidden();
+    }
+
+    /**
+     * Clears the selected student if the current filter hides them, so the panels never show a student
+     * that is not in the student list.
+     */
+    private void clearSelectionIfHidden() {
         if (selectedStudent.get() != null && !filteredStudents.contains(selectedStudent.get())) {
             selectedStudent.set(null);
         }
