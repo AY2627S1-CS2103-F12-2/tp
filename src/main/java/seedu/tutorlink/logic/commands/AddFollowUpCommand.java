@@ -46,7 +46,7 @@ public class AddFollowUpCommand extends Command {
 
         Student student = model.findStudentByName(name)
                 .orElseThrow(() -> new CommandException(String.format(Messages.MESSAGE_STUDENT_NOT_FOUND, name)));
-        if (student.getFollowUps().contains(followUp)) {
+        if (student.getOutstandingFollowUps().contains(followUp)) {
             throw new CommandException(MESSAGE_DUPLICATE_FOLLOW_UP);
         }
 
@@ -54,7 +54,7 @@ public class AddFollowUpCommand extends Command {
         model.setStudent(student, updatedStudent);
 
         return new CommandResult(String.format(MESSAGE_SUCCESS, student.getName(), followUp.getReviewDate(),
-                followUp.getDescription(), updatedStudent.getFollowUps().size()));
+                followUp.getDescription(), updatedStudent.getOutstandingFollowUps().size()));
     }
 
     @Override

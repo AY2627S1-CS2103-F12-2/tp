@@ -20,12 +20,33 @@ import seedu.tutorlink.model.ModelManager;
 import seedu.tutorlink.model.TutorLink;
 import seedu.tutorlink.model.UserPrefs;
 import seedu.tutorlink.model.followup.FollowUp;
+import seedu.tutorlink.model.followup.FollowUpStatus;
 import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.Student;
 
 public class ListFollowUpsCommandTest {
 
     private Model model = new ModelManager(getTypicalTutorLink(), new UserPrefs());
+
+    @Test
+    public void execute_mixedStatuses_numbersOnlyOutstandingFollowUps() {
+        Student student = BENSON.withFollowUp(new FollowUp("Done", LocalDate.of(2026, 10, 1), FollowUpStatus.DONE))
+                .withFollowUp(new FollowUp("Cancelled", LocalDate.of(2026, 10, 2), FollowUpStatus.CANCELLED))
+                .withFollowUp(new FollowUp("Outstanding", LocalDate.of(2026, 10, 3)));
+        model.setStudent(BENSON, student);
+        Model expected = new ModelManager(new TutorLink(model.getTutorLink()), new UserPrefs());
+        assertCommandSuccess(new ListFollowUpsCommand(student.getName()), model,
+                "Outstanding follow-ups for " + student.getName() + " (1):\n1. 2026-10-03 — Outstanding", expected);
+    }
+
+    @Test
+    public void execute_onlyHistoricalFollowUps_informationalMessage() {
+        Student student = BENSON.withFollowUp(new FollowUp("Done", LocalDate.of(2026, 10, 1), FollowUpStatus.DONE));
+        model.setStudent(BENSON, student);
+        Model expected = new ModelManager(new TutorLink(model.getTutorLink()), new UserPrefs());
+        assertCommandSuccess(new ListFollowUpsCommand(student.getName()), model,
+                String.format(ListFollowUpsCommand.MESSAGE_NONE_RECORDED, student.getName()), expected);
+    }
 
     @Test
     public void execute_unsortedFollowUps_sortedOutputWithoutChangingRecords() {
