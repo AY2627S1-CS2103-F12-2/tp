@@ -321,6 +321,41 @@ Errors leave all records unchanged:
 * An index larger than the current outstanding list, including `i/1` for an empty list, gives `Index exceeds the number of available items.`
 * Missing parameters or extra text before them give a format error with the correct command format. Repeated `n/` or `i/` prefixes are rejected.
 
+### Cancelling a follow-up: `followup cancel`
+
+Marks an outstanding follow-up as cancelled when you no longer intend to revisit it. It is removed from the outstanding list and panel but remains saved with status `CANCELLED`.
+
+Format: `followup cancel n/NAME i/INDEX`
+
+* Give the full name of an existing student, ignoring case, and each parameter exactly once. Parameters may be in either order.
+* `INDEX` must be a positive integer shown by `followup list n/NAME`. It refers to that student's outstanding follow-ups in review-date order, not their position in the data file.
+* The list is renumbered after cancellation. Run `followup list` again before choosing another item. Completed and cancelled follow-ups cannot be selected from this list.
+* Cancelling a follow-up leaves the student's other follow-ups, interactions, name and subjects unchanged. If the student is selected, the panel updates automatically.
+* The cancelled record and its status survive restarting TutorLink. You may add the same description and review date again if needed.
+
+Example, continuing after the completion example above, where the algebra follow-up is the only outstanding item:
+
+```text
+followup list n/John Tan
+followup cancel n/John Tan i/1
+```
+
+After the cancellation command, TutorLink shows:
+
+```text
+✔ Follow-up cancelled for John Tan — review on 2026-10-15: "Review algebra"
+Total outstanding follow-ups for John Tan: 0
+```
+
+The cancelled algebra follow-up and the completed drills follow-up remain saved. Running `followup list n/John Tan` now shows `ℹ No outstanding follow-ups for John Tan.`
+
+Errors leave all records unchanged:
+
+* An unknown student gives `No student named 'NAME' found.`
+* An empty index, zero, a negative number, a non-integer, or a value larger than `2147483647` gives `Index must be a positive integer.`
+* An index larger than the current outstanding list, including `i/1` for an empty list, gives `Index exceeds the number of available items.`
+* Missing parameters or extra text before them give a format error with the correct command format. Repeated `n/` or `i/` prefixes are rejected.
+
 ### Deleting a student: `student delete`
 
 Deletes a student, together with all of their interactions and follow-ups.
@@ -391,6 +426,7 @@ Action | Format, Examples
 **Add follow-up** | `followup add n/NAME desc/TEXT review/DATE`<br> e.g., `followup add n/John Tan desc/Review algebra review/2026-10-15`
 **View follow-ups** | `followup list n/NAME`<br> e.g., `followup list n/John Tan`
 **Complete follow-up** | `followup done n/NAME i/INDEX`<br> e.g., `followup done n/John Tan i/1`
+**Cancel follow-up** | `followup cancel n/NAME i/INDEX`<br> e.g., `followup cancel n/John Tan i/1`
 **Delete student** | `student delete n/NAME`<br> e.g., `student delete n/John Tan`
 **Help** | `help`
 **Exit** | `exit`
