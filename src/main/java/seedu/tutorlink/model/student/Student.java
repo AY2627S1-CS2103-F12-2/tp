@@ -5,9 +5,11 @@ import static seedu.tutorlink.commons.util.CollectionUtil.requireAllNonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 import seedu.tutorlink.commons.util.ToStringBuilder;
 import seedu.tutorlink.model.followup.FollowUp;
+import seedu.tutorlink.model.followup.FollowUpStatus;
 import seedu.tutorlink.model.interaction.Interaction;
 
 /**
@@ -83,6 +85,40 @@ public class Student {
      */
     public List<FollowUp> getFollowUps() {
         return followUps;
+    }
+
+    /**
+     * Returns an immutable list of outstanding follow-ups in displayed order, earliest review date first.
+     * Entries with the same review date retain insertion order.
+     */
+    public List<FollowUp> getOutstandingFollowUps() {
+        return getOutstandingFollowUpPositions().stream().map(followUps::get).toList();
+    }
+
+    /**
+     * Returns a copy with the outstanding follow-up at the given zero-based displayed index assigned a new status.
+     * Preserves all other records and their stored order.
+     *
+     * @param index The zero-based index in {@link #getOutstandingFollowUps()}.
+     * @param status The status to assign.
+     * @throws IndexOutOfBoundsException if the index does not identify an outstanding follow-up.
+     * @throws NullPointerException if the status is null.
+     */
+    public Student withOutstandingFollowUpStatus(int index, FollowUpStatus status) {
+        Objects.requireNonNull(status);
+        int storedIndex = getOutstandingFollowUpPositions().get(index);
+        List<FollowUp> updatedFollowUps = new ArrayList<>(followUps);
+        updatedFollowUps.set(storedIndex, followUps.get(storedIndex).withStatus(status));
+        return new Student(name, subjects, interactions, updatedFollowUps);
+    }
+
+    private List<Integer> getOutstandingFollowUpPositions() {
+        return IntStream.range(0, followUps.size())
+                .filter(index -> followUps.get(index).isOutstanding())
+                .boxed()
+                .sorted((first, second) ->
+                        FollowUp.REVIEW_DATE_ORDER.compare(followUps.get(first), followUps.get(second)))
+                .toList();
     }
 
     /**

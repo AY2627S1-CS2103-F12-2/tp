@@ -18,6 +18,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 import seedu.tutorlink.model.followup.FollowUp;
+import seedu.tutorlink.model.followup.FollowUpStatus;
 import seedu.tutorlink.model.interaction.Interaction;
 import seedu.tutorlink.testutil.StudentBuilder;
 
@@ -27,6 +28,49 @@ public class StudentTest {
             new FollowUp("Review algebra", LocalDate.of(2026, 10, 8));
     private static final FollowUp SECOND_FOLLOW_UP =
             new FollowUp("Revisit fractions", LocalDate.of(2026, 10, 9));
+
+    @Test
+    public void outstandingFollowUps_sortAndUpdateDisplayedIndexWithoutChangingOriginal() {
+        FollowUp first = FIRST_FOLLOW_UP;
+        FollowUp sameDate = new FollowUp("Same date", first.getReviewDate());
+        FollowUp history = FIRST_FOLLOW_UP.withStatus(FollowUpStatus.CANCELLED);
+        Student student = new StudentBuilder().build().withFollowUp(SECOND_FOLLOW_UP)
+                .withFollowUp(history).withFollowUp(first).withFollowUp(sameDate);
+        assertEquals(List.of(first, sameDate, SECOND_FOLLOW_UP), student.getOutstandingFollowUps());
+        assertThrows(UnsupportedOperationException.class, () -> student.getOutstandingFollowUps().clear());
+
+        Student updated = student.withOutstandingFollowUpStatus(1, FollowUpStatus.DONE);
+        assertEquals(List.of(SECOND_FOLLOW_UP, history, first, sameDate.withStatus(FollowUpStatus.DONE)),
+                updated.getFollowUps());
+        assertEquals(List.of(first, SECOND_FOLLOW_UP), updated.getOutstandingFollowUps());
+        assertEquals(List.of(SECOND_FOLLOW_UP, history, first, sameDate), student.getFollowUps());
+        assertThrows(IndexOutOfBoundsException.class, () ->
+                student.withOutstandingFollowUpStatus(-1, FollowUpStatus.DONE));
+        assertThrows(IndexOutOfBoundsException.class, () ->
+                student.withOutstandingFollowUpStatus(3, FollowUpStatus.DONE));
+        assertThrows(NullPointerException.class, () -> student.withOutstandingFollowUpStatus(0, null));
+    }
+
+    @Test
+    public void withOutstandingFollowUpStatus_equalEntries_updatesOnlySelectedPosition() {
+        Student student = new StudentBuilder().build().withFollowUp(FIRST_FOLLOW_UP).withFollowUp(FIRST_FOLLOW_UP);
+        assertEquals(List.of(FIRST_FOLLOW_UP, FIRST_FOLLOW_UP.withStatus(FollowUpStatus.DONE)),
+                student.withOutstandingFollowUpStatus(1, FollowUpStatus.DONE).getFollowUps());
+    }
+
+    @Test
+    public void copyAndWithInteraction_preserveFollowUpStatuses() {
+        Student student = new StudentBuilder().build()
+                .withFollowUp(FIRST_FOLLOW_UP.withStatus(FollowUpStatus.DONE))
+                .withFollowUp(SECOND_FOLLOW_UP.withStatus(FollowUpStatus.CANCELLED));
+        Student copy = new StudentBuilder(student).build();
+        Interaction interaction = new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "Revision lesson");
+
+        assertEquals(student, copy);
+        assertEquals(student.getFollowUps(), student.withInteraction(interaction).getFollowUps());
+        assertFalse(student.equals(new StudentBuilder().build()
+                .withFollowUp(FIRST_FOLLOW_UP).withFollowUp(SECOND_FOLLOW_UP)));
+    }
 
     @Test
     public void constructor_withoutFollowUps_emptyList() {

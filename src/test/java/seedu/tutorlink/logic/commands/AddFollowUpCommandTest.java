@@ -20,6 +20,7 @@ import seedu.tutorlink.model.ModelManager;
 import seedu.tutorlink.model.TutorLink;
 import seedu.tutorlink.model.UserPrefs;
 import seedu.tutorlink.model.followup.FollowUp;
+import seedu.tutorlink.model.followup.FollowUpStatus;
 import seedu.tutorlink.model.interaction.Interaction;
 import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.Student;
@@ -28,6 +29,21 @@ public class AddFollowUpCommandTest {
 
     private static final FollowUp FOLLOW_UP = new FollowUp("Review algebra", LocalDate.of(2026, 10, 15));
     private Model model = new ModelManager(getTypicalTutorLink(), new UserPrefs());
+
+    @Test
+    public void execute_duplicateOfHistory_allowedAndCountsOnlyOutstanding() {
+        Student student = BENSON.withFollowUp(FOLLOW_UP.withStatus(FollowUpStatus.DONE))
+                .withFollowUp(FOLLOW_UP.withStatus(FollowUpStatus.CANCELLED));
+        model.setStudent(BENSON, student);
+        Model expected = new ModelManager(new TutorLink(model.getTutorLink()), new UserPrefs());
+        expected.setStudent(student, student.withFollowUp(FOLLOW_UP));
+        String message = String.format(AddFollowUpCommand.MESSAGE_SUCCESS, student.getName(),
+                FOLLOW_UP.getReviewDate(), FOLLOW_UP.getDescription(), 1);
+
+        assertCommandSuccess(new AddFollowUpCommand(student.getName(), FOLLOW_UP), model, message, expected);
+        assertCommandFailure(new AddFollowUpCommand(student.getName(), FOLLOW_UP), model,
+                AddFollowUpCommand.MESSAGE_DUPLICATE_FOLLOW_UP);
+    }
 
     @Test
     public void execute_existingStudent_preservesRecordsAndUpdatesSelection() {

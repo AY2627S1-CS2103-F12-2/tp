@@ -259,7 +259,7 @@ Format: `followup add n/NAME desc/TEXT review/DATE`
 * `DATE` must be a real calendar date in `yyyy-MM-dd` format, such as `2026-10-15`. Past, present and future review dates are allowed.
 * Give each parameter exactly once. Missing parameters or repeated prefixes are rejected.
 * A follow-up belongs to the student. It does not need to be linked to an interaction.
-* A duplicate with the same description and review date for the same student is rejected. Descriptions are compared after trimming and are case-sensitive: `Review algebra` and `review algebra` are different descriptions.
+* An outstanding duplicate with the same description and review date for the same student is rejected. Descriptions are compared after trimming and are case-sensitive: `Review algebra` and `review algebra` are different descriptions. You may add the same description and review date again after the earlier follow-up is completed or cancelled.
 * A failed command leaves your stored data unchanged.
 
 Examples (after adding John Tan):
@@ -292,7 +292,7 @@ Format: `followup list n/NAME`
 
 * Give the full name of an existing student, ignoring case, with `n/` exactly once.
 * Follow-ups are numbered and sorted by review date, earliest first. Follow-ups with the same review date remain in the order they were added. The outstanding follow-ups panel uses the same ordering.
-* Every recorded follow-up counts as **outstanding**, including those with past review dates. TutorLink does not yet have a command to complete or cancel a follow-up; passing its review date does not remove it.
+* Only follow-ups with status `OUTSTANDING` are shown, including those with past review dates. Completed (`DONE`) and cancelled (`CANCELLED`) records remain saved but are excluded from this list and the panel. Passing a review date does not complete a follow-up automatically.
 * Listing follow-ups does not change stored data or select a different student in the panels. Use `student view n/NAME` to select a student.
 
 Example:
@@ -308,6 +308,40 @@ Outstanding follow-ups for John Tan (2):
 ```
 
 If John has no follow-ups, TutorLink shows `ℹ No outstanding follow-ups for John Tan.` An unknown student gives `No student named 'NAME' found.` Missing or repeated `n/` parameters are rejected.
+
+### Completing a follow-up: `followup done`
+
+Marks an outstanding follow-up as completed, removing it from the outstanding list and panel while retaining it in the data file with status `DONE`.
+
+Format: `followup done n/NAME i/INDEX`
+
+* Give the full name of an existing student, ignoring case, and each parameter exactly once. Parameters may be in either order.
+* `INDEX` must be a positive integer shown by `followup list n/NAME`. It refers to that student's outstanding follow-ups in review-date order, not their position in the data file.
+* The list is renumbered after completion. Run `followup list` again before choosing another item.
+* Completing a follow-up leaves the student's other follow-ups, interactions, name and subjects unchanged. If the student is selected, the panel updates automatically.
+* The completed record and its status survive restarting TutorLink. Older v1.3 records without a status load as outstanding.
+
+Example, continuing from the two follow-ups listed above:
+
+```text
+followup done n/John Tan i/1
+```
+
+TutorLink shows:
+
+```text
+✔ Follow-up completed for John Tan — review on 2026-10-14: "Check in on extra drills"
+Total outstanding follow-ups for John Tan: 1
+```
+
+The algebra follow-up is now item 1. The completed drills follow-up remains saved, and you can add the same description and review date again if needed.
+
+Errors leave all records unchanged:
+
+* An unknown student gives `No student named 'NAME' found.`
+* An empty index, zero, a negative number, a non-integer, or a value larger than `2147483647` gives `Index must be a positive integer.`
+* An index larger than the current outstanding list, including `i/1` for an empty list, gives `Index exceeds the number of available items.`
+* Missing parameters or extra text before them give a format error with the correct command format. Repeated `n/` or `i/` prefixes are rejected.
 
 ### Deleting a student: `student delete`
 
@@ -379,6 +413,7 @@ Action | Format, Examples
 **List interactions** | `interaction list n/NAME`<br> e.g., `interaction list n/John Tan`
 **Add follow-up** | `followup add n/NAME desc/TEXT review/DATE`<br> e.g., `followup add n/John Tan desc/Review algebra review/2026-10-15`
 **View follow-ups** | `followup list n/NAME`<br> e.g., `followup list n/John Tan`
+**Complete follow-up** | `followup done n/NAME i/INDEX`<br> e.g., `followup done n/John Tan i/1`
 **Delete student** | `student delete n/NAME`<br> e.g., `student delete n/John Tan`
 **Help** | `help`
 **Exit** | `exit`
