@@ -122,6 +122,10 @@ public class ModelManager implements Model {
 
     @Override
     public void setSelectedStudent(Student student) {
+        // Show everyone again rather than select a student the filter hides from the list
+        if (student != null && !filteredStudents.contains(student)) {
+            updateFilteredStudentList(PREDICATE_SHOW_ALL_STUDENTS);
+        }
         selectedStudent.set(student);
     }
 
