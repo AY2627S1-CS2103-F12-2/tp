@@ -15,6 +15,7 @@ import seedu.tutorlink.logic.commands.AddInteractionCommand;
 import seedu.tutorlink.logic.commands.Command;
 import seedu.tutorlink.logic.commands.DeleteCommand;
 import seedu.tutorlink.logic.commands.DoneFollowUpCommand;
+import seedu.tutorlink.logic.commands.EditStudentCommand;
 import seedu.tutorlink.logic.commands.ExitCommand;
 import seedu.tutorlink.logic.commands.FindCommand;
 import seedu.tutorlink.logic.commands.HelpCommand;
@@ -65,6 +66,7 @@ public class TutorLinkParser {
             case AddFollowUpCommand.COMMAND_WORD -> new AddFollowUpCommandParser().parse(arguments);
             case AddInteractionCommand.COMMAND_WORD -> new AddInteractionCommandParser().parse(arguments);
             case ViewStudentCommand.COMMAND_WORD -> new ViewStudentCommandParser().parse(arguments);
+            case EditStudentCommand.COMMAND_WORD -> new EditStudentCommandParser().parse(arguments);
             case DeleteCommand.COMMAND_WORD -> new DeleteCommandParser().parse(arguments);
             case FindCommand.COMMAND_WORD -> new FindCommandParser().parse(arguments);
             case ListCommand.COMMAND_WORD -> new ListCommand();

@@ -110,6 +110,28 @@ Format: `student view n/NAME`
 Example:
 * `student view n/john tan` shows the student added as `John Tan`.
 
+### Editing a student: `student edit`
+
+Renames a student, replaces their subjects, or both. Their interactions and follow-ups are kept.
+
+Format: `student edit n/NAME [new/NEW_NAME] [s/SUBJECT]…`
+
+* `NAME` is the student's current full name, ignoring case.
+* Give at least one of `new/` or `s/`.
+* `NEW_NAME` follows the same rules as in [`student add`](#adding-a-student-student-add). Renaming to the name of another existing student, ignoring case, is rejected as a duplicate. Changing only the casing, such as `john tan` to `John Tan`, is allowed.
+* If you give any `s/`, the subjects you give replace **all** the student's existing subjects. Without `s/`, the subjects stay the same.
+* If the student is shown in the panels, the panels update straight away. If you used `find` and the new name no longer matches it, the student leaves the filtered list and the panels are cleared. Use `list` to see all students again.
+
+Examples:
+* `student edit n/John Tan new/Jonathan Tan` renames John Tan.
+* `student edit n/John Tan s/Math s/Chemistry` changes John Tan's subjects to Math and Chemistry.
+
+On success, TutorLink shows the updated student:
+
+```
+✔ Student updated: Jonathan Tan (subjects: Math, Physics)
+```
+
 ### Listing all students: `list`
 
 Shows all your students in the student list on the left.
@@ -334,7 +356,7 @@ Deleting a student cannot be undone, and it also deletes every interaction and f
 </div>
 
 <div markdown="span" class="alert alert-primary">:bulb: **Tip:**
-To correct a student's name or subjects, delete the student and add them again. This also deletes their interactions and follow-ups.
+To correct a student's name or subjects, use [`student edit`](#editing-a-student-student-edit) instead. It keeps their interactions and follow-ups.
 </div>
 
 Example:
@@ -384,6 +406,7 @@ Action | Format, Examples
 --------|------------------
 **Add student** | `student add n/NAME [s/SUBJECT]…`<br> e.g., `student add n/John Tan s/Math s/Physics`
 **View student** | `student view n/NAME`<br> e.g., `student view n/John Tan`
+**Edit student** | `student edit n/NAME [new/NEW_NAME] [s/SUBJECT]…`<br> e.g., `student edit n/John Tan new/Jonathan Tan s/Math`
 **List students** | `list`
 **Find students** | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find tan lim`
 **Add interaction** | `interaction add n/NAME d/DATE [t/TIME] note/TEXT`<br> e.g., `interaction add n/John Tan d/2026-10-01 note/Discussed revision plan`

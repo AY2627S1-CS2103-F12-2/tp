@@ -191,6 +191,44 @@ Names are unique in the same way. `UniqueStudentList` treats two students as dup
   * Pros: Simplest to implement.
   * Cons: The tutor must remember the exact casing, and `john tan` could be added as a second record of the same student.
 
+### Editing a student
+
+`student edit n/NAME [new/NEW_NAME] [s/SUBJECT]...` renames a student, replaces their subjects, or both. It uses the same name lookup as other commands (see [Finding a student by name](#finding-a-student-by-name)).
+
+The sequence diagram below shows how `student edit n/john tan new/Jonathan Tan` renames the student `John Tan`.
+
+<img src="images/EditStudentSequenceDiagram.png" width="750" />
+
+<div markdown="span" class="alert alert-info">:information_source: **Note:** The lifeline for `EditStudentCommandParser` should end at the destroy marker (X), but due to a limitation of PlantUML, it continues to the end of the diagram.
+</div>
+
+1. `TutorLinkParser` reads the command word `student edit` and passes the rest of the input to a new `EditStudentCommandParser`.
+1. `EditStudentCommandParser` checks that `n/` and `new/` appear at most once, and parses each value with the same rules as `student add`. If neither `new/` nor any `s/` is given, it throws a `ParseException` saying there is nothing to change. Otherwise, it returns an `EditStudentCommand` holding the current name, an optional new name and an optional new list of subjects.
+1. When executed, `EditStudentCommand` finds the student with `Model#findStudentByName`. If there is no match, it throws a `CommandException` and nothing changes.
+1. `EditStudentCommand#createEditedStudent` builds a new `Student` with the new name (or the old one) and the new subjects (or the old ones). It copies the existing interactions and follow-ups unchanged. `Student` is immutable, so the edit always produces a new object.
+1. If the name changes to that of a *different* student, `Model#hasStudent` returns true and the command throws the same duplicate-student error as `student add`. A rename that only changes casing (`john tan` to `John Tan`) is the same student under `Student#isSameStudent`, so it is allowed.
+1. `Model#setStudent` replaces the old student with the edited one in `UniqueStudentList`. If the old student was selected, `ModelManager` selects the edited student, so the UI panels update without another command. If a `find` filter is active and the edited student no longer matches it, `ModelManager` clears the selection instead, using the same check as `Model#updateFilteredStudentList`, so the panels never show a student that the list hides.
+
+#### Design considerations
+
+**Aspect: What `s/` does when editing**
+
+* **Alternative 1 (current choice):** Any `s/` replaces all existing subjects.
+  * Pros: One command sets the exact subject list, with the same meaning as `s/` in `student add`. The result is easy to predict from the command alone.
+  * Cons: To add one subject, the tutor must retype the existing ones. There is no way to remove all subjects.
+* **Alternative 2:** Separate prefixes to add and remove single subjects (e.g. `s+/` and `s-/`).
+  * Pros: Small changes take less typing.
+  * Cons: More prefixes to learn, and the tutor must remember the current list to know what the result is.
+
+**Aspect: How the edited student is stored**
+
+* **Alternative 1 (current choice):** Build a new immutable `Student` and replace the old one with `Model#setStudent`.
+  * Pros: Follows how `interaction add` and `followup add` already update a student. The model and UI see one change, and a failed command changes nothing.
+  * Cons: Every field is copied, even the ones that do not change.
+* **Alternative 2:** Make `Student` mutable and change its fields in place.
+  * Pros: No copying.
+  * Cons: The UI and other references could see a half-edited student, and the duplicate check would need to happen before any field changes.
+
 ### Two-word command words
 
 TutorLink's command words name a domain and then an action, e.g. `student add`, `interaction list` and `followup add`. A few app-level commands (`help`, `list`, `find`, `exit`) are one word.
@@ -622,6 +660,41 @@ testers are expected to do more *exploratory* testing.
 
 1. Test case: `student view John Tan`<br>
    Expected: The error shows the correct command format.
+
+### Editing a student
+
+1. Renaming a student
+
+   1. Prerequisites: John Tan exists with subjects Math and Physics, and has at least one interaction. He is shown in the detail panel (`student view n/John Tan`).
+
+   1. Test case: `student edit n/john tan new/Jonathan Tan`<br>
+      Expected: The student list and detail panel show Jonathan Tan, still with Math and Physics. The interaction panel still shows his interactions. The result shows `✔ Student updated: Jonathan Tan (subjects: Math, Physics)`.
+
+   1. Test case: `student edit n/Jonathan Tan new/jonathan tan`<br>
+      Expected: The name changes to `jonathan tan`. This is allowed because only the casing changes.
+
+   1. Test case: `find jonathan`, then `student view n/jonathan tan`, then `student edit n/jonathan tan new/Jon Lim`<br>
+      Expected: Jon Lim leaves the filtered list and the detail, interaction and follow-up panels go back to their placeholders. `list` shows Jon Lim again.
+
+1. Replacing subjects
+
+   1. Prerequisites: Jonathan Tan exists with subjects Math and Physics.
+
+   1. Test case: `student edit n/Jonathan Tan s/Chemistry`<br>
+      Expected: Jonathan Tan's only subject is now Chemistry. Math and Physics are gone.
+
+1. Invalid edits
+
+   1. Prerequisites: Jonathan Tan and Aliyah Lim exist.
+
+   1. Test case: `student edit n/Jonathan Tan new/aliyah lim`<br>
+      Expected: Nothing changes. The error says a student named `Aliyah Lim` already exists.
+
+   1. Test case: `student edit n/Jonathan Tan`<br>
+      Expected: Nothing changes. The error says there is nothing to change and shows the correct command format.
+
+   1. Other incorrect commands to try: `student edit n/Nobody Here new/Ann`, `student edit n/Jonathan Tan new/12345`, `student edit n/Jonathan Tan s/Math s/math`, `student edit n/Jonathan Tan new/A new/B`<br>
+      Expected: Nothing changes. The error says no such student is found, explains which value is wrong, or says a prefix is repeated.
 
 ### Deleting a student
 
