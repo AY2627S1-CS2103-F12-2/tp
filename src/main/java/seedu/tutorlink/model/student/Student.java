@@ -167,6 +167,22 @@ public class Student {
         return new Student(name, subjects, updatedInteractions, followUps);
     }
 
+    /**
+     * Returns a copy with the interaction at the given zero-based chronological index replaced.
+     * Preserves all other records and their stored order.
+     *
+     * @param index The zero-based index in {@link #getInteractionsInChronologicalOrder()}.
+     * @param interaction The replacement interaction.
+     * @throws IndexOutOfBoundsException if the index does not identify an interaction.
+     * @throws NullPointerException if the replacement interaction is null.
+     */
+    public Student withInteractionAtChronologicalIndex(int index, Interaction interaction) {
+        int storedIndex = getChronologicalInteractionPositions().get(index);
+        List<Interaction> updatedInteractions = new ArrayList<>(interactions);
+        updatedInteractions.set(storedIndex, Objects.requireNonNull(interaction));
+        return new Student(name, subjects, updatedInteractions, followUps);
+    }
+
     private List<Integer> getChronologicalInteractionPositions() {
         return IntStream.range(0, interactions.size())
                 .boxed()
