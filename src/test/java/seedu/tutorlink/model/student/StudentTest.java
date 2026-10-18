@@ -171,6 +171,56 @@ public class StudentTest {
     }
 
     @Test
+    public void interactionDisplayedOrderAndRemoval_useChronologicalIndexWithoutChangingOriginal() {
+        Interaction later = new Interaction(LocalDate.of(2026, 10, 2), Optional.empty(), "Later lesson");
+        Interaction first = new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "First lesson");
+        Interaction sameTime = new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "Same time");
+        Student student = new StudentBuilder().build().withInteraction(later)
+                .withInteraction(first).withInteraction(sameTime).withFollowUp(FIRST_FOLLOW_UP);
+
+        assertEquals(List.of(first, sameTime, later), student.getInteractionsInChronologicalOrder());
+        assertThrows(UnsupportedOperationException.class, () ->
+                student.getInteractionsInChronologicalOrder().clear());
+
+        Student updated = student.withoutInteractionAtChronologicalIndex(1);
+        assertEquals(List.of(later, first), updated.getInteractions());
+        assertEquals(student.getSubjects(), updated.getSubjects());
+        assertEquals(student.getFollowUps(), updated.getFollowUps());
+        assertEquals(List.of(later, first, sameTime), student.getInteractions());
+        assertThrows(IndexOutOfBoundsException.class, () -> student.withoutInteractionAtChronologicalIndex(-1));
+        assertThrows(IndexOutOfBoundsException.class, () -> student.withoutInteractionAtChronologicalIndex(3));
+    }
+
+    @Test
+    public void withoutInteractionAtChronologicalIndex_equalEntries_removesOnlySelectedPosition() {
+        Interaction duplicate = new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "Same lesson");
+        Interaction other = new Interaction(LocalDate.of(2026, 10, 2), Optional.empty(), "Other lesson");
+        Student student = new StudentBuilder().build().withInteraction(duplicate)
+                .withInteraction(other).withInteraction(duplicate);
+
+        assertEquals(List.of(duplicate, other), student.withoutInteractionAtChronologicalIndex(1).getInteractions());
+    }
+
+    @Test
+    public void withInteractionAtChronologicalIndex_replacesSelectedStoredPosition() {
+        Interaction later = new Interaction(LocalDate.of(2026, 10, 2), Optional.empty(), "Later");
+        Interaction earlier = new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "Earlier");
+        Interaction replacement = new Interaction(LocalDate.of(2026, 10, 3), Optional.empty(), "Corrected");
+        Student student = new StudentBuilder().build().withInteraction(later)
+                .withInteraction(earlier).withFollowUp(FIRST_FOLLOW_UP);
+
+        Student updated = student.withInteractionAtChronologicalIndex(0, replacement);
+        assertEquals(List.of(later, replacement), updated.getInteractions());
+        assertEquals(student.getSubjects(), updated.getSubjects());
+        assertEquals(student.getFollowUps(), updated.getFollowUps());
+        assertEquals(List.of(later, earlier), student.getInteractions());
+        assertThrows(IndexOutOfBoundsException.class, () ->
+                student.withInteractionAtChronologicalIndex(2, replacement));
+        assertThrows(NullPointerException.class, () ->
+                student.withInteractionAtChronologicalIndex(0, null));
+    }
+
+    @Test
     public void isSameStudent() {
         // same object -> returns true
         assertTrue(ALICE.isSameStudent(ALICE));

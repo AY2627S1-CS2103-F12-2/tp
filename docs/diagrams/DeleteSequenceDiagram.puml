@@ -4,9 +4,9 @@ skinparam ArrowFontStyle plain
 
 box Logic LOGIC_COLOR_T1
 participant ":LogicManager" as LogicManager LOGIC_COLOR
-participant ":AddressBookParser" as AddressBookParser LOGIC_COLOR
-participant ":DeleteCommandParser" as DeleteCommandParser LOGIC_COLOR
-participant "d:DeleteCommand" as DeleteCommand LOGIC_COLOR
+participant ":TutorLinkParser" as TutorLinkParser LOGIC_COLOR
+participant ":DeleteInteractionCommandParser" as DeleteInteractionCommandParser LOGIC_COLOR
+participant "d:DeleteInteractionCommand" as DeleteInteractionCommand LOGIC_COLOR
 participant "r:CommandResult" as CommandResult LOGIC_COLOR
 end box
 
@@ -14,56 +14,62 @@ box Model MODEL_COLOR_T1
 participant "m:Model" as Model MODEL_COLOR
 end box
 
-[-> LogicManager : execute("delete 1")
+[-> LogicManager : execute("interaction delete n/John Tan i/1")
 activate LogicManager
 
-LogicManager -> AddressBookParser : parseCommand("delete 1")
-activate AddressBookParser
+LogicManager -> TutorLinkParser : parseCommand("interaction delete n/John Tan i/1")
+activate TutorLinkParser
 
-create DeleteCommandParser
-AddressBookParser -> DeleteCommandParser
-activate DeleteCommandParser
+create DeleteInteractionCommandParser
+TutorLinkParser -> DeleteInteractionCommandParser
+activate DeleteInteractionCommandParser
 
-DeleteCommandParser --> AddressBookParser
-deactivate DeleteCommandParser
+DeleteInteractionCommandParser --> TutorLinkParser
+deactivate DeleteInteractionCommandParser
 
-AddressBookParser -> DeleteCommandParser : parse("1")
-activate DeleteCommandParser
+TutorLinkParser -> DeleteInteractionCommandParser : parse(" n/John Tan i/1")
+activate DeleteInteractionCommandParser
 
-create DeleteCommand
-DeleteCommandParser -> DeleteCommand
-activate DeleteCommand
+create DeleteInteractionCommand
+DeleteInteractionCommandParser -> DeleteInteractionCommand
+activate DeleteInteractionCommand
 
-DeleteCommand --> DeleteCommandParser :
-deactivate DeleteCommand
+DeleteInteractionCommand --> DeleteInteractionCommandParser
+deactivate DeleteInteractionCommand
 
-DeleteCommandParser --> AddressBookParser : d
-deactivate DeleteCommandParser
+DeleteInteractionCommandParser --> TutorLinkParser : d
+deactivate DeleteInteractionCommandParser
 'Hidden arrow to position the destroy marker below the end of the activation bar.
-DeleteCommandParser -[hidden]-> AddressBookParser
-destroy DeleteCommandParser
+DeleteInteractionCommandParser -[hidden]-> TutorLinkParser
+destroy DeleteInteractionCommandParser
 
-AddressBookParser --> LogicManager : d
-deactivate AddressBookParser
+TutorLinkParser --> LogicManager : d
+deactivate TutorLinkParser
 
-LogicManager -> DeleteCommand : execute(m)
-activate DeleteCommand
+LogicManager -> DeleteInteractionCommand : execute(m)
+activate DeleteInteractionCommand
 
-DeleteCommand -> Model : deletePerson(1)
+DeleteInteractionCommand -> Model : findStudentByName(John Tan)
 activate Model
 
-Model --> DeleteCommand
+Model --> DeleteInteractionCommand : Optional[John Tan]
+deactivate Model
+
+DeleteInteractionCommand -> Model : setStudent(John Tan, updatedStudent)
+activate Model
+
+Model --> DeleteInteractionCommand
 deactivate Model
 
 create CommandResult
-DeleteCommand -> CommandResult
+DeleteInteractionCommand -> CommandResult
 activate CommandResult
 
-CommandResult --> DeleteCommand
+CommandResult --> DeleteInteractionCommand
 deactivate CommandResult
 
-DeleteCommand --> LogicManager : r
-deactivate DeleteCommand
+DeleteInteractionCommand --> LogicManager : r
+deactivate DeleteInteractionCommand
 
 [<--LogicManager
 deactivate LogicManager
