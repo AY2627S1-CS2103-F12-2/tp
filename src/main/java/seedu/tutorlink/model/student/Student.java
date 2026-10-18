@@ -81,6 +81,14 @@ public class Student {
     }
 
     /**
+     * Returns an immutable list of interactions in displayed order, earliest date and time first.
+     * Entries with the same date and time retain insertion order.
+     */
+    public List<Interaction> getInteractionsInChronologicalOrder() {
+        return getChronologicalInteractionPositions().stream().map(interactions::get).toList();
+    }
+
+    /**
      * Returns an immutable list of follow-ups, in the order they were added.
      */
     public List<FollowUp> getFollowUps() {
@@ -143,6 +151,44 @@ public class Student {
         List<Interaction> updatedInteractions = new ArrayList<>(interactions);
         updatedInteractions.add(Objects.requireNonNull(interaction));
         return new Student(name, subjects, updatedInteractions, followUps);
+    }
+
+    /**
+     * Returns a copy without the interaction at the given zero-based chronological index.
+     * Preserves all other records and their stored order.
+     *
+     * @param index The zero-based index in {@link #getInteractionsInChronologicalOrder()}.
+     * @throws IndexOutOfBoundsException if the index does not identify an interaction.
+     */
+    public Student withoutInteractionAtChronologicalIndex(int index) {
+        int storedIndex = getChronologicalInteractionPositions().get(index);
+        List<Interaction> updatedInteractions = new ArrayList<>(interactions);
+        updatedInteractions.remove(storedIndex);
+        return new Student(name, subjects, updatedInteractions, followUps);
+    }
+
+    /**
+     * Returns a copy with the interaction at the given zero-based chronological index replaced.
+     * Preserves all other records and their stored order.
+     *
+     * @param index The zero-based index in {@link #getInteractionsInChronologicalOrder()}.
+     * @param interaction The replacement interaction.
+     * @throws IndexOutOfBoundsException if the index does not identify an interaction.
+     * @throws NullPointerException if the replacement interaction is null.
+     */
+    public Student withInteractionAtChronologicalIndex(int index, Interaction interaction) {
+        int storedIndex = getChronologicalInteractionPositions().get(index);
+        List<Interaction> updatedInteractions = new ArrayList<>(interactions);
+        updatedInteractions.set(storedIndex, Objects.requireNonNull(interaction));
+        return new Student(name, subjects, updatedInteractions, followUps);
+    }
+
+    private List<Integer> getChronologicalInteractionPositions() {
+        return IntStream.range(0, interactions.size())
+                .boxed()
+                .sorted((first, second) ->
+                        Interaction.CHRONOLOGICAL_ORDER.compare(interactions.get(first), interactions.get(second)))
+                .toList();
     }
 
     /**

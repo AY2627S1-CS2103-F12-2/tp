@@ -247,6 +247,62 @@ If John has no interactions, TutorLink shows `ℹ No interactions recorded for J
 An unknown student gives `No student named 'NAME' found.` Missing or repeated `n/` parameters
 are rejected.
 
+### Editing an interaction: `interaction edit`
+
+Corrects one or more fields of an interaction in an existing student's history.
+
+Format: `interaction edit n/NAME i/INDEX [d/DATE] [t/TIME] [note/TEXT]`
+
+* `INDEX` is the interaction number shown by `interaction list n/NAME` and must be a positive integer.
+* At least one of `d/`, `t/` or `note/` must be supplied. Fields that are not supplied remain unchanged.
+* Date, time, and note values follow the same rules as `interaction add`. A future replacement date is allowed
+  with a warning. The `note/` parameter must be last, and everything after it is treated as note text.
+* An existing time can be replaced using `t/TIME`; omitting `t/` preserves it.
+* A failed command leaves your stored data unchanged.
+
+Examples:
+
+* `interaction edit n/John Tan i/2 note/Practised algebraic fractions and equations`
+* `interaction edit n/John Tan i/2 d/2026-10-02 t/15:00`
+
+After the first example, TutorLink shows the original and updated interaction:
+
+```text
+✔ Interaction updated for John Tan: 2026-10-01 14:30 — Practised algebraic fractions
+Updated to: 2026-10-01 14:30 — Practised algebraic fractions and equations
+```
+
+An unknown student, an out-of-range index, missing edit fields, invalid values, or repeated structured
+parameters are rejected. A zero, negative, or non-integer index gives `Index must be a positive integer.`
+
+### Deleting an interaction: `interaction delete`
+
+Deletes one interaction from an existing student's history.
+
+Format: `interaction delete n/NAME i/INDEX`
+
+* `NAME` identifies an existing student by their full name, ignoring case.
+* `INDEX` is the interaction number shown by `interaction list n/NAME`. It must be a positive integer.
+* Because `interaction list` displays interactions chronologically, the index refers to that displayed order,
+  not the order in which the interactions were recorded.
+* An index larger than the number of interactions is rejected with
+  `Index exceeds the number of available items.`
+* A failed command leaves your stored data unchanged.
+
+Example:
+
+* `interaction delete n/John Tan i/2`
+
+Using the interaction list above, TutorLink deletes the interaction dated `2026-10-01 14:30` and shows:
+
+```text
+✔ Interaction deleted for John Tan: 2026-10-01 14:30 — Practised algebraic fractions
+Total interactions for John Tan: 2
+```
+
+An unknown student gives `No student named 'NAME' found.` Missing or repeated `n/` or `i/` parameters
+are rejected. A zero, negative, or non-integer index is rejected with `Index must be a positive integer.`
+
 ### Adding a follow-up: `followup add`
 
 Records something you intend to revisit with an existing student, with a review date.
@@ -411,6 +467,8 @@ Action | Format, Examples
 **Find students** | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find tan lim`
 **Add interaction** | `interaction add n/NAME d/DATE [t/TIME] note/TEXT`<br> e.g., `interaction add n/John Tan d/2026-10-01 note/Discussed revision plan`
 **List interactions** | `interaction list n/NAME`<br> e.g., `interaction list n/John Tan`
+**Edit interaction** | `interaction edit n/NAME i/INDEX [d/DATE] [t/TIME] [note/TEXT]`<br> e.g., `interaction edit n/John Tan i/2 note/Corrected lesson note`
+**Delete interaction** | `interaction delete n/NAME i/INDEX`<br> e.g., `interaction delete n/John Tan i/2`
 **Add follow-up** | `followup add n/NAME desc/TEXT review/DATE`<br> e.g., `followup add n/John Tan desc/Review algebra review/2026-10-15`
 **View follow-ups** | `followup list n/NAME`<br> e.g., `followup list n/John Tan`
 **Complete follow-up** | `followup done n/NAME i/INDEX`<br> e.g., `followup done n/John Tan i/1`

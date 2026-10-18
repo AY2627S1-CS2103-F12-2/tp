@@ -15,9 +15,12 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
+import seedu.tutorlink.commons.core.index.Index;
 import seedu.tutorlink.logic.commands.AddCommand;
 import seedu.tutorlink.logic.commands.AddInteractionCommand;
 import seedu.tutorlink.logic.commands.DeleteCommand;
+import seedu.tutorlink.logic.commands.DeleteInteractionCommand;
+import seedu.tutorlink.logic.commands.EditInteractionCommand;
 import seedu.tutorlink.logic.commands.EditStudentCommand;
 import seedu.tutorlink.logic.commands.ExitCommand;
 import seedu.tutorlink.logic.commands.FindCommand;
@@ -121,6 +124,20 @@ public class TutorLinkParserTest {
     public void parseCommand_listInteractions() throws Exception {
         assertEquals(new ListInteractionsCommand(new Name("Alex Tan")), parser.parseCommand(
                 "interaction list n/Alex Tan"));
+    }
+
+    @Test
+    public void parseCommand_deleteInteraction() throws Exception {
+        assertEquals(new DeleteInteractionCommand(new Name("Alex Tan"),
+                Index.fromOneBased(2)), parser.parseCommand(
+                "interaction delete n/Alex Tan i/2"));
+    }
+
+    @Test
+    public void parseCommand_editInteraction() throws Exception {
+        assertEquals(new EditInteractionCommand(new Name("Alex Tan"), Index.fromOneBased(2), Optional.empty(),
+                Optional.empty(), Optional.of("Corrected note")), parser.parseCommand(
+                "interaction edit n/Alex Tan i/2 note/Corrected note"));
     }
 
     @Test
