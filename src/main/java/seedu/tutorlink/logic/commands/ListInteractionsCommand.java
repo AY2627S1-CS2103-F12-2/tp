@@ -43,21 +43,12 @@ public class ListInteractionsCommand extends Command {
             return new CommandResult(String.format(MESSAGE_NONE_RECORDED, student.getName()));
         }
 
-        List<Interaction> sortedInteractions = student.getInteractions().stream()
-                .sorted(Interaction.CHRONOLOGICAL_ORDER)
-                .toList();
+        List<Interaction> sortedInteractions = student.getInteractionsInChronologicalOrder();
         String formattedInteractions = IntStream.range(0, sortedInteractions.size())
-                .mapToObj(index -> (index + 1) + ". " + formatInteraction(sortedInteractions.get(index)))
+                .mapToObj(index -> (index + 1) + ". " + Messages.formatInteraction(sortedInteractions.get(index)))
                 .collect(Collectors.joining("\n"));
         return new CommandResult(String.format(MESSAGE_SUCCESS, student.getName(), sortedInteractions.size(),
                 formattedInteractions));
-    }
-
-    private static String formatInteraction(Interaction interaction) {
-        String formattedTime = interaction.getTime()
-                .map(time -> " " + time.format(Interaction.TIME_FORMATTER))
-                .orElse("");
-        return interaction.getDate() + formattedTime + " \u2014 " + interaction.getNote();
     }
 
     @Override

@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import seedu.tutorlink.logic.parser.Prefix;
+import seedu.tutorlink.model.interaction.Interaction;
 import seedu.tutorlink.model.student.Student;
 import seedu.tutorlink.model.student.Subject;
 
@@ -56,6 +57,16 @@ public class Messages {
             return MESSAGE_NO_SUBJECTS;
         }
         return subjects.stream().map(Subject::toString).collect(Collectors.joining(", "));
+    }
+
+    /**
+     * Returns the interaction's date, optional time, and note for display.
+     */
+    public static String formatInteraction(Interaction interaction) {
+        String formattedTime = interaction.getTime()
+                .map(time -> " " + time.format(Interaction.TIME_FORMATTER))
+                .orElse("");
+        return interaction.getDate() + formattedTime + " \u2014 " + interaction.getNote();
     }
 
 }
