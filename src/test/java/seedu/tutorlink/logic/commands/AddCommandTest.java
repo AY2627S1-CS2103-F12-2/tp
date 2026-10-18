@@ -213,6 +213,12 @@ public class AddCommandTest {
         }
 
         @Override
+        public Optional<Student> findStudentByName(Name name) {
+            requireNonNull(name);
+            return studentsAdded.stream().filter(student -> student.getName().isSameName(name)).findFirst();
+        }
+
+        @Override
         public void setSelectedStudent(Student student) {
             // selection is not checked by these tests
         }

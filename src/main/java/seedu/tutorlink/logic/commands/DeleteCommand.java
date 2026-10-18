@@ -46,7 +46,7 @@ public class DeleteCommand extends Command {
                 .orElseThrow(() -> new CommandException(String.format(Messages.MESSAGE_STUDENT_NOT_FOUND, name)));
         model.deleteStudent(student);
         assert !model.hasStudent(student) : "Deleted student should no longer be stored";
-        assert !student.equals(model.getSelectedStudent().get()) : "Deleted student should not stay selected";
+        assert !student.isSameStudent(model.getSelectedStudent().get()) : "Deleted student should not stay selected";
         logger.info("Deleted student " + student.getName());
 
         int totalStudents = model.getTutorLink().getStudentList().size();

@@ -58,7 +58,8 @@ public class AddCommand extends Command {
 
         model.addStudent(toAdd);
         model.setSelectedStudent(toAdd);
-        assert model.hasStudent(toAdd) : "Added student should be stored";
+        assert model.findStudentByName(toAdd.getName()).filter(toAdd::equals).isPresent()
+                : "Added student should be stored";
         logger.info("Added student " + toAdd.getName());
         int totalStudents = model.getTutorLink().getStudentList().size();
         return new CommandResult(String.format(MESSAGE_SUCCESS, toAdd.getName(), describeSubjects(toAdd),
