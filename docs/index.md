@@ -8,10 +8,12 @@ title: TutorLink
 
 ![Ui](images/Ui.png)
 
-**AddressBook is a desktop application for managing your contact details.** While it has a GUI, most of the user interactions happen using a CLI (Command Line Interface).
+**TutorLink is a desktop application for private tutors who teach several students through recurring one-to-one lessons.** It uses a command-line interface so tutors can quickly manage student records without interrupting their work.
 
-* If you are interested in using AddressBook, head over to the [_Quick Start_ section of the **User Guide**](UserGuide.html#quick-start).
-* If you are interested in developing AddressBook, the [**Developer Guide**](DeveloperGuide.html) is a good place to start.
+TutorLink keeps each student's subjects, dated interaction notes, and outstanding follow-ups in one place. All records are stored locally, helping an independent tutor regain each student's learning context before a lesson.
+
+* If you are interested in using TutorLink, head over to the [_Quick Start_ section of the **User Guide**](UserGuide.html#quick-start).
+* If you are interested in developing TutorLink, the [**Developer Guide**](DeveloperGuide.html) is a good place to start.
 
 
 **Acknowledgements**
