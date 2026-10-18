@@ -21,6 +21,8 @@ public class Messages {
     public static final String MESSAGE_INVALID_COMMAND_FORMAT = "Invalid command format!\n%1$s";
     public static final String MESSAGE_STUDENT_NOT_FOUND = "No student named '%1$s' found.";
     public static final String MESSAGE_INDEX_OUT_OF_RANGE = "Index exceeds the number of available items.";
+    public static final String MESSAGE_FUTURE_INTERACTION_DATE_WARNING =
+            "\u26A0 Interaction date %1$s is in the future (today is %2$s); recording it anyway.\n";
     public static final String MESSAGE_STUDENTS_LISTED_OVERVIEW =
             "%1$d student(s) listed. Type list to show all students again.";
     public static final String MESSAGE_DUPLICATE_FIELDS =

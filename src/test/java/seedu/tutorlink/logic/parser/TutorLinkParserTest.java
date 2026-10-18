@@ -19,6 +19,7 @@ import seedu.tutorlink.logic.commands.AddCommand;
 import seedu.tutorlink.logic.commands.AddInteractionCommand;
 import seedu.tutorlink.logic.commands.DeleteCommand;
 import seedu.tutorlink.logic.commands.DeleteInteractionCommand;
+import seedu.tutorlink.logic.commands.EditInteractionCommand;
 import seedu.tutorlink.logic.commands.ExitCommand;
 import seedu.tutorlink.logic.commands.FindCommand;
 import seedu.tutorlink.logic.commands.HelpCommand;
@@ -120,6 +121,13 @@ public class TutorLinkParserTest {
         assertEquals(new DeleteInteractionCommand(new Name("Alex Tan"),
                 Index.fromOneBased(2)), parser.parseCommand(
                 "interaction delete n/Alex Tan i/2"));
+    }
+
+    @Test
+    public void parseCommand_editInteraction() throws Exception {
+        assertEquals(new EditInteractionCommand(new Name("Alex Tan"), Index.fromOneBased(2), Optional.empty(),
+                Optional.empty(), Optional.of("Corrected note")), parser.parseCommand(
+                "interaction edit n/Alex Tan i/2 note/Corrected note"));
     }
 
     @Test

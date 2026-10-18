@@ -29,7 +29,7 @@ public class AddInteractionCommand extends Command {
     public static final String MESSAGE_SUCCESS = "\u2714 Interaction recorded for %1$s on %2$s%3$s.\n"
             + "Total interactions for %1$s: %4$d";
     public static final String MESSAGE_FUTURE_DATE_WARNING =
-            "\u26A0 Interaction date %1$s is in the future (today is %2$s); recording it anyway.\n";
+            Messages.MESSAGE_FUTURE_INTERACTION_DATE_WARNING;
     private final Name name;
     private final Interaction interaction;
 
