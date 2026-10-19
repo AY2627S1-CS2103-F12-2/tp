@@ -3,6 +3,9 @@ package seedu.tutorlink.logic.commands;
 import static java.util.Objects.requireNonNull;
 import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_NAME;
 
+import java.util.logging.Logger;
+
+import seedu.tutorlink.commons.core.LogsCenter;
 import seedu.tutorlink.commons.util.ToStringBuilder;
 import seedu.tutorlink.logic.Messages;
 import seedu.tutorlink.logic.commands.exceptions.CommandException;
@@ -23,6 +26,8 @@ public class DeleteCommand extends Command {
 
     public static final String MESSAGE_SUCCESS = "✔ Student deleted: %1$s\nTotal students: %2$d";
 
+    private static final Logger logger = LogsCenter.getLogger(DeleteCommand.class);
+
     private final Name name;
 
     /**
@@ -40,6 +45,9 @@ public class DeleteCommand extends Command {
         Student student = model.findStudentByName(name)
                 .orElseThrow(() -> new CommandException(String.format(Messages.MESSAGE_STUDENT_NOT_FOUND, name)));
         model.deleteStudent(student);
+        assert !model.hasStudent(student) : "Deleted student should no longer be stored";
+        assert !student.isSameStudent(model.getSelectedStudent().get()) : "Deleted student should not stay selected";
+        logger.info("Deleted student " + student.getName());
 
         int totalStudents = model.getTutorLink().getStudentList().size();
         return new CommandResult(String.format(MESSAGE_SUCCESS, student.getName(), totalStudents));
