@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.tutorlink.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.tutorlink.logic.Messages.MESSAGE_UNKNOWN_COMMAND;
 import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_NAME;
+import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_NEW_NAME;
 import static seedu.tutorlink.testutil.Assert.assertThrows;
 
 import java.time.LocalDate;
@@ -20,6 +21,7 @@ import seedu.tutorlink.logic.commands.AddInteractionCommand;
 import seedu.tutorlink.logic.commands.DeleteCommand;
 import seedu.tutorlink.logic.commands.DeleteInteractionCommand;
 import seedu.tutorlink.logic.commands.EditInteractionCommand;
+import seedu.tutorlink.logic.commands.EditStudentCommand;
 import seedu.tutorlink.logic.commands.ExitCommand;
 import seedu.tutorlink.logic.commands.FindCommand;
 import seedu.tutorlink.logic.commands.HelpCommand;
@@ -82,6 +84,14 @@ public class TutorLinkParserTest {
         DeleteCommand command = (DeleteCommand) parser.parseCommand(
                 DeleteCommand.COMMAND_WORD + " " + PREFIX_NAME + "Amy Bee");
         assertEquals(new DeleteCommand(new Name("Amy Bee")), command);
+    }
+
+    @Test
+    public void parseCommand_editStudent() throws Exception {
+        EditStudentCommand command = (EditStudentCommand) parser.parseCommand(
+                EditStudentCommand.COMMAND_WORD + " " + PREFIX_NAME + "Amy Bee " + PREFIX_NEW_NAME + "Amy Tan");
+        assertEquals(new EditStudentCommand(new Name("Amy Bee"), Optional.of(new Name("Amy Tan")), Optional.empty()),
+                command);
     }
 
     @Test
