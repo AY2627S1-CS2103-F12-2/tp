@@ -1,5 +1,7 @@
 package seedu.tutorlink.ui;
 
+import java.util.List;
+
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -44,7 +46,8 @@ public class FollowUpPanel extends UiPart<Region> {
 
     private void show(Student student) {
         entries.getChildren().clear();
-        boolean hasFollowUps = student != null && !student.getFollowUps().isEmpty();
+        List<FollowUp> outstanding = student == null ? List.of() : student.getOutstandingFollowUps();
+        boolean hasFollowUps = !outstanding.isEmpty();
         PanelEntries.setShown(placeholder, !hasFollowUps);
         PanelEntries.setShown(entriesScrollPane, hasFollowUps);
         if (!hasFollowUps) {
@@ -54,8 +57,7 @@ public class FollowUpPanel extends UiPart<Region> {
             return;
         }
 
-        student.getFollowUps().stream()
-                .sorted(FollowUp.REVIEW_DATE_ORDER)
+        outstanding.stream()
                 .map(followUp -> PanelEntries.createEntry(describeReview(followUp), followUp.getDescription()))
                 .forEach(entries.getChildren()::add);
     }

@@ -18,6 +18,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 import seedu.tutorlink.model.followup.FollowUp;
+import seedu.tutorlink.model.followup.FollowUpStatus;
 import seedu.tutorlink.model.interaction.Interaction;
 import seedu.tutorlink.testutil.StudentBuilder;
 
@@ -27,6 +28,49 @@ public class StudentTest {
             new FollowUp("Review algebra", LocalDate.of(2026, 10, 8));
     private static final FollowUp SECOND_FOLLOW_UP =
             new FollowUp("Revisit fractions", LocalDate.of(2026, 10, 9));
+
+    @Test
+    public void outstandingFollowUps_sortAndUpdateDisplayedIndexWithoutChangingOriginal() {
+        FollowUp first = FIRST_FOLLOW_UP;
+        FollowUp sameDate = new FollowUp("Same date", first.getReviewDate());
+        FollowUp history = FIRST_FOLLOW_UP.withStatus(FollowUpStatus.CANCELLED);
+        Student student = new StudentBuilder().build().withFollowUp(SECOND_FOLLOW_UP)
+                .withFollowUp(history).withFollowUp(first).withFollowUp(sameDate);
+        assertEquals(List.of(first, sameDate, SECOND_FOLLOW_UP), student.getOutstandingFollowUps());
+        assertThrows(UnsupportedOperationException.class, () -> student.getOutstandingFollowUps().clear());
+
+        Student updated = student.withOutstandingFollowUpStatus(1, FollowUpStatus.DONE);
+        assertEquals(List.of(SECOND_FOLLOW_UP, history, first, sameDate.withStatus(FollowUpStatus.DONE)),
+                updated.getFollowUps());
+        assertEquals(List.of(first, SECOND_FOLLOW_UP), updated.getOutstandingFollowUps());
+        assertEquals(List.of(SECOND_FOLLOW_UP, history, first, sameDate), student.getFollowUps());
+        assertThrows(IndexOutOfBoundsException.class, () ->
+                student.withOutstandingFollowUpStatus(-1, FollowUpStatus.DONE));
+        assertThrows(IndexOutOfBoundsException.class, () ->
+                student.withOutstandingFollowUpStatus(3, FollowUpStatus.DONE));
+        assertThrows(NullPointerException.class, () -> student.withOutstandingFollowUpStatus(0, null));
+    }
+
+    @Test
+    public void withOutstandingFollowUpStatus_equalEntries_updatesOnlySelectedPosition() {
+        Student student = new StudentBuilder().build().withFollowUp(FIRST_FOLLOW_UP).withFollowUp(FIRST_FOLLOW_UP);
+        assertEquals(List.of(FIRST_FOLLOW_UP, FIRST_FOLLOW_UP.withStatus(FollowUpStatus.DONE)),
+                student.withOutstandingFollowUpStatus(1, FollowUpStatus.DONE).getFollowUps());
+    }
+
+    @Test
+    public void copyAndWithInteraction_preserveFollowUpStatuses() {
+        Student student = new StudentBuilder().build()
+                .withFollowUp(FIRST_FOLLOW_UP.withStatus(FollowUpStatus.DONE))
+                .withFollowUp(SECOND_FOLLOW_UP.withStatus(FollowUpStatus.CANCELLED));
+        Student copy = new StudentBuilder(student).build();
+        Interaction interaction = new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "Revision lesson");
+
+        assertEquals(student, copy);
+        assertEquals(student.getFollowUps(), student.withInteraction(interaction).getFollowUps());
+        assertFalse(student.equals(new StudentBuilder().build()
+                .withFollowUp(FIRST_FOLLOW_UP).withFollowUp(SECOND_FOLLOW_UP)));
+    }
 
     @Test
     public void constructor_withoutFollowUps_emptyList() {
@@ -124,6 +168,56 @@ public class StudentTest {
         assertEquals(List.of(interaction), updatedStudent.getInteractions());
         assertEquals(student.getName(), updatedStudent.getName());
         assertEquals(student.getSubjects(), updatedStudent.getSubjects());
+    }
+
+    @Test
+    public void interactionDisplayedOrderAndRemoval_useChronologicalIndexWithoutChangingOriginal() {
+        Interaction later = new Interaction(LocalDate.of(2026, 10, 2), Optional.empty(), "Later lesson");
+        Interaction first = new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "First lesson");
+        Interaction sameTime = new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "Same time");
+        Student student = new StudentBuilder().build().withInteraction(later)
+                .withInteraction(first).withInteraction(sameTime).withFollowUp(FIRST_FOLLOW_UP);
+
+        assertEquals(List.of(first, sameTime, later), student.getInteractionsInChronologicalOrder());
+        assertThrows(UnsupportedOperationException.class, () ->
+                student.getInteractionsInChronologicalOrder().clear());
+
+        Student updated = student.withoutInteractionAtChronologicalIndex(1);
+        assertEquals(List.of(later, first), updated.getInteractions());
+        assertEquals(student.getSubjects(), updated.getSubjects());
+        assertEquals(student.getFollowUps(), updated.getFollowUps());
+        assertEquals(List.of(later, first, sameTime), student.getInteractions());
+        assertThrows(IndexOutOfBoundsException.class, () -> student.withoutInteractionAtChronologicalIndex(-1));
+        assertThrows(IndexOutOfBoundsException.class, () -> student.withoutInteractionAtChronologicalIndex(3));
+    }
+
+    @Test
+    public void withoutInteractionAtChronologicalIndex_equalEntries_removesOnlySelectedPosition() {
+        Interaction duplicate = new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "Same lesson");
+        Interaction other = new Interaction(LocalDate.of(2026, 10, 2), Optional.empty(), "Other lesson");
+        Student student = new StudentBuilder().build().withInteraction(duplicate)
+                .withInteraction(other).withInteraction(duplicate);
+
+        assertEquals(List.of(duplicate, other), student.withoutInteractionAtChronologicalIndex(1).getInteractions());
+    }
+
+    @Test
+    public void withInteractionAtChronologicalIndex_replacesSelectedStoredPosition() {
+        Interaction later = new Interaction(LocalDate.of(2026, 10, 2), Optional.empty(), "Later");
+        Interaction earlier = new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "Earlier");
+        Interaction replacement = new Interaction(LocalDate.of(2026, 10, 3), Optional.empty(), "Corrected");
+        Student student = new StudentBuilder().build().withInteraction(later)
+                .withInteraction(earlier).withFollowUp(FIRST_FOLLOW_UP);
+
+        Student updated = student.withInteractionAtChronologicalIndex(0, replacement);
+        assertEquals(List.of(later, replacement), updated.getInteractions());
+        assertEquals(student.getSubjects(), updated.getSubjects());
+        assertEquals(student.getFollowUps(), updated.getFollowUps());
+        assertEquals(List.of(later, earlier), student.getInteractions());
+        assertThrows(IndexOutOfBoundsException.class, () ->
+                student.withInteractionAtChronologicalIndex(2, replacement));
+        assertThrows(NullPointerException.class, () ->
+                student.withInteractionAtChronologicalIndex(0, null));
     }
 
     @Test

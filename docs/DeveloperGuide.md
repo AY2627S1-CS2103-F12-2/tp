@@ -91,18 +91,19 @@ Here's a (partial) class diagram of the `Logic` component:
 
 <img src="images/LogicClassDiagram.png" width="550"/>
 
-The sequence diagram below illustrates the interactions within the `Logic` component, taking `execute("delete 1")` API call as an example.
+The sequence diagram below illustrates the interactions within the `Logic` component, taking
+`execute("interaction delete n/John Tan i/1")` API call as an example.
 
-![Interactions Inside the Logic Component for the `delete 1` Command](images/DeleteSequenceDiagram.png)
+![Interactions Inside the Logic Component for the `interaction delete n/John Tan i/1` Command](images/DeleteSequenceDiagram.png)
 
-<div markdown="span" class="alert alert-info">:information_source: **Note:** The lifeline for `DeleteCommandParser` should end at the destroy marker (X), but due to a limitation of PlantUML, it continues to the end of the diagram.
+<div markdown="span" class="alert alert-info">:information_source: **Note:** The lifeline for `DeleteInteractionCommandParser` should end at the destroy marker (X), but due to a limitation of PlantUML, it continues to the end of the diagram.
 </div>
 
 How the `Logic` component works:
 
-1. When `Logic` is called upon to execute a command, the command is passed to an `AddressBookParser` object, which in turn creates a parser that matches the command (e.g., `DeleteCommandParser`) and uses it to parse the command.
-1. This results in a `Command` object (more precisely, an object of one of its subclasses e.g., `DeleteCommand`) which is executed by the `LogicManager`.
-1. The command can communicate with the `Model` when it is executed (e.g. to delete a person).<br>
+1. When `Logic` is called upon to execute a command, the command is passed to a `TutorLinkParser` object, which in turn creates a parser that matches the command (e.g., `DeleteInteractionCommandParser`) and uses it to parse the command.
+1. This results in a `Command` object (more precisely, an object of one of its subclasses e.g., `DeleteInteractionCommand`) which is executed by the `LogicManager`.
+1. The command can communicate with the `Model` when it is executed (e.g. to replace a student after deleting the selected interaction).<br>
    Note that although this is shown as a single step in the diagram above for simplicity, the code can require several interactions between the command object and the `Model` to complete the operation.
 1. The result of the command execution is encapsulated as a `CommandResult` object which is returned from `Logic`.
 
@@ -123,7 +124,9 @@ The `Model` component,
 
 * stores TutorLink's data, i.e. all `Student` objects, which are kept in a `UniqueStudentList`.
 * stores each student's records inside the `Student` itself. A `Student` has a `Name`, any number of `Subject`s, and lists of `Interaction`s and `FollowUp`s, which keep the order they were added in.
-* keeps every `Student` immutable. Recording an interaction or follow-up creates an updated copy (e.g. `Student#withInteraction`), and the command swaps it in with `Model#setStudent`.
+* gives each `FollowUp` exactly one `FollowUpStatus`: `OUTSTANDING`, `DONE` or `CANCELLED`. Completed and cancelled follow-ups remain in the student's stored list as history.
+* exposes outstanding follow-ups through `Student#getOutstandingFollowUps`, sorted by review date, earliest first. Follow-ups with the same review date retain their insertion order. Completed and cancelled records are excluded from this view.
+* keeps every `Student` and `FollowUp` immutable. Recording an interaction or follow-up creates an updated student copy (e.g. `Student#withInteraction`). For a status change, `FollowUp#withStatus` creates a replacement follow-up, and `Student#withOutstandingFollowUpStatus` places it in a new student copy using the displayed outstanding index while preserving the stored order and other records. The command replaces the stored student with `Model#setStudent`.
 * stores the `Student` objects matched by the current filter (e.g. the result of `find`) in a separate _filtered_ list. It exposes this as an unmodifiable `ObservableList<Student>` that the UI observes, so the student list updates when the filter changes.
 * stores the _selected_ student, i.e. the one whose details, interactions and follow-ups are shown, as a `ReadOnlyObjectProperty<Student>` that the UI panels observe. The selection follows the student when they are updated, and is cleared when they are deleted or hidden by a filter.
 * finds students by name with `Model#findStudentByName`, which matches names ignoring case and extra spaces (see [Finding a student by name](#finding-a-student-by-name)).
@@ -190,6 +193,44 @@ Names are unique in the same way. `UniqueStudentList` treats two students as dup
 * **Alternative 2:** Exactly as typed.
   * Pros: Simplest to implement.
   * Cons: The tutor must remember the exact casing, and `john tan` could be added as a second record of the same student.
+
+### Editing a student
+
+`student edit n/NAME [new/NEW_NAME] [s/SUBJECT]...` renames a student, replaces their subjects, or both. It uses the same name lookup as other commands (see [Finding a student by name](#finding-a-student-by-name)).
+
+The sequence diagram below shows how `student edit n/john tan new/Jonathan Tan` renames the student `John Tan`.
+
+<img src="images/EditStudentSequenceDiagram.png" width="750" />
+
+<div markdown="span" class="alert alert-info">:information_source: **Note:** The lifeline for `EditStudentCommandParser` should end at the destroy marker (X), but due to a limitation of PlantUML, it continues to the end of the diagram.
+</div>
+
+1. `TutorLinkParser` reads the command word `student edit` and passes the rest of the input to a new `EditStudentCommandParser`.
+1. `EditStudentCommandParser` checks that `n/` and `new/` appear at most once, and parses each value with the same rules as `student add`. If neither `new/` nor any `s/` is given, it throws a `ParseException` saying there is nothing to change. Otherwise, it returns an `EditStudentCommand` holding the current name, an optional new name and an optional new list of subjects.
+1. When executed, `EditStudentCommand` finds the student with `Model#findStudentByName`. If there is no match, it throws a `CommandException` and nothing changes.
+1. `EditStudentCommand#createEditedStudent` builds a new `Student` with the new name (or the old one) and the new subjects (or the old ones). It copies the existing interactions and follow-ups unchanged. `Student` is immutable, so the edit always produces a new object.
+1. If the name changes to that of a *different* student, `Model#hasStudent` returns true and the command throws the same duplicate-student error as `student add`. A rename that only changes casing (`john tan` to `John Tan`) is the same student under `Student#isSameStudent`, so it is allowed.
+1. `Model#setStudent` replaces the old student with the edited one in `UniqueStudentList`. If the old student was selected, `ModelManager` selects the edited student, so the UI panels update without another command. If a `find` filter is active and the edited student no longer matches it, `ModelManager` clears the selection instead, using the same check as `Model#updateFilteredStudentList`, so the panels never show a student that the list hides.
+
+#### Design considerations
+
+**Aspect: What `s/` does when editing**
+
+* **Alternative 1 (current choice):** Any `s/` replaces all existing subjects.
+  * Pros: One command sets the exact subject list, with the same meaning as `s/` in `student add`. The result is easy to predict from the command alone.
+  * Cons: To add one subject, the tutor must retype the existing ones. There is no way to remove all subjects.
+* **Alternative 2:** Separate prefixes to add and remove single subjects (e.g. `s+/` and `s-/`).
+  * Pros: Small changes take less typing.
+  * Cons: More prefixes to learn, and the tutor must remember the current list to know what the result is.
+
+**Aspect: How the edited student is stored**
+
+* **Alternative 1 (current choice):** Build a new immutable `Student` and replace the old one with `Model#setStudent`.
+  * Pros: Follows how `interaction add` and `followup add` already update a student. The model and UI see one change, and a failed command changes nothing.
+  * Cons: Every field is copied, even the ones that do not change.
+* **Alternative 2:** Make `Student` mutable and change its fields in place.
+  * Pros: No copying.
+  * Cons: The UI and other references could see a half-edited student, and the duplicate check would need to happen before any field changes.
 
 ### Two-word command words
 
@@ -553,7 +594,7 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 * **Student**: A person the tutor teaches, identified in TutorLink by their name (case-insensitive and unique). Interactions and follow-ups are always recorded against a student.
 * **Follow-up**: A note describing something the tutor intends to revisit with a student. Each follow-up belongs to a student, rather than to a particular interaction, and has a description and a review date.
 * **Review date**: The date on which the tutor intends to review a follow-up, in `yyyy-MM-dd` format. It is not necessarily the date of a lesson.
-* **Outstanding follow-up**: A follow-up that has not been completed or cancelled. Until TutorLink supports completing or cancelling follow-ups, every recorded follow-up is outstanding.
+* **Outstanding follow-up**: A follow-up with status `OUTSTANDING` that has not been completed or cancelled. Completed (`DONE`) and cancelled (`CANCELLED`) follow-ups remain stored but are excluded from the outstanding list and panel.
 * **Interaction**: A dated record of a lesson or other discussion with a student. Each interaction belongs to exactly one student and contains a concise note and, optionally, a time.
 * **Interaction date**: The date on which an interaction occurred, in `yyyy-MM-dd` format. Future dates are allowed but trigger a warning.
 * **Concise note**: A single-line note of 1 to 500 characters recorded with an interaction to summarise what happened.
@@ -625,6 +666,41 @@ testers are expected to do more *exploratory* testing.
 
 1. Test case: `find lim`, then `student view n/John Tan`<br>
    Expected: John Tan is shown in the detail panel. The student list shows all students again, including John Tan.
+
+### Editing a student
+
+1. Renaming a student
+
+   1. Prerequisites: John Tan exists with subjects Math and Physics, and has at least one interaction. He is shown in the detail panel (`student view n/John Tan`).
+
+   1. Test case: `student edit n/john tan new/Jonathan Tan`<br>
+      Expected: The student list and detail panel show Jonathan Tan, still with Math and Physics. The interaction panel still shows his interactions. The result shows `✔ Student updated: Jonathan Tan (subjects: Math, Physics)`.
+
+   1. Test case: `student edit n/Jonathan Tan new/jonathan tan`<br>
+      Expected: The name changes to `jonathan tan`. This is allowed because only the casing changes.
+
+   1. Test case: `find jonathan`, then `student view n/jonathan tan`, then `student edit n/jonathan tan new/Jon Lim`<br>
+      Expected: Jon Lim leaves the filtered list and the detail, interaction and follow-up panels go back to their placeholders. `list` shows Jon Lim again.
+
+1. Replacing subjects
+
+   1. Prerequisites: Jonathan Tan exists with subjects Math and Physics.
+
+   1. Test case: `student edit n/Jonathan Tan s/Chemistry`<br>
+      Expected: Jonathan Tan's only subject is now Chemistry. Math and Physics are gone.
+
+1. Invalid edits
+
+   1. Prerequisites: Jonathan Tan and Aliyah Lim exist.
+
+   1. Test case: `student edit n/Jonathan Tan new/aliyah lim`<br>
+      Expected: Nothing changes. The error says a student named `Aliyah Lim` already exists.
+
+   1. Test case: `student edit n/Jonathan Tan`<br>
+      Expected: Nothing changes. The error says there is nothing to change and shows the correct command format.
+
+   1. Other incorrect commands to try: `student edit n/Nobody Here new/Ann`, `student edit n/Jonathan Tan new/12345`, `student edit n/Jonathan Tan s/Math s/math`, `student edit n/Jonathan Tan new/A new/B`<br>
+      Expected: Nothing changes. The error says no such student is found, explains which value is wrong, or says a prefix is repeated.
 
 ### Deleting a student
 

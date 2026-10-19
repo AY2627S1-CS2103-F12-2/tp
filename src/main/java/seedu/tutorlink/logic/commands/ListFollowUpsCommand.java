@@ -45,13 +45,11 @@ public class ListFollowUpsCommand extends Command {
 
         Student student = model.findStudentByName(name)
                 .orElseThrow(() -> new CommandException(String.format(Messages.MESSAGE_STUDENT_NOT_FOUND, name)));
-        if (student.getFollowUps().isEmpty()) {
+        List<FollowUp> sortedFollowUps = student.getOutstandingFollowUps();
+        if (sortedFollowUps.isEmpty()) {
             return new CommandResult(String.format(MESSAGE_NONE_RECORDED, student.getName()));
         }
 
-        List<FollowUp> sortedFollowUps = student.getFollowUps().stream()
-                .sorted(FollowUp.REVIEW_DATE_ORDER)
-                .toList();
         String formattedFollowUps = IntStream.range(0, sortedFollowUps.size())
                 .mapToObj(index -> (index + 1) + ". " + sortedFollowUps.get(index).getReviewDate()
                         + " \u2014 " + sortedFollowUps.get(index).getDescription())

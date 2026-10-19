@@ -111,6 +111,28 @@ Format: `student view n/NAME`
 Example:
 * `student view n/john tan` shows the student added as `John Tan`.
 
+### Editing a student: `student edit`
+
+Renames a student, replaces their subjects, or both. Their interactions and follow-ups are kept.
+
+Format: `student edit n/NAME [new/NEW_NAME] [s/SUBJECT]…`
+
+* `NAME` is the student's current full name, ignoring case.
+* Give at least one of `new/` or `s/`.
+* `NEW_NAME` follows the same rules as in [`student add`](#adding-a-student-student-add). Renaming to the name of another existing student, ignoring case, is rejected as a duplicate. Changing only the casing, such as `john tan` to `John Tan`, is allowed.
+* If you give any `s/`, the subjects you give replace **all** the student's existing subjects. Without `s/`, the subjects stay the same.
+* If the student is shown in the panels, the panels update straight away. If you used `find` and the new name no longer matches it, the student leaves the filtered list and the panels are cleared. Use `list` to see all students again.
+
+Examples:
+* `student edit n/John Tan new/Jonathan Tan` renames John Tan.
+* `student edit n/John Tan s/Math s/Chemistry` changes John Tan's subjects to Math and Chemistry.
+
+On success, TutorLink shows the updated student:
+
+```
+✔ Student updated: Jonathan Tan (subjects: Math, Physics)
+```
+
 ### Listing all students: `list`
 
 Shows all your students in the student list on the left.
@@ -226,6 +248,62 @@ If John has no interactions, TutorLink shows `ℹ No interactions recorded for J
 An unknown student gives `No student named 'NAME' found.` Missing or repeated `n/` parameters
 are rejected.
 
+### Editing an interaction: `interaction edit`
+
+Corrects one or more fields of an interaction in an existing student's history.
+
+Format: `interaction edit n/NAME i/INDEX [d/DATE] [t/TIME] [note/TEXT]`
+
+* `INDEX` is the interaction number shown by `interaction list n/NAME` and must be a positive integer.
+* At least one of `d/`, `t/` or `note/` must be supplied. Fields that are not supplied remain unchanged.
+* Date, time, and note values follow the same rules as `interaction add`. A future replacement date is allowed
+  with a warning. The `note/` parameter must be last, and everything after it is treated as note text.
+* An existing time can be replaced using `t/TIME`; omitting `t/` preserves it.
+* A failed command leaves your stored data unchanged.
+
+Examples:
+
+* `interaction edit n/John Tan i/2 note/Practised algebraic fractions and equations`
+* `interaction edit n/John Tan i/2 d/2026-10-02 t/15:00`
+
+After the first example, TutorLink shows the original and updated interaction:
+
+```text
+✔ Interaction updated for John Tan: 2026-10-01 14:30 — Practised algebraic fractions
+Updated to: 2026-10-01 14:30 — Practised algebraic fractions and equations
+```
+
+An unknown student, an out-of-range index, missing edit fields, invalid values, or repeated structured
+parameters are rejected. A zero, negative, or non-integer index gives `Index must be a positive integer.`
+
+### Deleting an interaction: `interaction delete`
+
+Deletes one interaction from an existing student's history.
+
+Format: `interaction delete n/NAME i/INDEX`
+
+* `NAME` identifies an existing student by their full name, ignoring case.
+* `INDEX` is the interaction number shown by `interaction list n/NAME`. It must be a positive integer.
+* Because `interaction list` displays interactions chronologically, the index refers to that displayed order,
+  not the order in which the interactions were recorded.
+* An index larger than the number of interactions is rejected with
+  `Index exceeds the number of available items.`
+* A failed command leaves your stored data unchanged.
+
+Example:
+
+* `interaction delete n/John Tan i/2`
+
+Using the interaction list above, TutorLink deletes the interaction dated `2026-10-01 14:30` and shows:
+
+```text
+✔ Interaction deleted for John Tan: 2026-10-01 14:30 — Practised algebraic fractions
+Total interactions for John Tan: 2
+```
+
+An unknown student gives `No student named 'NAME' found.` Missing or repeated `n/` or `i/` parameters
+are rejected. A zero, negative, or non-integer index is rejected with `Index must be a positive integer.`
+
 ### Adding a follow-up: `followup add`
 
 Records something you intend to revisit with an existing student, with a review date.
@@ -238,7 +316,7 @@ Format: `followup add n/NAME desc/TEXT review/DATE`
 * `DATE` must be a real calendar date in `yyyy-MM-dd` format, such as `2026-10-15`. Past, present and future review dates are allowed.
 * Give each parameter exactly once. Missing parameters or repeated prefixes are rejected.
 * A follow-up belongs to the student. It does not need to be linked to an interaction.
-* A duplicate with the same description and review date for the same student is rejected. Descriptions are compared after trimming and are case-sensitive: `Review algebra` and `review algebra` are different descriptions.
+* An outstanding duplicate with the same description and review date for the same student is rejected. Descriptions are compared after trimming and are case-sensitive: `Review algebra` and `review algebra` are different descriptions. You may add the same description and review date again after the earlier follow-up is completed or cancelled.
 * A failed command leaves your stored data unchanged.
 
 Examples (after adding John Tan):
@@ -271,7 +349,7 @@ Format: `followup list n/NAME`
 
 * Give the full name of an existing student, ignoring case, with `n/` exactly once.
 * Follow-ups are numbered and sorted by review date, earliest first. Follow-ups with the same review date remain in the order they were added. The outstanding follow-ups panel uses the same ordering.
-* Every recorded follow-up counts as **outstanding**, including those with past review dates. TutorLink does not yet have a command to complete or cancel a follow-up; passing its review date does not remove it.
+* Only follow-ups with status `OUTSTANDING` are shown, including those with past review dates. Completed (`DONE`) and cancelled (`CANCELLED`) records remain saved but are excluded from this list and the panel. Passing a review date does not complete a follow-up automatically.
 * Listing follow-ups does not change stored data or select a different student in the panels. Use `student view n/NAME` to select a student.
 
 Example:
@@ -288,6 +366,75 @@ Outstanding follow-ups for John Tan (2):
 
 If John has no follow-ups, TutorLink shows `ℹ No outstanding follow-ups for John Tan.` An unknown student gives `No student named 'NAME' found.` Missing or repeated `n/` parameters are rejected.
 
+### Completing a follow-up: `followup done`
+
+Marks an outstanding follow-up as completed, removing it from the outstanding list and panel while retaining it in the data file with status `DONE`.
+
+Format: `followup done n/NAME i/INDEX`
+
+* Give the full name of an existing student, ignoring case, and each parameter exactly once. Parameters may be in either order.
+* `INDEX` must be a positive integer shown by `followup list n/NAME`. It refers to that student's outstanding follow-ups in review-date order, not their position in the data file.
+* The list is renumbered after completion. Run `followup list` again before choosing another item.
+* Completing a follow-up leaves the student's other follow-ups, interactions, name and subjects unchanged. If the student is selected, the panel updates automatically.
+* The completed record and its status survive restarting TutorLink. Older v1.3 records without a status load as outstanding.
+
+Example, continuing from the two follow-ups listed above:
+
+```text
+followup done n/John Tan i/1
+```
+
+TutorLink shows:
+
+```text
+✔ Follow-up completed for John Tan — review on 2026-10-14: "Check in on extra drills"
+Total outstanding follow-ups for John Tan: 1
+```
+
+The algebra follow-up is now item 1. The completed drills follow-up remains saved, and you can add the same description and review date again if needed.
+
+Errors leave all records unchanged:
+
+* An unknown student gives `No student named 'NAME' found.`
+* An empty index, zero, a negative number, a non-integer, or a value larger than `2147483647` gives `Index must be a positive integer.`
+* An index larger than the current outstanding list, including `i/1` for an empty list, gives `Index exceeds the number of available items.`
+* Missing parameters or extra text before them give a format error with the correct command format. Repeated `n/` or `i/` prefixes are rejected.
+
+### Cancelling a follow-up: `followup cancel`
+
+Marks an outstanding follow-up as cancelled when you no longer intend to revisit it. It is removed from the outstanding list and panel but remains saved with status `CANCELLED`.
+
+Format: `followup cancel n/NAME i/INDEX`
+
+* Give the full name of an existing student, ignoring case, and each parameter exactly once. Parameters may be in either order.
+* `INDEX` must be a positive integer shown by `followup list n/NAME`. It refers to that student's outstanding follow-ups in review-date order, not their position in the data file.
+* The list is renumbered after cancellation. Run `followup list` again before choosing another item. Completed and cancelled follow-ups cannot be selected from this list.
+* Cancelling a follow-up leaves the student's other follow-ups, interactions, name and subjects unchanged. If the student is selected, the panel updates automatically.
+* The cancelled record and its status survive restarting TutorLink. You may add the same description and review date again if needed.
+
+Example, continuing after the completion example above, where the algebra follow-up is the only outstanding item:
+
+```text
+followup list n/John Tan
+followup cancel n/John Tan i/1
+```
+
+After the cancellation command, TutorLink shows:
+
+```text
+✔ Follow-up cancelled for John Tan — review on 2026-10-15: "Review algebra"
+Total outstanding follow-ups for John Tan: 0
+```
+
+The cancelled algebra follow-up and the completed drills follow-up remain saved. Running `followup list n/John Tan` now shows `ℹ No outstanding follow-ups for John Tan.`
+
+Errors leave all records unchanged:
+
+* An unknown student gives `No student named 'NAME' found.`
+* An empty index, zero, a negative number, a non-integer, or a value larger than `2147483647` gives `Index must be a positive integer.`
+* An index larger than the current outstanding list, including `i/1` for an empty list, gives `Index exceeds the number of available items.`
+* Missing parameters or extra text before them give a format error with the correct command format. Repeated `n/` or `i/` prefixes are rejected.
+
 ### Deleting a student: `student delete`
 
 Deletes a student, together with all of their interactions and follow-ups.
@@ -301,7 +448,7 @@ Deleting a student cannot be undone, and it also deletes every interaction and f
 </div>
 
 <div markdown="span" class="alert alert-primary">:bulb: **Tip:**
-To correct a student's name or subjects, delete the student and add them again. This also deletes their interactions and follow-ups.
+To correct a student's name or subjects, use [`student edit`](#editing-a-student-student-edit) instead. It keeps their interactions and follow-ups.
 </div>
 
 Example:
@@ -351,12 +498,17 @@ Action | Format, Examples
 --------|------------------
 **Add student** | `student add n/NAME [s/SUBJECT]…`<br> e.g., `student add n/John Tan s/Math s/Physics`
 **View student** | `student view n/NAME`<br> e.g., `student view n/John Tan`
+**Edit student** | `student edit n/NAME [new/NEW_NAME] [s/SUBJECT]…`<br> e.g., `student edit n/John Tan new/Jonathan Tan s/Math`
 **List students** | `list`
 **Find students** | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find tan lim`
 **Add interaction** | `interaction add n/NAME d/DATE [t/TIME] note/TEXT`<br> e.g., `interaction add n/John Tan d/2026-10-01 note/Discussed revision plan`
 **List interactions** | `interaction list n/NAME`<br> e.g., `interaction list n/John Tan`
+**Edit interaction** | `interaction edit n/NAME i/INDEX [d/DATE] [t/TIME] [note/TEXT]`<br> e.g., `interaction edit n/John Tan i/2 note/Corrected lesson note`
+**Delete interaction** | `interaction delete n/NAME i/INDEX`<br> e.g., `interaction delete n/John Tan i/2`
 **Add follow-up** | `followup add n/NAME desc/TEXT review/DATE`<br> e.g., `followup add n/John Tan desc/Review algebra review/2026-10-15`
 **View follow-ups** | `followup list n/NAME`<br> e.g., `followup list n/John Tan`
+**Complete follow-up** | `followup done n/NAME i/INDEX`<br> e.g., `followup done n/John Tan i/1`
+**Cancel follow-up** | `followup cancel n/NAME i/INDEX`<br> e.g., `followup cancel n/John Tan i/1`
 **Delete student** | `student delete n/NAME`<br> e.g., `student delete n/John Tan`
 **Help** | `help`
 **Exit** | `exit`

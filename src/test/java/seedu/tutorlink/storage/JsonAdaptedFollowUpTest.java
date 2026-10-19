@@ -9,8 +9,33 @@ import org.junit.jupiter.api.Test;
 
 import seedu.tutorlink.commons.exceptions.IllegalValueException;
 import seedu.tutorlink.model.followup.FollowUp;
+import seedu.tutorlink.model.followup.FollowUpStatus;
 
 public class JsonAdaptedFollowUpTest {
+
+    @Test
+    public void toModelType_eachStatus_preservesStatus() throws Exception {
+        for (FollowUpStatus status : FollowUpStatus.values()) {
+            FollowUp followUp = new FollowUp("Review algebra", LocalDate.of(2026, 10, 15), status);
+            assertEquals(followUp, new JsonAdaptedFollowUp(followUp).toModelType());
+            assertEquals(followUp,
+                    new JsonAdaptedFollowUp("Review algebra", "2026-10-15", status.name()).toModelType());
+        }
+    }
+
+    @Test
+    public void toModelType_missingStatus_defaultsToOutstanding() throws Exception {
+        assertEquals(FollowUpStatus.OUTSTANDING,
+                new JsonAdaptedFollowUp("Review algebra", "2026-10-15").toModelType().getStatus());
+    }
+
+    @Test
+    public void toModelType_invalidStatus_throwsIllegalValueException() {
+        for (String status : new String[]{"", "done", "UNKNOWN", " DONE "}) {
+            assertThrows(IllegalValueException.class, JsonAdaptedFollowUp.INVALID_STATUS_MESSAGE, () ->
+                    new JsonAdaptedFollowUp("Review algebra", "2026-10-15", status).toModelType());
+        }
+    }
 
     @Test
     public void toModelType_validValues_returnsFollowUp() throws Exception {

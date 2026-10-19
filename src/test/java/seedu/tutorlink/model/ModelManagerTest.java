@@ -149,6 +149,45 @@ public class ModelManagerTest {
     }
 
     @Test
+    public void setStudent_editedStudentStillMatchesFilter_selectionFollowsEdit() {
+        modelManager.addStudent(ALICE);
+        modelManager.addStudent(BENSON);
+        modelManager.updateFilteredStudentList(new NameContainsKeywordsPredicate(List.of("Alice")));
+        modelManager.setSelectedStudent(ALICE);
+        Student renamedAlice = new StudentBuilder(ALICE).withName("Alice Tan").build();
+
+        modelManager.setStudent(ALICE, renamedAlice);
+
+        assertEquals(renamedAlice, modelManager.getSelectedStudent().get());
+    }
+
+    @Test
+    public void setStudent_editedStudentHiddenByFilter_selectionCleared() {
+        modelManager.addStudent(ALICE);
+        modelManager.addStudent(BENSON);
+        modelManager.updateFilteredStudentList(new NameContainsKeywordsPredicate(List.of("Alice")));
+        modelManager.setSelectedStudent(ALICE);
+        Student renamedAlice = new StudentBuilder(ALICE).withName("Carol Pauline").build();
+
+        modelManager.setStudent(ALICE, renamedAlice);
+
+        assertEquals(null, modelManager.getSelectedStudent().get());
+        assertFalse(modelManager.getFilteredStudentList().contains(renamedAlice));
+    }
+
+    @Test
+    public void setStudent_otherStudentHiddenByEdit_selectionUnchanged() {
+        modelManager.addStudent(ALICE);
+        modelManager.addStudent(BENSON);
+        modelManager.updateFilteredStudentList(new NameContainsKeywordsPredicate(List.of("Alice", "Benson")));
+        modelManager.setSelectedStudent(BENSON);
+
+        modelManager.setStudent(ALICE, new StudentBuilder(ALICE).withName("Carol Pauline").build());
+
+        assertEquals(BENSON, modelManager.getSelectedStudent().get());
+    }
+
+    @Test
     public void deleteStudent_selectedStudentDeleted_selectionCleared() {
         modelManager.addStudent(ALICE);
         modelManager.addStudent(BENSON);

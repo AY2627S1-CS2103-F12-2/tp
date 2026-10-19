@@ -5,9 +5,11 @@ import static seedu.tutorlink.commons.util.CollectionUtil.requireAllNonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 import seedu.tutorlink.commons.util.ToStringBuilder;
 import seedu.tutorlink.model.followup.FollowUp;
+import seedu.tutorlink.model.followup.FollowUpStatus;
 import seedu.tutorlink.model.interaction.Interaction;
 
 /**
@@ -79,10 +81,52 @@ public class Student {
     }
 
     /**
+     * Returns an immutable list of interactions in displayed order, earliest date and time first.
+     * Entries with the same date and time retain insertion order.
+     */
+    public List<Interaction> getInteractionsInChronologicalOrder() {
+        return getChronologicalInteractionPositions().stream().map(interactions::get).toList();
+    }
+
+    /**
      * Returns an immutable list of follow-ups, in the order they were added.
      */
     public List<FollowUp> getFollowUps() {
         return followUps;
+    }
+
+    /**
+     * Returns an immutable list of outstanding follow-ups in displayed order, earliest review date first.
+     * Entries with the same review date retain insertion order.
+     */
+    public List<FollowUp> getOutstandingFollowUps() {
+        return getOutstandingFollowUpPositions().stream().map(followUps::get).toList();
+    }
+
+    /**
+     * Returns a copy with the outstanding follow-up at the given zero-based displayed index assigned a new status.
+     * Preserves all other records and their stored order.
+     *
+     * @param index The zero-based index in {@link #getOutstandingFollowUps()}.
+     * @param status The status to assign.
+     * @throws IndexOutOfBoundsException if the index does not identify an outstanding follow-up.
+     * @throws NullPointerException if the status is null.
+     */
+    public Student withOutstandingFollowUpStatus(int index, FollowUpStatus status) {
+        Objects.requireNonNull(status);
+        int storedIndex = getOutstandingFollowUpPositions().get(index);
+        List<FollowUp> updatedFollowUps = new ArrayList<>(followUps);
+        updatedFollowUps.set(storedIndex, followUps.get(storedIndex).withStatus(status));
+        return new Student(name, subjects, interactions, updatedFollowUps);
+    }
+
+    private List<Integer> getOutstandingFollowUpPositions() {
+        return IntStream.range(0, followUps.size())
+                .filter(index -> followUps.get(index).isOutstanding())
+                .boxed()
+                .sorted((first, second) ->
+                        FollowUp.REVIEW_DATE_ORDER.compare(followUps.get(first), followUps.get(second)))
+                .toList();
     }
 
     /**
@@ -107,6 +151,44 @@ public class Student {
         List<Interaction> updatedInteractions = new ArrayList<>(interactions);
         updatedInteractions.add(Objects.requireNonNull(interaction));
         return new Student(name, subjects, updatedInteractions, followUps);
+    }
+
+    /**
+     * Returns a copy without the interaction at the given zero-based chronological index.
+     * Preserves all other records and their stored order.
+     *
+     * @param index The zero-based index in {@link #getInteractionsInChronologicalOrder()}.
+     * @throws IndexOutOfBoundsException if the index does not identify an interaction.
+     */
+    public Student withoutInteractionAtChronologicalIndex(int index) {
+        int storedIndex = getChronologicalInteractionPositions().get(index);
+        List<Interaction> updatedInteractions = new ArrayList<>(interactions);
+        updatedInteractions.remove(storedIndex);
+        return new Student(name, subjects, updatedInteractions, followUps);
+    }
+
+    /**
+     * Returns a copy with the interaction at the given zero-based chronological index replaced.
+     * Preserves all other records and their stored order.
+     *
+     * @param index The zero-based index in {@link #getInteractionsInChronologicalOrder()}.
+     * @param interaction The replacement interaction.
+     * @throws IndexOutOfBoundsException if the index does not identify an interaction.
+     * @throws NullPointerException if the replacement interaction is null.
+     */
+    public Student withInteractionAtChronologicalIndex(int index, Interaction interaction) {
+        int storedIndex = getChronologicalInteractionPositions().get(index);
+        List<Interaction> updatedInteractions = new ArrayList<>(interactions);
+        updatedInteractions.set(storedIndex, Objects.requireNonNull(interaction));
+        return new Student(name, subjects, updatedInteractions, followUps);
+    }
+
+    private List<Integer> getChronologicalInteractionPositions() {
+        return IntStream.range(0, interactions.size())
+                .boxed()
+                .sorted((first, second) ->
+                        Interaction.CHRONOLOGICAL_ORDER.compare(interactions.get(first), interactions.get(second)))
+                .toList();
     }
 
     /**
