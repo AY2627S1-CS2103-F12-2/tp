@@ -124,7 +124,9 @@ The `Model` component,
 
 * stores TutorLink's data, i.e. all `Student` objects, which are kept in a `UniqueStudentList`.
 * stores each student's records inside the `Student` itself. A `Student` has a `Name`, any number of `Subject`s, and lists of `Interaction`s and `FollowUp`s, which keep the order they were added in.
-* keeps every `Student` immutable. Recording an interaction or follow-up creates an updated copy (e.g. `Student#withInteraction`), and the command swaps it in with `Model#setStudent`.
+* gives each `FollowUp` exactly one `FollowUpStatus`: `OUTSTANDING`, `DONE` or `CANCELLED`. Completed and cancelled follow-ups remain in the student's stored list as history.
+* exposes outstanding follow-ups through `Student#getOutstandingFollowUps`, sorted by review date, earliest first. Follow-ups with the same review date retain their insertion order. Completed and cancelled records are excluded from this view.
+* keeps every `Student` and `FollowUp` immutable. Recording an interaction or follow-up creates an updated student copy (e.g. `Student#withInteraction`). For a status change, `FollowUp#withStatus` creates a replacement follow-up, and `Student#withOutstandingFollowUpStatus` places it in a new student copy using the displayed outstanding index while preserving the stored order and other records. The command replaces the stored student with `Model#setStudent`.
 * stores the `Student` objects matched by the current filter (e.g. the result of `find`) in a separate _filtered_ list. It exposes this as an unmodifiable `ObservableList<Student>` that the UI observes, so the student list updates when the filter changes.
 * stores the _selected_ student, i.e. the one whose details, interactions and follow-ups are shown, as a `ReadOnlyObjectProperty<Student>` that the UI panels observe. The selection follows the student when they are updated, and is cleared when they are deleted or hidden by a filter.
 * finds students by name with `Model#findStudentByName`, which matches names ignoring case and extra spaces (see [Finding a student by name](#finding-a-student-by-name)).
