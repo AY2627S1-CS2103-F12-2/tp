@@ -246,6 +246,19 @@ public class ModelManagerTest {
     }
 
     @Test
+    public void setSelectedStudent_nullWhileFilterActive_selectionClearedAndFilterKept() {
+        modelManager.addStudent(ALICE);
+        modelManager.addStudent(BENSON);
+        modelManager.updateFilteredStudentList(new NameContainsKeywordsPredicate(List.of("Benson")));
+        modelManager.setSelectedStudent(BENSON);
+
+        modelManager.setSelectedStudent(null);
+
+        assertEquals(null, modelManager.getSelectedStudent().get());
+        assertEquals(List.of(BENSON), modelManager.getFilteredStudentList());
+    }
+
+    @Test
     public void updateFilteredStudentList_selectedStudentStillShown_selectionKept() {
         modelManager.addStudent(ALICE);
         modelManager.addStudent(BENSON);
