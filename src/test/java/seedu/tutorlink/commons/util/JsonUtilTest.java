@@ -1,6 +1,7 @@
 package seedu.tutorlink.commons.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -37,6 +38,32 @@ public class JsonUtilTest {
         assertEquals(serializableTestClass.getName(), SerializableTestClass.getNameTestValue());
         assertEquals(serializableTestClass.getListOfLocalDateTimes(), SerializableTestClass.getListTestValues());
         assertEquals(serializableTestClass.getMapOfIntegerToString(), SerializableTestClass.getHashMapTestValues());
+    }
+
+    @Test
+    public void fromString_trailingContent_throwsException() {
+        String jsonWithTrailingContent = SerializableTestClass.JSON_STRING_REPRESENTATION + "TRAILING";
+
+        assertThrows(IOException.class, () ->
+                JsonUtil.fromJsonString(jsonWithTrailingContent, SerializableTestClass.class));
+    }
+
+    @Test
+    public void fromString_secondRoot_throwsException() {
+        String jsonWithSecondRoot = SerializableTestClass.JSON_STRING_REPRESENTATION + "{}";
+
+        assertThrows(IOException.class, () ->
+                JsonUtil.fromJsonString(jsonWithSecondRoot, SerializableTestClass.class));
+    }
+
+    @Test
+    public void fromString_trailingWhitespace_succeeds() throws IOException {
+        String jsonWithTrailingWhitespace = SerializableTestClass.JSON_STRING_REPRESENTATION + " \r\n\t";
+
+        SerializableTestClass result = JsonUtil.fromJsonString(
+                jsonWithTrailingWhitespace, SerializableTestClass.class);
+
+        assertEquals(SerializableTestClass.getNameTestValue(), result.getName());
     }
 
     //TODO: @Test jsonUtil_readJsonStringToObjectInstance_correctObject()
