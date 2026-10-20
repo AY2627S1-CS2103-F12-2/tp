@@ -439,28 +439,128 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 
 (For all use cases below, the **System** is the `TutorLink` and the **Actor** is the `Tutor`, unless specified otherwise)
 
-**Use case: Delete a person**
+**Use case: Add a student**
 
 **MSS**
 
-1.  User requests to list persons
-2.  TutorLink shows a list of persons
-3.  User requests to delete a specific person in the list
-4.  TutorLink deletes the person
+1.  Tutor requests to add a student, providing the student's name and any subjects taught.
+2.  TutorLink validates the name and subjects.
+3.  TutorLink adds the student and shows them in the detail panel.
+4.  TutorLink confirms that the student was added, with the new total number of students.
 
     Use case ends.
 
 **Extensions**
 
-* 2a. The list is empty.
+* 2a. The name or a subject breaks the naming rules.
 
-  Use case ends.
+    * 2a1. TutorLink shows an error message explaining which value is wrong.
 
-* 3a. The given index is invalid.
+      Use case ends without changing any stored data.
 
-    * 3a1. TutorLink shows an error message.
+* 2b. The same subject is given more than once, ignoring case.
 
-      Use case resumes at step 2.
+    * 2b1. TutorLink shows an error message.
+
+      Use case ends without changing any stored data.
+
+* 2c. A student with the same name already exists, ignoring case.
+
+    * 2c1. TutorLink shows an error message naming the existing student.
+
+      Use case ends without changing any stored data.
+
+**Use case: View a student**
+
+**MSS**
+
+1.  Tutor requests to view a specific student by name.
+2.  TutorLink finds the student.
+3.  TutorLink shows the student's name and subjects, together with their interactions and outstanding follow-ups.
+
+    Use case ends.
+
+**Extensions**
+
+* 1a. The tutor does not identify a student.
+
+    * 1a1. TutorLink shows an error message with the correct command format.
+
+      Use case ends.
+
+* 2a. No student matches the given name.
+
+    * 2a1. TutorLink shows an error message.
+
+      Use case ends.
+
+**Use case: Edit a student**
+
+**MSS**
+
+1.  Tutor requests to edit a specific student, providing a new name, a new set of subjects, or both.
+2.  TutorLink finds the student and validates the new values.
+3.  TutorLink updates the student, keeping their interactions and follow-ups.
+4.  TutorLink confirms the student's updated name and subjects.
+
+    Use case ends.
+
+**Extensions**
+
+* 1a. The tutor gives neither a new name nor any subjects.
+
+    * 1a1. TutorLink shows an error message saying there is nothing to change.
+
+      Use case ends.
+
+* 2a. No student matches the given name.
+
+    * 2a1. TutorLink shows an error message.
+
+      Use case ends without changing any stored data.
+
+* 2b. A new value breaks the naming rules, or a subject is repeated.
+
+    * 2b1. TutorLink shows an error message explaining which value is wrong.
+
+      Use case ends without changing any stored data.
+
+* 2c. The new name belongs to another existing student, ignoring case.
+
+    * 2c1. TutorLink shows an error message naming the existing student.
+
+      Use case ends without changing any stored data.
+
+* 3a. The tutor gave new subjects.
+
+    * 3a1. TutorLink replaces all of the student's existing subjects with the new ones.
+
+      Use case resumes at step 4.
+
+**Use case: Delete a student**
+
+**MSS**
+
+1.  Tutor requests to delete a specific student by name.
+2.  TutorLink finds the student.
+3.  TutorLink deletes the student together with all their interactions and follow-ups.
+4.  TutorLink confirms the deletion, with the new total number of students.
+
+    Use case ends.
+
+**Extensions**
+
+* 2a. No student matches the given name.
+
+    * 2a1. TutorLink shows an error message.
+
+      Use case ends without changing any stored data.
+
+* 3a. The deleted student was shown in the detail panel.
+
+    * 3a1. TutorLink clears the detail, interaction and follow-up panels.
+
+      Use case resumes at step 4.
 
 **Use case: Add a follow-up for a student**
 
