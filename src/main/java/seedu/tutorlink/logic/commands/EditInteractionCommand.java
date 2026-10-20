@@ -27,6 +27,7 @@ public class EditInteractionCommand extends Command {
     public static final String MESSAGE_USAGE = "Command format: " + COMMAND_WORD
             + " n/NAME i/INDEX [d/DATE] [t/TIME] [note/TEXT]\n"
             + "At least one of d/, t/ or note/ must be given, and note/ must be last.\n"
+            + "Use t/TIME to replace a time, or t/ with no value to remove it.\n"
             + "Example: " + COMMAND_WORD + " n/John Tan i/1 note/Reviewed fractions";
     public static final String MESSAGE_SUCCESS = "\u2714 Interaction updated for %1$s: %2$s\n"
             + "Updated to: %3$s";
@@ -37,6 +38,7 @@ public class EditInteractionCommand extends Command {
     private final Index index;
     private final Optional<LocalDate> date;
     private final Optional<LocalTime> time;
+    private final boolean isTimeEdited;
     private final Optional<String> note;
 
     /**
@@ -44,12 +46,25 @@ public class EditInteractionCommand extends Command {
      */
     public EditInteractionCommand(Name name, Index index, Optional<LocalDate> date,
             Optional<LocalTime> time, Optional<String> note) {
+        this(name, index, date, time, time.isPresent(), note);
+    }
+
+    /**
+     * Creates a command that edits the supplied fields of an interaction.
+     * An empty {@code time} removes the existing time when {@code isTimeEdited} is true.
+     */
+    public EditInteractionCommand(Name name, Index index, Optional<LocalDate> date,
+            Optional<LocalTime> time, boolean isTimeEdited, Optional<String> note) {
         this.name = requireNonNull(name);
         this.index = requireNonNull(index);
         this.date = requireNonNull(date);
         this.time = requireNonNull(time);
+        this.isTimeEdited = isTimeEdited;
         this.note = requireNonNull(note);
-        if (date.isEmpty() && time.isEmpty() && note.isEmpty()) {
+        if (!isTimeEdited && time.isPresent()) {
+            throw new IllegalArgumentException("A replacement time requires a time edit");
+        }
+        if (date.isEmpty() && !isTimeEdited && note.isEmpty()) {
             throw new IllegalArgumentException("At least one interaction field must be edited");
         }
     }
@@ -65,8 +80,9 @@ public class EditInteractionCommand extends Command {
         }
 
         Interaction original = chronologicalInteractions.get(index.getZeroBased());
+        Optional<LocalTime> editedTime = isTimeEdited ? time : original.getTime();
         Interaction edited = new Interaction(date.orElse(original.getDate()),
-                time.map(Optional::of).orElse(original.getTime()), note.orElse(original.getNote()));
+                editedTime, note.orElse(original.getNote()));
         Student updatedStudent = student.withInteractionAtChronologicalIndex(index.getZeroBased(), edited);
         assert updatedStudent.getInteractions().size() == student.getInteractions().size()
                 : "Editing should preserve the interaction count";
@@ -97,12 +113,14 @@ public class EditInteractionCommand extends Command {
             return false;
         }
         return name.equals(otherCommand.name) && index.equals(otherCommand.index)
-                && date.equals(otherCommand.date) && time.equals(otherCommand.time) && note.equals(otherCommand.note);
+                && date.equals(otherCommand.date) && time.equals(otherCommand.time)
+                && isTimeEdited == otherCommand.isTimeEdited && note.equals(otherCommand.note);
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this).add("name", name).add("index", index)
-                .add("date", date).add("time", time).add("note", note).toString();
+                .add("date", date).add("time", time).add("isTimeEdited", isTimeEdited)
+                .add("note", note).toString();
     }
 }

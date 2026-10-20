@@ -73,6 +73,21 @@ public class EditInteractionCommandTest {
     }
 
     @Test
+    public void execute_emptyTimeEdit_removesTimeAndPreservesOtherFields() throws Exception {
+        Student student = BENSON.withInteraction(EARLIER);
+        model.setStudent(BENSON, student);
+        EditInteractionCommand command = new EditInteractionCommand(student.getName(), Index.fromOneBased(1),
+                Optional.empty(), Optional.empty(), true, Optional.empty());
+
+        command.execute(model);
+
+        Interaction actual = model.findStudentByName(student.getName()).orElseThrow().getInteractions().getFirst();
+        assertEquals(EARLIER.getDate(), actual.getDate());
+        assertTrue(actual.getTime().isEmpty());
+        assertEquals(EARLIER.getNote(), actual.getNote());
+    }
+
+    @Test
     public void execute_futureDate_successWithWarning() {
         Student student = BENSON.withInteraction(EARLIER);
         model.setStudent(BENSON, student);
@@ -109,11 +124,15 @@ public class EditInteractionCommandTest {
                 Optional.empty(), Optional.empty(), Optional.of("New"));
         assertThrows(IllegalArgumentException.class, () -> new EditInteractionCommand(BENSON.getName(), index,
                 Optional.empty(), Optional.empty(), Optional.empty()));
+        assertThrows(IllegalArgumentException.class, () -> new EditInteractionCommand(BENSON.getName(), index,
+                Optional.empty(), Optional.of(LocalTime.of(14, 30)), false, Optional.empty()));
         assertTrue(command.equals(command));
         assertTrue(command.equals(new EditInteractionCommand(BENSON.getName(), index,
                 Optional.empty(), Optional.empty(), Optional.of("New"))));
         assertFalse(command.equals(null));
         assertFalse(command.equals(new EditInteractionCommand(BENSON.getName(), index,
                 Optional.of(LocalDate.of(2026, 10, 2)), Optional.empty(), Optional.empty())));
+        assertFalse(command.equals(new EditInteractionCommand(BENSON.getName(), index,
+                Optional.empty(), Optional.empty(), true, Optional.of("New"))));
     }
 }

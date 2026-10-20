@@ -25,9 +25,10 @@ public class EditInteractionCommandParser implements Parser<EditInteractionComma
     public EditInteractionCommand parse(String args) throws ParseException {
         ArgumentMultimap arguments = ArgumentTokenizer.tokenizeWithTrailingPrefix(args, PREFIX_NOTE,
                 PREFIX_NAME, PREFIX_INDEX, PREFIX_DATE, PREFIX_TIME);
-        boolean hasEdit = arguments.getValue(PREFIX_DATE).isPresent()
-                || arguments.getValue(PREFIX_TIME).isPresent()
-                || arguments.getValue(PREFIX_NOTE).isPresent();
+        Optional<String> dateArgument = arguments.getValue(PREFIX_DATE);
+        Optional<String> timeArgument = arguments.getValue(PREFIX_TIME);
+        Optional<String> noteArgument = arguments.getValue(PREFIX_NOTE);
+        boolean hasEdit = dateArgument.isPresent() || timeArgument.isPresent() || noteArgument.isPresent();
         if (arguments.getValue(PREFIX_NAME).isEmpty() || arguments.getValue(PREFIX_INDEX).isEmpty()
                 || !hasEdit || !arguments.getPreamble().isEmpty()) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT,
@@ -40,15 +41,15 @@ public class EditInteractionCommandParser implements Parser<EditInteractionComma
         Optional<LocalDate> date = Optional.empty();
         Optional<LocalTime> time = Optional.empty();
         Optional<String> note = Optional.empty();
-        if (arguments.getValue(PREFIX_DATE).isPresent()) {
-            date = Optional.of(ParserUtil.parseInteractionDate(arguments.getValue(PREFIX_DATE).get()));
+        if (dateArgument.isPresent()) {
+            date = Optional.of(ParserUtil.parseInteractionDate(dateArgument.get()));
         }
-        if (arguments.getValue(PREFIX_TIME).isPresent()) {
-            time = Optional.of(ParserUtil.parseInteractionTime(arguments.getValue(PREFIX_TIME).get()));
+        if (timeArgument.isPresent() && !timeArgument.get().isEmpty()) {
+            time = Optional.of(ParserUtil.parseInteractionTime(timeArgument.get()));
         }
-        if (arguments.getValue(PREFIX_NOTE).isPresent()) {
-            note = Optional.of(ParserUtil.parseInteractionNote(arguments.getValue(PREFIX_NOTE).get()));
+        if (noteArgument.isPresent()) {
+            note = Optional.of(ParserUtil.parseInteractionNote(noteArgument.get()));
         }
-        return new EditInteractionCommand(name, index, date, time, note);
+        return new EditInteractionCommand(name, index, date, time, timeArgument.isPresent(), note);
     }
 }
