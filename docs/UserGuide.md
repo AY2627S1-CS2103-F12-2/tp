@@ -106,6 +106,7 @@ Shows a student's name and subjects, and shows their interactions and follow-ups
 Format: `student view n/NAME`
 
 * The name is matched ignoring case, but it must otherwise be the full name. Use [`find`](#finding-students-by-name-find) if you only remember part of it.
+* If a [`find`](#finding-students-by-name-find) is hiding the student, the student list shows all your students again so the student you view is in it.
 
 Example:
 * `student view n/john tan` shows the student added as `John Tan`.

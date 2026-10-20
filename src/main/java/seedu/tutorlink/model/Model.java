@@ -81,6 +81,7 @@ public interface Model {
 
     /**
      * Shows {@code student} in detail. {@code student} may be {@code null} to clear the selection.
+     * If the current filter hides {@code student}, the filter is reset to show all students.
      */
     void setSelectedStudent(Student student);
 
