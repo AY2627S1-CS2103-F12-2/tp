@@ -88,6 +88,23 @@ public class EditInteractionCommandTest {
     }
 
     @Test
+    public void execute_compoundEdit_updatesSelectedInteractionAndPreservesSiblings() throws Exception {
+        Student student = BENSON.withInteraction(LATER).withInteraction(EARLIER);
+        model.setStudent(BENSON, student);
+        model.setSelectedStudent(student);
+        Interaction edited = new Interaction(LocalDate.of(2026, 10, 4),
+                Optional.of(LocalTime.of(16, 45)), "Reviewed algebra");
+        EditInteractionCommand command = new EditInteractionCommand(student.getName(), Index.fromOneBased(1),
+                Optional.of(edited.getDate()), edited.getTime(), Optional.of(edited.getNote()));
+
+        command.execute(model);
+
+        Student actual = model.findStudentByName(student.getName()).orElseThrow();
+        assertEquals(List.of(LATER, edited), actual.getInteractions());
+        assertEquals(actual, model.getSelectedStudent().getValue());
+    }
+
+    @Test
     public void execute_futureDate_successWithWarning() {
         Student student = BENSON.withInteraction(EARLIER);
         model.setStudent(BENSON, student);
@@ -134,5 +151,10 @@ public class EditInteractionCommandTest {
                 Optional.of(LocalDate.of(2026, 10, 2)), Optional.empty(), Optional.empty())));
         assertFalse(command.equals(new EditInteractionCommand(BENSON.getName(), index,
                 Optional.empty(), Optional.empty(), true, Optional.of("New"))));
+        assertFalse(command.equals(new EditInteractionCommand(BENSON.getName(), index,
+                Optional.empty(), Optional.of(LocalTime.of(14, 30)), Optional.of("New"))));
+        assertFalse(command.equals(new EditInteractionCommand(BENSON.getName(), index,
+                Optional.empty(), Optional.empty(), Optional.of("Different"))));
+        assertTrue(command.toString().contains("isTimeEdited=false"));
     }
 }
