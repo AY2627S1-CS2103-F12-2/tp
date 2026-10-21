@@ -3,8 +3,6 @@ package seedu.tutorlink.logic;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static seedu.tutorlink.logic.Messages.MESSAGE_STUDENT_NOT_FOUND;
 import static seedu.tutorlink.logic.Messages.MESSAGE_UNKNOWN_COMMAND;
-import static seedu.tutorlink.logic.commands.CommandTestUtil.NAME_DESC_AMY;
-import static seedu.tutorlink.logic.commands.CommandTestUtil.SUBJECT_DESC_MATH;
 import static seedu.tutorlink.testutil.Assert.assertThrows;
 import static seedu.tutorlink.testutil.TypicalStudents.AMY;
 
@@ -162,6 +160,37 @@ public class LogicManagerTest {
     }
 
     @Test
+    public void execute_readOnlyInteractionList_doesNotAttemptToSave() throws Exception {
+        model.addStudent(new StudentBuilder(AMY).build());
+
+        Path dataPath = temporaryFolder.resolve("ReadOnlyData.json");
+        JsonTutorLinkStorage tutorLinkStorage = new JsonTutorLinkStorage(dataPath) {
+            @Override
+            public void saveTutorLink(ReadOnlyTutorLink tutorLink) throws IOException {
+                throw DUMMY_IO_EXCEPTION;
+            }
+        };
+        JsonUserPrefsStorage userPrefsStorage =
+                new JsonUserPrefsStorage(temporaryFolder.resolve("ReadOnlyUserPrefs.json"));
+        logic = new LogicManager(model, new StorageManager(tutorLinkStorage, userPrefsStorage));
+
+        CommandResult result = logic.execute(ListInteractionsCommand.COMMAND_WORD + " n/" + AMY.getName());
+
+        assertEquals(String.format(ListInteractionsCommand.MESSAGE_NONE_RECORDED, AMY.getName()),
+                result.getFeedbackToUser());
+    }
+
+    @Test
+    public void execute_interactionAddStorageFailure_restoresModel() {
+        model.addStudent(new StudentBuilder(AMY).build());
+        String command = AddInteractionCommand.COMMAND_WORD
+                + " n/" + AMY.getName() + " d/2026-10-01 note/Save failure interaction";
+
+        assertCommandFailureForExceptionFromStorage(DUMMY_IO_EXCEPTION,
+                String.format(LogicManager.FILE_OPS_ERROR_FORMAT, DUMMY_IO_EXCEPTION.getMessage()), command);
+    }
+
+    @Test
     public void getFilteredStudentList_modifyList_throwsUnsupportedOperationException() {
         assertThrows(UnsupportedOperationException.class, () -> logic.getFilteredStudentList().remove(0));
     }
@@ -226,6 +255,20 @@ public class LogicManagerTest {
      * @param expectedMessage the message expected inside exception thrown by the Logic component
      */
     private void assertCommandFailureForExceptionFromStorage(IOException e, String expectedMessage) {
+        model.addStudent(new StudentBuilder(AMY).build());
+        String interactionCommand = AddInteractionCommand.COMMAND_WORD
+                + " n/" + AMY.getName() + " d/2026-10-01 note/Storage failure interaction";
+        assertCommandFailureForExceptionFromStorage(e, expectedMessage, interactionCommand);
+    }
+
+    /**
+     * Tests that a storage failure is reported and the command's mutation is rolled back.
+     *
+     * @param e the exception to be thrown by the Storage component
+     * @param expectedMessage the message expected inside exception thrown by LogicManager
+     * @param command the data-changing command to execute
+     */
+    private void assertCommandFailureForExceptionFromStorage(IOException e, String expectedMessage, String command) {
         Path prefPath = temporaryFolder.resolve("ExceptionUserPrefs.json");
 
         // Inject LogicManager with a JsonTutorLinkStorage that throws the IOException e when saving
@@ -242,11 +285,7 @@ public class LogicManagerTest {
 
         logic = new LogicManager(model, storage);
 
-        // Triggers the saveTutorLink method by executing an add command
-        String addCommand = AddCommand.COMMAND_WORD + NAME_DESC_AMY + SUBJECT_DESC_MATH;
-        Student expectedStudent = new StudentBuilder(AMY).build();
-        ModelManager expectedModel = new ModelManager();
-        expectedModel.addStudent(expectedStudent);
-        assertCommandFailure(addCommand, CommandException.class, expectedMessage, expectedModel);
+        ModelManager expectedModel = new ModelManager(model.getTutorLink(), new UserPrefs());
+        assertCommandFailure(command, CommandException.class, expectedMessage, expectedModel);
     }
 }

@@ -14,6 +14,7 @@ import seedu.tutorlink.logic.commands.exceptions.CommandException;
 import seedu.tutorlink.logic.parser.TutorLinkParser;
 import seedu.tutorlink.logic.parser.exceptions.ParseException;
 import seedu.tutorlink.model.Model;
+import seedu.tutorlink.model.TutorLink;
 import seedu.tutorlink.model.student.Student;
 import seedu.tutorlink.storage.Storage;
 
@@ -47,13 +48,20 @@ public class LogicManager implements Logic {
 
         CommandResult commandResult;
         Command command = tutorLinkParser.parseCommand(commandText);
+        TutorLink previousTutorLink = new TutorLink(model.getTutorLink());
         commandResult = command.execute(model);
+
+        if (previousTutorLink.equals(model.getTutorLink())) {
+            return commandResult;
+        }
 
         try {
             storage.saveTutorLink(model.getTutorLink());
         } catch (AccessDeniedException e) {
+            model.setTutorLink(previousTutorLink);
             throw new CommandException(String.format(FILE_OPS_PERMISSION_ERROR_FORMAT, e.getMessage()), e);
         } catch (IOException ioe) {
+            model.setTutorLink(previousTutorLink);
             throw new CommandException(String.format(FILE_OPS_ERROR_FORMAT, ioe.getMessage()), ioe);
         }
 
