@@ -24,7 +24,7 @@ public class ViewStudentCommand extends Command {
             + PREFIX_NAME + "NAME\n"
             + "Example: " + COMMAND_WORD + " " + PREFIX_NAME + "John Tan";
 
-    public static final String MESSAGE_SUCCESS = "Student: %1$s\nSubjects: %2$s";
+    public static final String MESSAGE_SUCCESS = "\u2714 Student: %1$s\nSubjects: %2$s";
 
     private static final Logger logger = LogsCenter.getLogger(ViewStudentCommand.class);
 
