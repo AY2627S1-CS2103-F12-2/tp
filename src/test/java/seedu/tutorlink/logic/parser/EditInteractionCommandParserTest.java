@@ -42,6 +42,24 @@ public class EditInteractionCommandParserTest {
     }
 
     @Test
+    public void parse_emptyTime_returnsCommandThatRemovesTime() throws Exception {
+        EditInteractionCommand expected = new EditInteractionCommand(new Name("John Tan"), Index.fromOneBased(1),
+                Optional.empty(), Optional.empty(), true, Optional.empty());
+
+        assertEquals(expected, parser.parse(" n/John Tan i/1 t/"));
+    }
+
+    @Test
+    public void parse_emptyTimeWithOtherFields_returnsCommandThatRemovesTime() throws Exception {
+        EditInteractionCommand expected = new EditInteractionCommand(new Name("John Tan"), Index.fromOneBased(1),
+                Optional.of(LocalDate.of(2026, 10, 2)), Optional.empty(), true,
+                Optional.of("Reviewed algebra"));
+
+        assertEquals(expected, parser.parse(
+                " n/John Tan i/1 d/2026-10-02 t/ note/Reviewed algebra"));
+    }
+
+    @Test
     public void parse_noteConsumesRemainingPrefixes() throws Exception {
         EditInteractionCommand expected = new EditInteractionCommand(new Name("John Tan"), Index.fromOneBased(1),
                 Optional.empty(), Optional.empty(), Optional.of("Corrected d/2026-10-02 t/14:30"));

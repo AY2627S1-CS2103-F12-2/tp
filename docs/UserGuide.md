@@ -258,20 +258,30 @@ Format: `interaction edit n/NAME i/INDEX [d/DATE] [t/TIME] [note/TEXT]`
 * At least one of `d/`, `t/` or `note/` must be supplied. Fields that are not supplied remain unchanged.
 * Date, time, and note values follow the same rules as `interaction add`. A future replacement date is allowed
   with a warning. The `note/` parameter must be last, and everything after it is treated as note text.
-* An existing time can be replaced using `t/TIME`; omitting `t/` preserves it.
-* Changing the date can renumber the list. Run `interaction list` again before choosing another item.
+* An existing time can be replaced using `t/TIME`, removed using `t/` with no value,
+  or preserved by omitting `t/`.
+* Changing the date or time can renumber the list. Run `interaction list` again before choosing another item.
 * A failed command leaves your stored data unchanged.
 
 Examples:
 
 * `interaction edit n/John Tan i/2 note/Practised algebraic fractions and equations`
 * `interaction edit n/John Tan i/2 d/2026-10-02 t/15:00`
+* `interaction edit n/John Tan i/2 d/2026-10-02 t/ note/Reviewed algebra`
 
 After the first example, TutorLink shows the original and updated interaction:
 
 ```text
 ✔ Interaction updated for John Tan: 2026-10-01 14:30 — Practised algebraic fractions
 Updated to: 2026-10-01 14:30 — Practised algebraic fractions and equations
+```
+
+If item 2 is still the interaction shown above, the third example changes its date and note while
+removing its existing time. TutorLink shows:
+
+```text
+✔ Interaction updated for John Tan: 2026-10-01 14:30 — Practised algebraic fractions and equations
+Updated to: 2026-10-02 — Reviewed algebra
 ```
 
 An unknown student, an out-of-range index, missing edit fields, invalid values, or repeated structured
