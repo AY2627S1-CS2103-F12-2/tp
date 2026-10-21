@@ -19,11 +19,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import seedu.tutorlink.logic.commands.AddFollowUpCommand;
+import seedu.tutorlink.logic.commands.CommandResult;
 import seedu.tutorlink.logic.commands.exceptions.CommandException;
 import seedu.tutorlink.model.Model;
 import seedu.tutorlink.model.ModelManager;
 import seedu.tutorlink.model.ReadOnlyTutorLink;
 import seedu.tutorlink.model.TutorLink;
+import seedu.tutorlink.model.UserPrefs;
 import seedu.tutorlink.model.followup.FollowUp;
 import seedu.tutorlink.model.followup.FollowUpStatus;
 import seedu.tutorlink.model.interaction.Interaction;
@@ -45,6 +48,7 @@ public class FollowUpPersistenceTest {
     public Path temporaryFolder;
 
     private Model model;
+    private Logic logic;
     private Student originalStudent;
     private Path dataPath;
 
@@ -96,11 +100,44 @@ public class FollowUpPersistenceTest {
         assertSaveFailureRestoresData(CANCEL_COMMAND, new AccessDeniedException(dataPath.toString()));
     }
 
-    private void assertSaveFailureRestoresData(String command, IOException failure) throws Exception {
+    @Test
+    public void execute_addFollowUpIoFailureThenSuccessfulSave_failedAdditionNotPersisted() throws Exception {
+        assertRecoveryDoesNotPersistFailedChange(ADD_COMMAND, new IOException("Disk unavailable"));
+    }
+
+    @Test
+    public void execute_addFollowUpPermissionFailureThenSuccessfulSave_failedAdditionNotPersisted() throws Exception {
+        assertRecoveryDoesNotPersistFailedChange(ADD_COMMAND, new AccessDeniedException(dataPath.toString()));
+    }
+
+    @Test
+    public void execute_doneFollowUpIoFailureThenSuccessfulSave_failedCompletionNotPersisted() throws Exception {
+        assertRecoveryDoesNotPersistFailedChange(DONE_COMMAND, new IOException("Disk unavailable"));
+    }
+
+    @Test
+    public void execute_doneFollowUpPermissionFailureThenSuccessfulSave_failedCompletionNotPersisted()
+            throws Exception {
+        assertRecoveryDoesNotPersistFailedChange(DONE_COMMAND, new AccessDeniedException(dataPath.toString()));
+    }
+
+    @Test
+    public void execute_cancelFollowUpIoFailureThenSuccessfulSave_failedCancellationNotPersisted() throws Exception {
+        assertRecoveryDoesNotPersistFailedChange(CANCEL_COMMAND, new IOException("Disk unavailable"));
+    }
+
+    @Test
+    public void execute_cancelFollowUpPermissionFailureThenSuccessfulSave_failedCancellationNotPersisted()
+            throws Exception {
+        assertRecoveryDoesNotPersistFailedChange(CANCEL_COMMAND, new AccessDeniedException(dataPath.toString()));
+    }
+
+    private RecoverableTutorLinkStorage assertSaveFailureRestoresData(String command, IOException failure)
+            throws Exception {
         TutorLink originalData = new TutorLink(model.getTutorLink());
         byte[] originalFile = Files.readAllBytes(dataPath);
-        FailingTutorLinkStorage storage = new FailingTutorLinkStorage(dataPath, failure);
-        Logic logic = new LogicManager(model, new StorageManager(storage,
+        RecoverableTutorLinkStorage storage = new RecoverableTutorLinkStorage(dataPath, failure);
+        logic = new LogicManager(model, new StorageManager(storage,
                 new JsonUserPrefsStorage(temporaryFolder.resolve("preferences.json"))));
         var displayedStudents = logic.getFilteredStudentList();
         var selectedStudent = logic.getSelectedStudent();
@@ -122,22 +159,54 @@ public class FollowUpPersistenceTest {
         }
         assertArrayEquals(originalFile, Files.readAllBytes(dataPath));
         assertEquals(originalData, new TutorLink(new JsonTutorLinkStorage(dataPath).readTutorLink().orElseThrow()));
+        return storage;
     }
 
-    private static class FailingTutorLinkStorage extends JsonTutorLinkStorage {
+    private void assertRecoveryDoesNotPersistFailedChange(String command, IOException failure) throws Exception {
+        RecoverableTutorLinkStorage storage = assertSaveFailureRestoresData(command, failure);
+        FollowUp successfulAddition = new FollowUp("Successful addition", REVIEW_DATE.plusDays(2));
+        Student expectedStudent = originalStudent.withFollowUp(successfulAddition);
+        TutorLink expectedData = new TutorLink(model.getTutorLink());
+        expectedData.setStudent(originalStudent, expectedStudent);
 
-        private final IOException failure;
+        storage.allowSaving();
+        CommandResult result = logic.execute("followup add n/" + AMY.getName()
+                + " desc/" + successfulAddition.getDescription() + " review/" + successfulAddition.getReviewDate());
+
+        assertEquals(String.format(AddFollowUpCommand.MESSAGE_SUCCESS, AMY.getName(),
+                successfulAddition.getReviewDate(), successfulAddition.getDescription(), 4),
+                result.getFeedbackToUser());
+        assertEquals(2, storage.saveAttempts);
+        assertEquals(expectedData, model.getTutorLink());
+
+        ReadOnlyTutorLink savedData = new JsonTutorLinkStorage(dataPath).readTutorLink().orElseThrow();
+        Model restartedModel = new ModelManager(savedData, new UserPrefs());
+        assertEquals(expectedData, restartedModel.getTutorLink());
+        assertEquals(expectedStudent.getOutstandingFollowUps(),
+                restartedModel.findStudentByName(AMY.getName()).orElseThrow().getOutstandingFollowUps());
+    }
+
+    private static class RecoverableTutorLinkStorage extends JsonTutorLinkStorage {
+
+        private IOException failure;
         private int saveAttempts;
 
-        FailingTutorLinkStorage(Path filePath, IOException failure) {
+        RecoverableTutorLinkStorage(Path filePath, IOException failure) {
             super(filePath);
             this.failure = failure;
+        }
+
+        void allowSaving() {
+            failure = null;
         }
 
         @Override
         public void saveTutorLink(ReadOnlyTutorLink tutorLink) throws IOException {
             saveAttempts++;
-            throw failure;
+            if (failure != null) {
+                throw failure;
+            }
+            super.saveTutorLink(tutorLink);
         }
     }
 }
