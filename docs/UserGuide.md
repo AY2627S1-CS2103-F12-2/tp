@@ -260,6 +260,7 @@ Format: `interaction edit n/NAME i/INDEX [d/DATE] [t/TIME] [note/TEXT]`
   with a warning. The `note/` parameter must be last, and everything after it is treated as note text.
 * An existing time can be replaced using `t/TIME`, removed using `t/` with no value,
   or preserved by omitting `t/`.
+* Changing the date or time can renumber the list. Run `interaction list` again before choosing another item.
 * A failed command leaves your stored data unchanged.
 
 Examples:
@@ -296,6 +297,7 @@ Format: `interaction delete n/NAME i/INDEX`
 * `INDEX` is the interaction number shown by `interaction list n/NAME`. It must be a positive integer.
 * Because `interaction list` displays interactions chronologically, the index refers to that displayed order,
   not the order in which the interactions were recorded.
+* The list is renumbered after deletion. Run `interaction list` again before choosing another item.
 * An index larger than the number of interactions is rejected with
   `Index exceeds the number of available items.`
 * A failed command leaves your stored data unchanged.

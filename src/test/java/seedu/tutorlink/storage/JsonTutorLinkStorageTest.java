@@ -210,6 +210,22 @@ public class JsonTutorLinkStorageTest {
     }
 
     @Test
+    public void read_trailingJsonContent_throwsDataLoadingException() throws Exception {
+        Path path = testFolder.resolve("trailingJsonContent.json");
+        Files.writeString(path, "{\"students\":[] }TRAILING_GARBAGE");
+
+        assertThrows(DataLoadingException.class, () -> new JsonTutorLinkStorage(path).readTutorLink());
+    }
+
+    @Test
+    public void read_trailingWhitespace_succeeds() throws Exception {
+        Path path = testFolder.resolve("trailingWhitespace.json");
+        Files.writeString(path, "{\"students\":[] } \r\n\t");
+
+        assertEquals(new TutorLink(), new TutorLink(new JsonTutorLinkStorage(path).readTutorLink().orElseThrow()));
+    }
+
+    @Test
     public void read_notJsonFormat_exceptionThrown() {
         assertThrows(DataLoadingException.class, () -> readTutorLink("notJsonFormatTutorLink.json"));
     }
