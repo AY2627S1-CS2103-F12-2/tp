@@ -83,8 +83,8 @@ public class MainApp extends Application {
         try {
             tutorLinkOptional = storage.readTutorLink();
             if (tutorLinkOptional.isEmpty()) {
-                logger.info("Creating a new data file " + storage.getTutorLinkFilePath()
-                        + " populated with a sample TutorLink.");
+                logger.info("Data file " + storage.getTutorLinkFilePath() + " not found. Starting with sample data;"
+                        + " the file will be created after the first command that changes data.");
             }
             initialData = tutorLinkOptional.orElseGet(SampleDataUtil::getSampleTutorLink);
         } catch (DataLoadingException e) {
