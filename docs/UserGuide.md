@@ -490,7 +490,7 @@ Some edits can also make TutorLink behave unexpectedly, for example a value outs
 ## FAQ
 
 **Q**: How do I move my data to another computer?<br>
-**A**: Install TutorLink on the other computer and run it once. Then replace the `data/tutorlink.json` file it creates with the one from your old computer's home folder.
+**A**: Close TutorLink on both computers. Copy the `data` folder, which contains `tutorlink.json`, from the folder with `tutorlink.jar` on your old computer into the folder with `tutorlink.jar` on the new computer, replacing any existing `data` folder. Then start TutorLink on the new computer.
 
 **Q**: How do I remove the sample students?<br>
 **A**: Delete each one with `student delete n/NAME`. TutorLink only adds sample students when it starts without a data file.
