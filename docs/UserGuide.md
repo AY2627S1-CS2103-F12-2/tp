@@ -238,7 +238,7 @@ Example:
 After recording the interactions above, the result is:
 
 ```text
-Interactions for John Tan (3):
+✔ Interactions for John Tan (3):
 1. 2026-10-01 — Discussed revision plan
 2. 2026-10-01 14:30 — Practised algebraic fractions
 3. 2026-10-15 — Reviewed algebraic fractions
@@ -371,7 +371,7 @@ Example:
 After adding the two examples above, the result is:
 
 ```text
-Outstanding follow-ups for John Tan (2):
+✔ Outstanding follow-ups for John Tan (2):
 1. 2026-10-14 — Check in on extra drills
 2. 2026-10-15 — Review algebra
 ```

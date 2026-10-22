@@ -36,7 +36,8 @@ public class ListFollowUpsCommandTest {
         model.setStudent(BENSON, student);
         Model expected = new ModelManager(new TutorLink(model.getTutorLink()), new UserPrefs());
         assertCommandSuccess(new ListFollowUpsCommand(student.getName()), model,
-                "Outstanding follow-ups for " + student.getName() + " (1):\n1. 2026-10-03 — Outstanding", expected);
+                "\u2714 Outstanding follow-ups for " + student.getName() + " (1):\n1. 2026-10-03 — Outstanding",
+                expected);
     }
 
     @Test
@@ -58,7 +59,7 @@ public class ListFollowUpsCommandTest {
         model.setSelectedStudent(student);
         Model expectedModel = new ModelManager(new TutorLink(model.getTutorLink()), new UserPrefs());
         expectedModel.setSelectedStudent(student);
-        String expectedMessage = "Outstanding follow-ups for " + BENSON.getName() + " (3):\n"
+        String expectedMessage = "\u2714 Outstanding follow-ups for " + BENSON.getName() + " (3):\n"
                 + "1. 2026-10-14 — First added\n"
                 + "2. 2026-10-14 — Second added\n"
                 + "3. 2026-10-15 — Later review";
@@ -91,7 +92,7 @@ public class ListFollowUpsCommandTest {
                 .withFollowUp(new FollowUp("Future", today.plusDays(1)));
         model.setStudent(BENSON, student);
         Model expectedModel = new ModelManager(new TutorLink(model.getTutorLink()), new UserPrefs());
-        String message = "Outstanding follow-ups for " + BENSON.getName() + " (3):\n"
+        String message = "\u2714 Outstanding follow-ups for " + BENSON.getName() + " (3):\n"
                 + "1. " + today.minusDays(1) + " — Past\n"
                 + "2. " + today + " — Today\n"
                 + "3. " + today.plusDays(1) + " — Future";

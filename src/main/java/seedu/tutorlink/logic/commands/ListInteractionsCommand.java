@@ -22,7 +22,7 @@ public class ListInteractionsCommand extends Command {
     public static final String COMMAND_WORD = "interaction list";
     public static final String MESSAGE_USAGE = "Command format: " + COMMAND_WORD + " n/NAME\n"
             + "Example: " + COMMAND_WORD + " n/Alex Tan";
-    public static final String MESSAGE_SUCCESS = "Interactions for %1$s (%2$d):\n%3$s";
+    public static final String MESSAGE_SUCCESS = "\u2714 Interactions for %1$s (%2$d):\n%3$s";
     public static final String MESSAGE_NONE_RECORDED = "\u2139 No interactions recorded for %1$s yet.";
     private final Name name;
 

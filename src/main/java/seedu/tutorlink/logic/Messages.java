@@ -24,7 +24,7 @@ public class Messages {
     public static final String MESSAGE_FUTURE_INTERACTION_DATE_WARNING =
             "\u26A0 Interaction date %1$s is in the future (today is %2$s); recording it anyway.\n";
     public static final String MESSAGE_STUDENTS_LISTED_OVERVIEW =
-            "%1$d student(s) listed. Type list to show all students again.";
+            "\u2714 %1$d student(s) listed. Type list to show all students again.";
     public static final String MESSAGE_DUPLICATE_FIELDS =
                 "Multiple values specified for the following single-valued field(s): ";
 
