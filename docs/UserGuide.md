@@ -171,7 +171,7 @@ Format: `interaction add n/NAME d/DATE [t/TIME] note/TEXT`
 * `NAME` identifies an existing student by their full name, ignoring case.
 * `DATE` must be a real calendar date in `yyyy-MM-dd` format, such as `2026-10-01`.
   A future date is allowed, but TutorLink warns you before recording it.
-* `TIME` is optional. If given, it must use the 24-hour `HH:mm` format, such as `14:30`.
+* `TIME` is optional. If given, it must use the 24-hour `HH:mm` format, such as `14:30`. A `t/` with no value records the interaction without a time.
 * `TEXT` is 1 to 500 characters long after leading and trailing whitespace is removed.
   It must not be blank and must be on a single line. If you paste text containing line breaks, each line break becomes a space,
   so a pasted `First line⏎Second line` is recorded as `First line Second line`.
