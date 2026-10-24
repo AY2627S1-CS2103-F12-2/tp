@@ -12,8 +12,13 @@ import java.util.stream.Collectors;
  * 2. Leading and trailing whitespaces of an argument value will be discarded.<br>
  * 3. An argument may be repeated and all its values will be accumulated e.g. the value of {@code t/}
  *    in the above example.<br>
+ * 4. The name connectors {@code s/o} and {@code d/o} (as in {@code Raj s/o Kumar}) are part of a value,
+ *    not the prefixes {@code s/} and {@code d/}.<br>
  */
 public class ArgumentTokenizer {
+
+    private static final String SON_OF = "s/o";
+    private static final String DAUGHTER_OF = "d/o";
 
     /**
      * Tokenizes an arguments string and returns an {@code ArgumentMultimap} object that maps prefixes to their
@@ -72,12 +77,27 @@ public class ArgumentTokenizer {
 
         int prefixPosition = findPrefixPosition(argsString, prefix.getPrefix(), 0);
         while (prefixPosition != -1) {
-            PrefixPosition extendedPrefix = new PrefixPosition(prefix, prefixPosition);
-            positions.add(extendedPrefix);
+            if (!isNameConnector(argsString, prefixPosition)) {
+                positions.add(new PrefixPosition(prefix, prefixPosition));
+            }
             prefixPosition = findPrefixPosition(argsString, prefix.getPrefix(), prefixPosition);
         }
 
         return positions;
+    }
+
+    /**
+     * Returns true if the text at {@code position} is a name connector such as {@code s/o} or {@code d/o},
+     * i.e. a prefix followed by the single letter {@code o} and then whitespace or the end of the input.
+     */
+    private static boolean isNameConnector(String argsString, int position) {
+        return argsString.startsWith(SON_OF, position) && isWordEnd(argsString, position + SON_OF.length())
+                || argsString.startsWith(DAUGHTER_OF, position)
+                && isWordEnd(argsString, position + DAUGHTER_OF.length());
+    }
+
+    private static boolean isWordEnd(String argsString, int position) {
+        return position == argsString.length() || Character.isWhitespace(argsString.charAt(position));
     }
 
     /**
