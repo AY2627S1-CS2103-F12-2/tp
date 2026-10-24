@@ -16,7 +16,7 @@ public class Name {
 
     public static final String MESSAGE_CONSTRAINTS = "Student name must be 1 to " + MAX_LENGTH
             + " characters, contain at least one letter, and use only letters, spaces, hyphens, apostrophes"
-            + " or full stops.";
+            + " or full stops. The connectors s/o and d/o are also allowed, as in Raj s/o Kumar.";
 
     /*
      * Letters include accented letters and combining marks (e.g. José). Both straight and curly apostrophes are
@@ -25,6 +25,8 @@ public class Name {
      */
     public static final String VALIDATION_REGEX = "[\\p{L}\\p{M}'\u2019.-][\\p{L}\\p{M}'\u2019. -]*";
     private static final String LETTER_REGEX = ".*\\p{L}.*";
+    /* A standalone "s/o" (son of) or "d/o" (daughter of) word, in any case. */
+    private static final String CONNECTOR_REGEX = "(?i)(?<!\\S)[sd]/o(?!\\S)";
 
     public final String fullName;
 
@@ -46,8 +48,9 @@ public class Name {
      */
     public static boolean isValidName(String test) {
         String composedTest = toComposedForm(test);
+        String testWithoutConnectors = composedTest.replaceAll(CONNECTOR_REGEX, "so");
         return composedTest.length() <= MAX_LENGTH
-                && composedTest.matches(VALIDATION_REGEX)
+                && testWithoutConnectors.matches(VALIDATION_REGEX)
                 && composedTest.matches(LETTER_REGEX);
     }
 

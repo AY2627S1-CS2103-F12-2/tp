@@ -31,7 +31,9 @@ public class NameTest {
         assertFalse(Name.isValidName("^")); // only disallowed characters
         assertFalse(Name.isValidName("peter*")); // contains a disallowed symbol
         assertFalse(Name.isValidName("peter the 2nd")); // contains a digit
-        assertFalse(Name.isValidName("Ravi s/o Kumar")); // '/' clashes with command prefixes
+        assertFalse(Name.isValidName("Ravi s/ Kumar")); // '/' outside a name connector
+        assertFalse(Name.isValidName("Ravi a/o Kumar")); // not a name connector
+        assertFalse(Name.isValidName("Ravi s/oKumar")); // connector joined to the next word
         assertFalse(Name.isValidName("-'.")); // no letter
         assertFalse(Name.isValidName(" Peter")); // leading space
         assertFalse(Name.isValidName("a".repeat(Name.MAX_LENGTH + 1))); // too long
@@ -47,6 +49,8 @@ public class NameTest {
         assertTrue(Name.isValidName("José Müller")); // accented letters
         assertTrue(Name.isValidName("李小龙")); // non-Latin letters
         assertTrue(Name.isValidName("a".repeat(Name.MAX_LENGTH))); // maximum length
+        assertTrue(Name.isValidName("Ravi s/o Kumar")); // son-of connector
+        assertTrue(Name.isValidName("Siti D/O Ahmad")); // daughter-of connector in capitals
     }
 
     @Test

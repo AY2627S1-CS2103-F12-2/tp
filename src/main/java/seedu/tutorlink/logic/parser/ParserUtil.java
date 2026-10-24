@@ -9,6 +9,8 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import seedu.tutorlink.commons.core.index.Index;
 import seedu.tutorlink.commons.util.StringUtil;
@@ -24,6 +26,7 @@ import seedu.tutorlink.model.student.Subject;
 public class ParserUtil {
 
     public static final String MESSAGE_INVALID_INDEX = "Index must be a positive integer.";
+    public static final String MESSAGE_UNKNOWN_PREFIX = "'%1$s' is not a parameter of this command.";
     public static final int MAX_FOLLOW_UP_DESCRIPTION_LENGTH = FollowUp.MAX_DESCRIPTION_LENGTH;
     public static final String MESSAGE_EMPTY_FOLLOW_UP_DESCRIPTION = "Description cannot be empty.";
     public static final String MESSAGE_LONG_FOLLOW_UP_DESCRIPTION = FollowUp.MESSAGE_LONG_DESCRIPTION;
@@ -42,6 +45,13 @@ public class ParserUtil {
     public static final String MESSAGE_INVALID_INTERACTION_NOTE_LENGTH =
             String.format("Note must be %d characters or fewer.", MAX_INTERACTION_NOTE_LENGTH);
 
+    /*
+     * A later word starting with letters and '/', such as " x/", that is not the name connector "s/o" or "d/o".
+     * A slash in the first word (e.g. "Math/Physics") is part of the value, not a parameter.
+     */
+    private static final Pattern UNKNOWN_PREFIX_PATTERN =
+            Pattern.compile("(?<=\\s)(?!(?i:[sd]/o)(?!\\S))\\p{Alpha}+/");
+
     /**
      * Parses {@code oneBasedIndex} into an {@code Index} and returns it. Leading and trailing whitespaces will be
      * trimmed.
@@ -50,6 +60,7 @@ public class ParserUtil {
     public static Index parseIndex(String oneBasedIndex) throws ParseException {
         String trimmedIndex = oneBasedIndex.trim();
         if (!StringUtil.isNonZeroUnsignedInteger(trimmedIndex)) {
+            verifyNoUnknownPrefix(trimmedIndex);
             throw new ParseException(MESSAGE_INVALID_INDEX);
         }
         return Index.fromOneBased(Integer.parseInt(trimmedIndex));
@@ -65,6 +76,7 @@ public class ParserUtil {
         requireNonNull(name);
         String trimmedName = name.trim().replaceAll("\\s+", " ");
         if (!Name.isValidName(trimmedName)) {
+            verifyNoUnknownPrefix(trimmedName);
             throw new ParseException(Name.MESSAGE_CONSTRAINTS);
         }
         return new Name(trimmedName);
@@ -80,6 +92,7 @@ public class ParserUtil {
         requireNonNull(subject);
         String trimmedSubject = subject.trim();
         if (!Subject.isValidSubject(trimmedSubject)) {
+            verifyNoUnknownPrefix(trimmedSubject);
             throw new ParseException(
                     String.format(MESSAGE_INVALID_SUBJECT, trimmedSubject, Subject.MESSAGE_CONSTRAINTS));
         }
@@ -149,6 +162,7 @@ public class ParserUtil {
     private static LocalDate parseDate(String date) throws ParseException {
         String trimmedDate = date.trim();
         if (!trimmedDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            verifyNoUnknownPrefix(trimmedDate);
             throw new ParseException(MESSAGE_INVALID_DATE_FORMAT);
         }
         try {
@@ -168,6 +182,7 @@ public class ParserUtil {
         requireNonNull(interactionTime);
         String trimmedInteractionTime = interactionTime.trim();
         if (!trimmedInteractionTime.matches("\\d{2}:\\d{2}")) {
+            verifyNoUnknownPrefix(trimmedInteractionTime);
             throw new ParseException(MESSAGE_INVALID_INTERACTION_TIME);
         }
 
@@ -197,5 +212,18 @@ public class ParserUtil {
             throw new ParseException(MESSAGE_INVALID_INTERACTION_NOTE_LENGTH);
         }
         return trimmedInteractionNote;
+    }
+
+    /**
+     * Checks an invalid value for text that looks like a parameter this command does not take, such as
+     * {@code x/foo} in {@code n/Ann x/foo}, so the user is told about that parameter rather than the value.
+     *
+     * @throws ParseException if {@code value} contains such a parameter.
+     */
+    private static void verifyNoUnknownPrefix(String value) throws ParseException {
+        Matcher matcher = UNKNOWN_PREFIX_PATTERN.matcher(value);
+        if (matcher.find()) {
+            throw new ParseException(String.format(MESSAGE_UNKNOWN_PREFIX, matcher.group()));
+        }
     }
 }

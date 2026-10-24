@@ -7,6 +7,7 @@ import static seedu.tutorlink.logic.parser.ParserUtil.MESSAGE_INVALID_CALENDAR_D
 import static seedu.tutorlink.logic.parser.ParserUtil.MESSAGE_INVALID_DATE_FORMAT;
 import static seedu.tutorlink.logic.parser.ParserUtil.MESSAGE_INVALID_INDEX;
 import static seedu.tutorlink.logic.parser.ParserUtil.MESSAGE_INVALID_SUBJECT;
+import static seedu.tutorlink.logic.parser.ParserUtil.MESSAGE_UNKNOWN_PREFIX;
 import static seedu.tutorlink.testutil.Assert.assertThrows;
 import static seedu.tutorlink.testutil.TypicalIndexes.INDEX_FIRST_STUDENT;
 
@@ -216,5 +217,22 @@ public class ParserUtilTest {
     @Test
     public void parseName_repeatedSpacesBetweenWords_returnsNameWithSingleSpaces() throws Exception {
         assertEquals(new Name("John Tan"), ParserUtil.parseName("  John   Tan "));
+    }
+
+    @Test
+    public void parseValues_unknownPrefix_throwsUnknownPrefixMessage() {
+        String unknownX = String.format(MESSAGE_UNKNOWN_PREFIX, "x/");
+        assertThrows(ParseException.class, unknownX, () -> ParserUtil.parseName("Ann x/foo"));
+        assertThrows(ParseException.class, String.format(MESSAGE_UNKNOWN_PREFIX, "sub/"), () ->
+                ParserUtil.parseSubject("Math sub/Physics"));
+        assertThrows(ParseException.class, unknownX, () -> ParserUtil.parseIndex("1 x/2"));
+        assertThrows(ParseException.class, unknownX, () -> ParserUtil.parseInteractionDate("2026-10-01 x/2"));
+        assertThrows(ParseException.class, unknownX, () -> ParserUtil.parseInteractionTime("10:00 x/2"));
+    }
+
+    @Test
+    public void parseName_invalidNameWithConnector_throwsNameConstraints() {
+        // "s/o" is a name connector, so the name rules are reported instead of an unknown parameter
+        assertThrows(ParseException.class, Name.MESSAGE_CONSTRAINTS, () -> ParserUtil.parseName("Raj s/o 2"));
     }
 }

@@ -60,6 +60,12 @@ public class AddCommandParserTest {
     }
 
     @Test
+    public void parse_nameWithConnector_success() {
+        Student expectedStudent = new StudentBuilder().withName("Raj s/o Kumar").withSubjects("Math").build();
+        assertParseSuccess(parser, " n/Raj s/o Kumar s/Math", new AddCommand(expectedStudent));
+    }
+
+    @Test
     public void parse_compulsoryFieldMissing_failure() {
         String expectedMessage = String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddCommand.MESSAGE_USAGE);
 

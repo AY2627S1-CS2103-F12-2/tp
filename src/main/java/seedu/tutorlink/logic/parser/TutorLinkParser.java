@@ -2,7 +2,9 @@ package seedu.tutorlink.logic.parser;
 
 import static seedu.tutorlink.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.tutorlink.logic.Messages.MESSAGE_UNKNOWN_COMMAND;
+import static seedu.tutorlink.logic.Messages.MESSAGE_UNKNOWN_SUBCOMMAND;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -41,6 +43,13 @@ public class TutorLinkParser {
     private static final Pattern BASIC_COMMAND_FORMAT = Pattern.compile(
             "(?<commandWord>(?:(?:student|interaction|followup)\\s+)?\\S+)(?<arguments>.*)",
             Pattern.CASE_INSENSITIVE);
+    /** Command words that start with a domain, in the order they are suggested to the user. */
+    private static final List<String> DOMAIN_COMMAND_WORDS = List.of(
+            AddCommand.COMMAND_WORD, ViewStudentCommand.COMMAND_WORD, EditStudentCommand.COMMAND_WORD,
+            DeleteCommand.COMMAND_WORD, AddInteractionCommand.COMMAND_WORD, ListInteractionsCommand.COMMAND_WORD,
+            EditInteractionCommand.COMMAND_WORD, DeleteInteractionCommand.COMMAND_WORD,
+            AddFollowUpCommand.COMMAND_WORD, ListFollowUpsCommand.COMMAND_WORD, DoneFollowUpCommand.COMMAND_WORD,
+            CancelFollowUpCommand.COMMAND_WORD);
     private static final Logger logger = LogsCenter.getLogger(TutorLinkParser.class);
 
     /**
@@ -83,9 +92,24 @@ public class TutorLinkParser {
             case HelpCommand.COMMAND_WORD -> new HelpCommand();
             default -> {
                 logger.finer("This user input caused a ParseException: " + userInput);
-                throw new ParseException(MESSAGE_UNKNOWN_COMMAND);
+                throw new ParseException(getUnknownCommandMessage(commandWord));
             }
         };
+    }
+
+    /**
+     * Returns the error message for an unknown {@code commandWord}. If it starts with a domain such as
+     * {@code student}, the message lists the commands in that domain.
+     */
+    private static String getUnknownCommandMessage(String commandWord) {
+        String domainWithSpace = commandWord.split(" ")[0] + " ";
+        List<String> domainCommandWords = DOMAIN_COMMAND_WORDS.stream()
+                .filter(word -> word.startsWith(domainWithSpace))
+                .toList();
+        if (domainCommandWords.isEmpty()) {
+            return MESSAGE_UNKNOWN_COMMAND;
+        }
+        return String.format(MESSAGE_UNKNOWN_SUBCOMMAND, String.join(", ", domainCommandWords));
     }
 
     /**

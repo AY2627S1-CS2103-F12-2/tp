@@ -36,7 +36,8 @@ public class EditStudentCommand extends Command {
             + PREFIX_NEW_NAME + "Jonathan Tan "
             + PREFIX_SUBJECT + "Math";
 
-    public static final String MESSAGE_SUCCESS = "✔ Student updated: %1$s (subjects: %2$s)";
+    public static final String MESSAGE_SUCCESS = "✔ Student updated: %1$s (%2$s)";
+    public static final String MESSAGE_NO_CHANGE = "No changes made: %1$s already has this name and these subjects.";
     public static final String MESSAGE_NOTHING_TO_EDIT = "Nothing to change. Give " + PREFIX_NEW_NAME
             + "NEW_NAME, " + PREFIX_SUBJECT + "SUBJECT, or both.\n" + MESSAGE_USAGE;
 
@@ -70,6 +71,9 @@ public class EditStudentCommand extends Command {
         Student student = model.findStudentByName(name)
                 .orElseThrow(() -> new CommandException(String.format(Messages.MESSAGE_STUDENT_NOT_FOUND, name)));
         Student editedStudent = createEditedStudent(student);
+        if (editedStudent.equals(student)) {
+            throw new CommandException(String.format(MESSAGE_NO_CHANGE, student.getName()));
+        }
 
         if (!student.isSameStudent(editedStudent) && model.hasStudent(editedStudent)) {
             Name existingName = model.findStudentByName(editedStudent.getName())
@@ -83,7 +87,7 @@ public class EditStudentCommand extends Command {
         logger.info("Edited student " + student.getName() + " -> " + editedStudent.getName());
 
         return new CommandResult(String.format(MESSAGE_SUCCESS, editedStudent.getName(),
-                Messages.formatSubjects(editedStudent.getSubjects())));
+                AddCommand.describeSubjects(editedStudent.getSubjects())));
     }
 
     /**
