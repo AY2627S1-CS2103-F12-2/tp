@@ -502,6 +502,7 @@ Some edits can also make TutorLink behave unexpectedly, for example a value outs
 1. **When using multiple screens**, if you move TutorLink to a secondary screen and later switch to using only the primary screen, the window opens off-screen. To fix this, delete the `preferences.json` file in the home folder before running TutorLink again.
 2. **If you minimize the help window** and then run `help` again (or use the `Help` menu, or press `F1`), the minimized help window stays minimized and no new one appears. Restore the minimized window manually.
 3. **If TutorLink is in a write-protected folder**, it cannot save your data and each command that changes data shows `Could not save data to file ... due to insufficient permissions to write to the file or the folder.` Move `tutorlink.jar` to a folder you can write to, such as one in your home directory, and start it again.
+4. **On macOS, if TutorLink is in full-screen mode**, the help window also opens in full-screen mode, in its own space. Closing it takes you to the desktop instead of back to TutorLink, which is still open in its own full-screen space. Switch back to TutorLink with `Cmd+Tab` or by swiping between spaces, or exit full-screen mode before using `help`.
 
 --------------------------------------------------------------------------------------------------------------------
 
