@@ -17,6 +17,7 @@ public class Messages {
 
     public static final String MESSAGE_ERROR_PREFIX = "\u274C ";
     public static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command.";
+    public static final String MESSAGE_UNKNOWN_SUBCOMMAND = "Unknown command. Did you mean one of these? %1$s";
     public static final String MESSAGE_NO_SUBJECTS = "(none recorded)";
     public static final String MESSAGE_INVALID_COMMAND_FORMAT = "Invalid command format!\n%1$s";
     public static final String MESSAGE_STUDENT_NOT_FOUND = "No student named '%1$s' found.";
