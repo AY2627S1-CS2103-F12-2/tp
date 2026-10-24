@@ -122,6 +122,7 @@ Format: `student edit n/NAME [new/NEW_NAME] [s/SUBJECT]…`
 * Give at least one of `new/` or `s/`.
 * `NEW_NAME` follows the same rules as in [`student add`](#adding-a-student-student-add). Renaming to the name of another existing student, ignoring case, is rejected as a duplicate. Changing only the casing, such as `john tan` to `John Tan`, is allowed.
 * If you give any `s/`, the subjects you give replace **all** the student's existing subjects. Without `s/`, the subjects stay the same.
+* If the new name and subjects are exactly the same as the current ones, nothing changes and TutorLink shows `No changes made: John Tan already has this name and these subjects.`
 * If the student is shown in the panels, the panels update straight away. If you used `find` and the new name no longer matches it, the student leaves the filtered list and the panels are cleared. Use `list` to see all students again.
 
 Examples:
@@ -133,6 +134,8 @@ On success, TutorLink shows the updated student:
 ```
 ✔ Student updated: Jonathan Tan (subjects: Math, Physics)
 ```
+
+If the student has no subjects left, the message ends with `(no subjects recorded)`, as in `student add`.
 
 ### Listing all students: `list`
 

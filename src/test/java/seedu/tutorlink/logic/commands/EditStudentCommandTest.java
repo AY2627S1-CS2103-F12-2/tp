@@ -43,7 +43,7 @@ public class EditStudentCommandTest {
         Model expectedModel = new ModelManager(getTypicalTutorLink(), new UserPrefs());
         expectedModel.setStudent(BENSON, edited);
         String expectedMessage = String.format(EditStudentCommand.MESSAGE_SUCCESS, NEW_NAME,
-                Messages.formatSubjects(BENSON.getSubjects()));
+                "subjects: " + Messages.formatSubjects(BENSON.getSubjects()));
 
         assertCommandSuccess(new EditStudentCommand(BENSON.getName(), Optional.of(NEW_NAME), Optional.empty()),
                 model, expectedMessage, expectedModel);
@@ -54,10 +54,32 @@ public class EditStudentCommandTest {
         Student edited = new Student(BENSON.getName(), NEW_SUBJECTS);
         Model expectedModel = new ModelManager(getTypicalTutorLink(), new UserPrefs());
         expectedModel.setStudent(BENSON, edited);
-        String expectedMessage = String.format(EditStudentCommand.MESSAGE_SUCCESS, BENSON.getName(), "Chemistry");
+        String expectedMessage = String.format(EditStudentCommand.MESSAGE_SUCCESS, BENSON.getName(),
+                "subjects: Chemistry");
 
         assertCommandSuccess(new EditStudentCommand(BENSON.getName(), Optional.empty(), Optional.of(NEW_SUBJECTS)),
                 model, expectedMessage, expectedModel);
+    }
+
+    @Test
+    public void execute_noSubjectsLeft_saysNoSubjectsRecorded() {
+        Student edited = new Student(NEW_NAME, List.of());
+        model.setStudent(BENSON, new Student(BENSON.getName(), List.of()));
+        Model expectedModel = new ModelManager(model.getTutorLink(), new UserPrefs());
+        expectedModel.setStudent(expectedModel.findStudentByName(BENSON.getName()).orElseThrow(), edited);
+        String expectedMessage = "✔ Student updated: Benson Lee (no subjects recorded)";
+
+        assertCommandSuccess(new EditStudentCommand(BENSON.getName(), Optional.of(NEW_NAME), Optional.empty()),
+                model, expectedMessage, expectedModel);
+    }
+
+    @Test
+    public void execute_sameNameAndSubjects_throwsCommandException() {
+        String expectedMessage = String.format(EditStudentCommand.MESSAGE_NO_CHANGE, BENSON.getName());
+        assertCommandFailure(new EditStudentCommand(BENSON.getName(), Optional.of(BENSON.getName()),
+                Optional.empty()), model, expectedMessage);
+        assertCommandFailure(new EditStudentCommand(BENSON.getName(), Optional.empty(),
+                Optional.of(BENSON.getSubjects())), model, expectedMessage);
     }
 
     @Test
