@@ -69,11 +69,11 @@ public class CancelFollowUpCommandTest {
         assertCommandFailure(new CancelFollowUpCommand(new Name("Missing Student"), Index.fromOneBased(1)), model,
                 String.format(Messages.MESSAGE_STUDENT_NOT_FOUND, "Missing Student"));
         assertCommandFailure(new CancelFollowUpCommand(BENSON.getName(), Index.fromOneBased(1)), model,
-                Messages.MESSAGE_INDEX_OUT_OF_RANGE);
+                "Benson Meier has no outstanding follow-ups.");
         model.setStudent(BENSON, BENSON.withFollowUp(new FollowUp("History", DATE, FollowUpStatus.CANCELLED))
                 .withFollowUp(new FollowUp("Active", DATE)));
         assertCommandFailure(new CancelFollowUpCommand(BENSON.getName(), Index.fromOneBased(2)), model,
-                Messages.MESSAGE_INDEX_OUT_OF_RANGE);
+                "Index 2 is out of range: Benson Meier's outstanding follow-ups are numbered 1 to 1.");
     }
 
     @Test
@@ -82,7 +82,7 @@ public class CancelFollowUpCommandTest {
         model.setStudent(BENSON, BENSON.withFollowUp(followUp));
         CancelFollowUpCommand command = new CancelFollowUpCommand(BENSON.getName(), Index.fromOneBased(1));
         command.execute(model);
-        assertCommandFailure(command, model, Messages.MESSAGE_INDEX_OUT_OF_RANGE);
+        assertCommandFailure(command, model, "Benson Meier has no outstanding follow-ups.");
         assertEquals(List.of(), model.findStudentByName(BENSON.getName()).orElseThrow().getOutstandingFollowUps());
 
         Path path = testFolder.resolve("cancelled.json");

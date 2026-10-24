@@ -299,8 +299,9 @@ Format: `interaction delete n/NAME i/INDEX`
 * Because `interaction list` displays interactions chronologically, the index refers to that displayed order,
   not the order in which the interactions were recorded.
 * The list is renumbered after deletion. Run `interaction list` again before choosing another item.
-* An index larger than the number of interactions is rejected with
-  `Index exceeds the number of available items.`
+* An index larger than the number of interactions is rejected with a message giving the valid range, such as
+  `Index 3 is out of range: John Tan's interactions are numbered 1 to 2.` If the student has no interactions,
+  TutorLink shows `John Tan has no interactions.`
 * A failed command leaves your stored data unchanged.
 
 Example:
@@ -410,7 +411,7 @@ Errors leave all records unchanged:
 
 * An unknown student gives `No student named 'NAME' found.`
 * An empty index, zero, a negative number, a non-integer, or a value larger than `2147483647` gives `Index must be a positive integer.`
-* An index larger than the current outstanding list, including `i/1` for an empty list, gives `Index exceeds the number of available items.`
+* An index larger than the current outstanding list gives the valid range, such as `Index 3 is out of range: John Tan's outstanding follow-ups are numbered 1 to 2.` If there are no outstanding follow-ups, TutorLink shows `John Tan has no outstanding follow-ups.`
 * Missing parameters or extra text before them give a format error with the correct command format. Repeated `n/` or `i/` prefixes are rejected.
 
 ### Cancelling a follow-up: `followup cancel`
@@ -445,7 +446,7 @@ Errors leave all records unchanged:
 
 * An unknown student gives `No student named 'NAME' found.`
 * An empty index, zero, a negative number, a non-integer, or a value larger than `2147483647` gives `Index must be a positive integer.`
-* An index larger than the current outstanding list, including `i/1` for an empty list, gives `Index exceeds the number of available items.`
+* An index larger than the current outstanding list gives the valid range, such as `Index 3 is out of range: John Tan's outstanding follow-ups are numbered 1 to 2.` If there are no outstanding follow-ups, TutorLink shows `John Tan has no outstanding follow-ups.`
 * Missing parameters or extra text before them give a format error with the correct command format. Repeated `n/` or `i/` prefixes are rejected.
 
 ### Deleting a student: `student delete`

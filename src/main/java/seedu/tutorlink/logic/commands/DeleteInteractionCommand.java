@@ -54,7 +54,8 @@ public class DeleteInteractionCommand extends Command {
                 .orElseThrow(() -> new CommandException(String.format(Messages.MESSAGE_STUDENT_NOT_FOUND, name)));
         List<Interaction> displayedInteractions = student.getInteractionsInChronologicalOrder();
         if (index.getZeroBased() >= displayedInteractions.size()) {
-            throw new CommandException(Messages.MESSAGE_INDEX_OUT_OF_RANGE);
+            throw new CommandException(Messages.getIndexOutOfRangeMessage(index, student.getName(),
+                    displayedInteractions.size(), Messages.ITEMS_INTERACTIONS));
         }
 
         Interaction deletedInteraction = displayedInteractions.get(index.getZeroBased());

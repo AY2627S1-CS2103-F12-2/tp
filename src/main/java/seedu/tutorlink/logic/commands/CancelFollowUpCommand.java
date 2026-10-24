@@ -54,7 +54,8 @@ public class CancelFollowUpCommand extends Command {
                 .orElseThrow(() -> new CommandException(String.format(Messages.MESSAGE_STUDENT_NOT_FOUND, name)));
         List<FollowUp> outstanding = student.getOutstandingFollowUps();
         if (index.getZeroBased() >= outstanding.size()) {
-            throw new CommandException(Messages.MESSAGE_INDEX_OUT_OF_RANGE);
+            throw new CommandException(Messages.getIndexOutOfRangeMessage(index, student.getName(),
+                    outstanding.size(), Messages.ITEMS_OUTSTANDING_FOLLOW_UPS));
         }
 
         FollowUp cancelled = outstanding.get(index.getZeroBased());

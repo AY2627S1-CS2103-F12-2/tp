@@ -65,11 +65,11 @@ public class DeleteInteractionCommandTest {
         assertCommandFailure(new DeleteInteractionCommand(new Name("Missing Student"), Index.fromOneBased(1)),
                 model, String.format(Messages.MESSAGE_STUDENT_NOT_FOUND, "Missing Student"));
         assertCommandFailure(new DeleteInteractionCommand(BENSON.getName(), Index.fromOneBased(1)),
-                model, Messages.MESSAGE_INDEX_OUT_OF_RANGE);
+                model, "Benson Meier has no interactions.");
 
         model.setStudent(BENSON, BENSON.withInteraction(EARLIEST));
         assertCommandFailure(new DeleteInteractionCommand(BENSON.getName(), Index.fromOneBased(2)),
-                model, Messages.MESSAGE_INDEX_OUT_OF_RANGE);
+                model, "Index 2 is out of range: Benson Meier's interactions are numbered 1 to 1.");
     }
 
     @Test
