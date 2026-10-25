@@ -557,6 +557,8 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 
     * 1c1. TutorLink warns the tutor that the date is in the future and records the interaction.
 
+      Use case resumes at step 3.
+
 **Use case: View a student's interaction history**
 
 **MSS**
@@ -586,7 +588,134 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 
       Use case ends.
 
-*{More to be added}*
+**Use case: Edit an interaction**
+
+**MSS**
+
+1.  Tutor requests to view a student's interaction history (UC: View a student's interaction history).
+2.  Tutor requests to edit one interaction by its displayed index, giving a new date, time, note, or any of these.
+3.  TutorLink finds the student and the interaction, and validates the new values.
+4.  TutorLink updates the interaction, keeping any values the tutor did not give.
+5.  TutorLink shows the interaction before and after the change.
+
+    Use case ends.
+
+**Extensions**
+
+* 2a. The tutor gives no new date, time or note.
+
+    * 2a1. TutorLink shows an error message with the correct command format.
+
+      Use case ends without changing any stored data.
+
+* 3a. No student matches the given name.
+
+    * 3a1. TutorLink shows an error message.
+
+      Use case ends without changing any stored data.
+
+* 3b. The index is not a positive integer, or is larger than the number of interactions.
+
+    * 3b1. TutorLink shows an error message.
+
+      Use case ends without changing any stored data.
+
+* 3c. A new value is invalid.
+
+    * 3c1. TutorLink shows an error message explaining which value is wrong.
+
+      Use case ends without changing any stored data.
+
+* 3d. The tutor gives an empty time.
+
+    * 3d1. TutorLink removes the interaction's time.
+
+      Use case resumes at step 4.
+
+**Use case: Delete an interaction**
+
+**MSS**
+
+1.  Tutor requests to view a student's interaction history (UC: View a student's interaction history).
+2.  Tutor requests to delete one interaction by its displayed index.
+3.  TutorLink finds the student and the interaction.
+4.  TutorLink deletes the interaction and confirms which one was deleted, with the new total.
+
+    Use case ends.
+
+**Extensions**
+
+* 3a. No student matches the given name.
+
+    * 3a1. TutorLink shows an error message.
+
+      Use case ends without changing any stored data.
+
+* 3b. The index is not a positive integer, or is larger than the number of interactions.
+
+    * 3b1. TutorLink shows an error message.
+
+      Use case ends without changing any stored data.
+
+**Use case: Complete a follow-up**
+
+**MSS**
+
+1.  Tutor requests to view a student's follow-ups (UC: View a student's follow-ups).
+2.  Tutor requests to mark one outstanding follow-up as done by its displayed index.
+3.  TutorLink finds the student and the follow-up.
+4.  TutorLink marks the follow-up as done, removing it from the outstanding list but keeping it in the student's record.
+5.  TutorLink confirms which follow-up was completed, with the number still outstanding.
+
+    Use case ends.
+
+**Extensions**
+
+* 3a. No student matches the given name.
+
+    * 3a1. TutorLink shows an error message.
+
+      Use case ends without changing any stored data.
+
+* 3b. The index is not a positive integer, or is larger than the number of outstanding follow-ups.
+
+    * 3b1. TutorLink shows an error message.
+
+      Use case ends without changing any stored data.
+
+**Use case: Cancel a follow-up**
+
+Same as *Complete a follow-up*, except that in step 2 the tutor requests to cancel the follow-up, and in steps 4 and 5
+TutorLink marks it as cancelled instead of done.
+
+**Use case: Find students by name**
+
+**MSS**
+
+1.  Tutor requests to find students, giving one or more words from their names.
+2.  TutorLink shows only the students whose names contain any of the words, ignoring case.
+
+    Use case ends.
+
+**Extensions**
+
+* 1a. The tutor gives no words.
+
+    * 1a1. TutorLink shows an error message with the correct command format.
+
+      Use case ends.
+
+* 2a. No student matches any of the words.
+
+    * 2a1. TutorLink shows an empty student list.
+
+      Use case ends.
+
+* 2b. The tutor later requests to list all students.
+
+    * 2b1. TutorLink shows all students again.
+
+      Use case ends.
 
 ### Non-Functional Requirements
 
@@ -625,19 +754,22 @@ testers are expected to do more *exploratory* testing.
 
 1. Initial launch
 
-   1. Download the JAR file and copy it into an empty folder.
+   1. Download the JAR file and copy it into an empty folder that you can write to.
 
-   1. Double-click the JAR file.<br>
+   1. Open a terminal in that folder and run `java -jar tutorlink.jar`.<br>
       Expected: The GUI opens with a set of sample students. The window size may not be optimal.
 
 1. Saving window preferences
 
    1. Resize the window to an optimal size. Move the window to a different location. Close the window.
 
-   1. Relaunch the app by double-clicking the JAR file.<br>
+   1. Relaunch the app with `java -jar tutorlink.jar`.<br>
        Expected: The most recent window size and location are retained.
 
-1. _{ more test cases …​ }_
+1. Shutting down
+
+   1. Type `exit` in the command box.<br>
+      Expected: The window closes and the app stops.
 
 ### Adding a student
 
@@ -747,4 +879,4 @@ testers are expected to do more *exploratory* testing.
    1. Close TutorLink. Open `data/tutorlink.json` in a text editor and break it, e.g. delete the closing `}` or change a student's `"name"` to `"12345"`.
 
    1. Relaunch TutorLink.<br>
-      Expected: TutorLink starts with no students, and the corrupted file is left on disk until the next command that changes data overwrites it.
+      Expected: TutorLink starts with no students and shows a warning. A copy of the corrupted file is saved as `data/tutorlink.json.bak`, so the data can be recovered after the next command that changes data overwrites `data/tutorlink.json`.
