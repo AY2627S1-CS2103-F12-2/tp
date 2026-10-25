@@ -131,7 +131,7 @@ public class EditInteractionCommandTest {
                 String.format(Messages.MESSAGE_STUDENT_NOT_FOUND, "Missing Student"));
         EditInteractionCommand outOfRange = new EditInteractionCommand(BENSON.getName(),
                 Index.fromOneBased(1), Optional.empty(), Optional.empty(), Optional.of("New"));
-        assertCommandFailure(outOfRange, model, Messages.MESSAGE_INDEX_OUT_OF_RANGE);
+        assertCommandFailure(outOfRange, model, "Benson Meier has no interactions.");
     }
 
     @Test

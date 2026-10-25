@@ -76,7 +76,8 @@ public class EditInteractionCommand extends Command {
                 .orElseThrow(() -> new CommandException(String.format(Messages.MESSAGE_STUDENT_NOT_FOUND, name)));
         List<Interaction> chronologicalInteractions = student.getInteractionsInChronologicalOrder();
         if (index.getZeroBased() >= chronologicalInteractions.size()) {
-            throw new CommandException(Messages.MESSAGE_INDEX_OUT_OF_RANGE);
+            throw new CommandException(Messages.getIndexOutOfRangeMessage(index, student.getName(),
+                    chronologicalInteractions.size(), Messages.ITEMS_INTERACTIONS));
         }
 
         Interaction original = chronologicalInteractions.get(index.getZeroBased());

@@ -152,6 +152,24 @@ public class ArgumentTokenizerTest {
     }
 
     @Test
+    public void tokenize_nameConnector_keptInValue() {
+        Prefix name = new Prefix("n/");
+        Prefix subject = new Prefix("s/");
+        Prefix date = new Prefix("d/");
+        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(
+                " n/Raj s/o Kumar s/Math n/Siti d/o Ahmad d/2026-10-01 s/o", name, subject, date);
+
+        assertArgumentPresent(argMultimap, name, "Raj s/o Kumar", "Siti d/o Ahmad");
+        assertArgumentPresent(argMultimap, subject, "Math");
+        assertArgumentPresent(argMultimap, date, "2026-10-01 s/o");
+
+        // a subject that only starts with "o" is still a subject
+        argMultimap = ArgumentTokenizer.tokenize(" n/Raj s/oboe", name, subject);
+        assertArgumentPresent(argMultimap, name, "Raj");
+        assertArgumentPresent(argMultimap, subject, "oboe");
+    }
+
+    @Test
     public void equalsMethod() {
         Prefix aaa = new Prefix("aaa");
 

@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_SUBJECT;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import seedu.tutorlink.commons.core.LogsCenter;
@@ -13,6 +14,7 @@ import seedu.tutorlink.logic.commands.exceptions.CommandException;
 import seedu.tutorlink.model.Model;
 import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.Student;
+import seedu.tutorlink.model.student.Subject;
 
 /**
  * Adds a student to TutorLink.
@@ -62,15 +64,18 @@ public class AddCommand extends Command {
                 : "Added student should be stored";
         logger.info("Added student " + toAdd.getName());
         int totalStudents = model.getTutorLink().getStudentList().size();
-        return new CommandResult(String.format(MESSAGE_SUCCESS, toAdd.getName(), describeSubjects(toAdd),
+        return new CommandResult(String.format(MESSAGE_SUCCESS, toAdd.getName(), describeSubjects(toAdd.getSubjects()),
                 totalStudents));
     }
 
-    private static String describeSubjects(Student student) {
-        if (student.getSubjects().isEmpty()) {
+    /**
+     * Returns the subjects as {@code subjects: Math, Physics}, or {@code no subjects recorded} if there are none.
+     */
+    static String describeSubjects(List<Subject> subjects) {
+        if (subjects.isEmpty()) {
             return MESSAGE_NO_SUBJECTS;
         }
-        return String.format(MESSAGE_SUBJECTS, Messages.formatSubjects(student.getSubjects()));
+        return String.format(MESSAGE_SUBJECTS, Messages.formatSubjects(subjects));
     }
 
     @Override

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.tutorlink.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.tutorlink.logic.Messages.MESSAGE_UNKNOWN_COMMAND;
+import static seedu.tutorlink.logic.Messages.MESSAGE_UNKNOWN_SUBCOMMAND;
 import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_NEW_NAME;
 import static seedu.tutorlink.testutil.Assert.assertThrows;
@@ -71,12 +72,22 @@ public class TutorLinkParserTest {
 
     @Test
     public void parseCommand_domainWithoutAction_throwsParseException() {
-        assertThrows(ParseException.class, MESSAGE_UNKNOWN_COMMAND, () -> parser.parseCommand("student"));
+        String studentCommands = String.format(MESSAGE_UNKNOWN_SUBCOMMAND,
+                "student add, student view, student edit, student delete");
+        assertThrows(ParseException.class, studentCommands, () -> parser.parseCommand("student"));
+        assertThrows(ParseException.class, String.format(MESSAGE_UNKNOWN_SUBCOMMAND,
+                "interaction add, interaction list, interaction edit, interaction delete"), () ->
+                parser.parseCommand("Interaction"));
+        assertThrows(ParseException.class, String.format(MESSAGE_UNKNOWN_SUBCOMMAND,
+                "followup add, followup list, followup done, followup cancel"), () ->
+                parser.parseCommand("followup"));
     }
 
     @Test
     public void parseCommand_domainWithUnknownAction_throwsParseException() {
-        assertThrows(ParseException.class, MESSAGE_UNKNOWN_COMMAND, () -> parser.parseCommand("student fly"));
+        String studentCommands = String.format(MESSAGE_UNKNOWN_SUBCOMMAND,
+                "student add, student view, student edit, student delete");
+        assertThrows(ParseException.class, studentCommands, () -> parser.parseCommand("student fly"));
     }
 
     @Test

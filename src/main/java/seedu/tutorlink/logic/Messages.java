@@ -5,8 +5,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import seedu.tutorlink.commons.core.index.Index;
 import seedu.tutorlink.logic.parser.Prefix;
 import seedu.tutorlink.model.interaction.Interaction;
+import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.Student;
 import seedu.tutorlink.model.student.Subject;
 
@@ -17,10 +19,15 @@ public class Messages {
 
     public static final String MESSAGE_ERROR_PREFIX = "\u274C ";
     public static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command.";
+    public static final String MESSAGE_UNKNOWN_SUBCOMMAND = "Unknown command. Did you mean one of these? %1$s";
     public static final String MESSAGE_NO_SUBJECTS = "(none recorded)";
     public static final String MESSAGE_INVALID_COMMAND_FORMAT = "Invalid command format!\n%1$s";
     public static final String MESSAGE_STUDENT_NOT_FOUND = "No student named '%1$s' found.";
-    public static final String MESSAGE_INDEX_OUT_OF_RANGE = "Index exceeds the number of available items.";
+    public static final String MESSAGE_INDEX_OUT_OF_RANGE = "Index %1$d is out of range: %2$s's %3$s are numbered"
+            + " 1 to %4$d.";
+    public static final String MESSAGE_NO_ITEMS_TO_SELECT = "%1$s has no %2$s.";
+    public static final String ITEMS_INTERACTIONS = "interactions";
+    public static final String ITEMS_OUTSTANDING_FOLLOW_UPS = "outstanding follow-ups";
     public static final String MESSAGE_FUTURE_INTERACTION_DATE_WARNING =
             "\u26A0 Interaction date %1$s is in the future (today is %2$s); recording it anyway.\n";
     public static final String MESSAGE_STUDENTS_LISTED_OVERVIEW =
@@ -38,6 +45,24 @@ public class Messages {
                 Stream.of(duplicatePrefixes).map(Prefix::toString).collect(Collectors.toSet());
 
         return MESSAGE_DUPLICATE_FIELDS + String.join(" ", duplicateFields);
+    }
+
+    /**
+     * Returns an error message for an index that is beyond the end of a student's list of items.
+     *
+     * @param index The index the user gave.
+     * @param studentName The name of the student whose list was used.
+     * @param listSize The number of items in the list.
+     * @param itemsDescription The kind of items in the list, such as {@link #ITEMS_INTERACTIONS}.
+     */
+    public static String getIndexOutOfRangeMessage(Index index, Name studentName, int listSize,
+            String itemsDescription) {
+        assert index.getZeroBased() >= listSize : "Index should be out of range";
+        if (listSize == 0) {
+            return String.format(MESSAGE_NO_ITEMS_TO_SELECT, studentName, itemsDescription);
+        }
+        return String.format(MESSAGE_INDEX_OUT_OF_RANGE, index.getOneBased(), studentName, itemsDescription,
+                listSize);
     }
 
     /**

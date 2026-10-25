@@ -44,8 +44,10 @@ public class AddInteractionCommandParser implements Parser<AddInteractionCommand
         LocalDate date = ParserUtil.parseInteractionDate(argMultimap.getValue(PREFIX_DATE).get());
         String note = ParserUtil.parseInteractionNote(argMultimap.getValue(PREFIX_NOTE).get());
         Optional<LocalTime> time = Optional.empty();
-        if (argMultimap.getValue(PREFIX_TIME).isPresent()) {
-            time = Optional.of(ParserUtil.parseInteractionTime(argMultimap.getValue(PREFIX_TIME).get()));
+        Optional<String> timeValue = argMultimap.getValue(PREFIX_TIME);
+        // An empty t/ means no time, as in interaction edit
+        if (timeValue.isPresent() && !timeValue.get().isEmpty()) {
+            time = Optional.of(ParserUtil.parseInteractionTime(timeValue.get()));
         }
 
         return new AddInteractionCommand(name, new Interaction(date, time, note));

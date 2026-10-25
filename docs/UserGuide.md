@@ -83,6 +83,7 @@ Adds a student, with the subjects you teach them.
 Format: `student add n/NAME [s/SUBJECT]…`
 
 * `NAME` is 1 to 50 characters long and contains at least one letter. It may use letters (including accented letters such as `é`), spaces, hyphens, apostrophes and full stops, so names such as `Mary-Jane O'Brien` and `Tan Ah Kow Jr.` are accepted.
+* `NAME` may also contain `s/o` or `d/o` as a separate word, as in `Raj s/o Kumar`. TutorLink reads these as part of the name, not as the start of a subject.
 * Each student's name must be unique, ignoring case. If `John Tan` exists, adding `john tan` is rejected as a duplicate.
 * `SUBJECT` is 1 to 30 characters long and may use letters, digits, spaces, hyphens, `+` and `&`, for example `H2 Math` or `Biology + Chemistry`.
 * A student can have any number of subjects, including none. Giving the same subject twice, in any case, is rejected.
@@ -121,6 +122,7 @@ Format: `student edit n/NAME [new/NEW_NAME] [s/SUBJECT]…`
 * Give at least one of `new/` or `s/`.
 * `NEW_NAME` follows the same rules as in [`student add`](#adding-a-student-student-add). Renaming to the name of another existing student, ignoring case, is rejected as a duplicate. Changing only the casing, such as `john tan` to `John Tan`, is allowed.
 * If you give any `s/`, the subjects you give replace **all** the student's existing subjects. Without `s/`, the subjects stay the same.
+* If the new name and subjects are exactly the same as the current ones, nothing changes and TutorLink shows `No changes made: John Tan already has this name and these subjects.`
 * If the student is shown in the panels, the panels update straight away. If you used `find` and the new name no longer matches it, the student leaves the filtered list and the panels are cleared. Use `list` to see all students again.
 
 Examples:
@@ -132,6 +134,8 @@ On success, TutorLink shows the updated student:
 ```
 ✔ Student updated: Jonathan Tan (subjects: Math, Physics)
 ```
+
+If the student has no subjects left, the message ends with `(no subjects recorded)`, as in `student add`.
 
 ### Listing all students: `list`
 
@@ -167,7 +171,7 @@ Format: `interaction add n/NAME d/DATE [t/TIME] note/TEXT`
 * `NAME` identifies an existing student by their full name, ignoring case.
 * `DATE` must be a real calendar date in `yyyy-MM-dd` format, such as `2026-10-01`.
   A future date is allowed, but TutorLink warns you before recording it.
-* `TIME` is optional. If given, it must use the 24-hour `HH:mm` format, such as `14:30`.
+* `TIME` is optional. If given, it must use the 24-hour `HH:mm` format, such as `14:30`. A `t/` with no value records the interaction without a time.
 * `TEXT` is 1 to 500 characters long after leading and trailing whitespace is removed.
   It must not be blank and must be on a single line. If you paste text containing line breaks, each line break becomes a space,
   so a pasted `First line⏎Second line` is recorded as `First line Second line`.
@@ -298,8 +302,9 @@ Format: `interaction delete n/NAME i/INDEX`
 * Because `interaction list` displays interactions chronologically, the index refers to that displayed order,
   not the order in which the interactions were recorded.
 * The list is renumbered after deletion. Run `interaction list` again before choosing another item.
-* An index larger than the number of interactions is rejected with
-  `Index exceeds the number of available items.`
+* An index larger than the number of interactions is rejected with a message giving the valid range, such as
+  `Index 3 is out of range: John Tan's interactions are numbered 1 to 2.` If the student has no interactions,
+  TutorLink shows `John Tan has no interactions.`
 * A failed command leaves your stored data unchanged.
 
 Example:
@@ -409,7 +414,7 @@ Errors leave all records unchanged:
 
 * An unknown student gives `No student named 'NAME' found.`
 * An empty index, zero, a negative number, a non-integer, or a value larger than `2147483647` gives `Index must be a positive integer.`
-* An index larger than the current outstanding list, including `i/1` for an empty list, gives `Index exceeds the number of available items.`
+* An index larger than the current outstanding list gives the valid range, such as `Index 3 is out of range: John Tan's outstanding follow-ups are numbered 1 to 2.` If there are no outstanding follow-ups, TutorLink shows `John Tan has no outstanding follow-ups.`
 * Missing parameters or extra text before them give a format error with the correct command format. Repeated `n/` or `i/` prefixes are rejected.
 
 ### Cancelling a follow-up: `followup cancel`
@@ -444,7 +449,7 @@ Errors leave all records unchanged:
 
 * An unknown student gives `No student named 'NAME' found.`
 * An empty index, zero, a negative number, a non-integer, or a value larger than `2147483647` gives `Index must be a positive integer.`
-* An index larger than the current outstanding list, including `i/1` for an empty list, gives `Index exceeds the number of available items.`
+* An index larger than the current outstanding list gives the valid range, such as `Index 3 is out of range: John Tan's outstanding follow-ups are numbered 1 to 2.` If there are no outstanding follow-ups, TutorLink shows `John Tan has no outstanding follow-ups.`
 * Missing parameters or extra text before them give a format error with the correct command format. Repeated `n/` or `i/` prefixes are rejected.
 
 ### Deleting a student: `student delete`
