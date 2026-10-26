@@ -223,6 +223,12 @@ public class ParserUtilTest {
     }
 
     @Test
+    public void parseInteractionNote_carriageReturnNote_throwsParseException() {
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE_MULTILINE, () ->
+                ParserUtil.parseInteractionNote("First line\rSecond line"));
+    }
+
+    @Test
     public void parseName_repeatedSpacesBetweenWords_returnsNameWithSingleSpaces() throws Exception {
         assertEquals(new Name("John Tan"), ParserUtil.parseName("  John   Tan "));
     }
