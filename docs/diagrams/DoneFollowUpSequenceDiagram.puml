@@ -1,0 +1,89 @@
+@startuml
+!include style.puml
+skinparam ArrowFontStyle plain
+
+box Logic LOGIC_COLOR_T1
+participant ":LogicManager" as LogicManager LOGIC_COLOR
+participant ":TutorLinkParser" as TutorLinkParser LOGIC_COLOR
+participant ":DoneFollowUpCommandParser" as DoneFollowUpCommandParser LOGIC_COLOR
+participant "d:DoneFollowUpCommand" as DoneFollowUpCommand LOGIC_COLOR
+participant "r:CommandResult" as CommandResult LOGIC_COLOR
+end box
+
+box Model MODEL_COLOR_T1
+participant "m:Model" as Model MODEL_COLOR
+participant "s:Student" as Student MODEL_COLOR
+end box
+
+[-> LogicManager : execute("followup done n/John Tan i/1")
+activate LogicManager
+
+LogicManager -> TutorLinkParser : parseCommand("followup done n/John Tan i/1")
+activate TutorLinkParser
+
+create DoneFollowUpCommandParser
+TutorLinkParser -> DoneFollowUpCommandParser
+activate DoneFollowUpCommandParser
+
+DoneFollowUpCommandParser --> TutorLinkParser
+deactivate DoneFollowUpCommandParser
+
+TutorLinkParser -> DoneFollowUpCommandParser : parse(" n/John Tan i/1")
+activate DoneFollowUpCommandParser
+
+create DoneFollowUpCommand
+DoneFollowUpCommandParser -> DoneFollowUpCommand
+activate DoneFollowUpCommand
+
+DoneFollowUpCommand --> DoneFollowUpCommandParser
+deactivate DoneFollowUpCommand
+
+DoneFollowUpCommandParser --> TutorLinkParser : d
+deactivate DoneFollowUpCommandParser
+'Hidden arrow to position the destroy marker below the end of the activation bar.
+DoneFollowUpCommandParser -[hidden]-> TutorLinkParser
+destroy DoneFollowUpCommandParser
+
+TutorLinkParser --> LogicManager : d
+deactivate TutorLinkParser
+
+LogicManager -> DoneFollowUpCommand : execute(m)
+activate DoneFollowUpCommand
+
+DoneFollowUpCommand -> Model : findStudentByName(John Tan)
+activate Model
+
+Model --> DoneFollowUpCommand : Optional[s]
+deactivate Model
+
+DoneFollowUpCommand -> Student : getOutstandingFollowUps()
+activate Student
+
+Student --> DoneFollowUpCommand : outstanding
+deactivate Student
+
+DoneFollowUpCommand -> Student : withOutstandingFollowUpStatus(0, DONE)
+activate Student
+
+Student --> DoneFollowUpCommand : updated
+deactivate Student
+
+DoneFollowUpCommand -> Model : setStudent(s, updated)
+activate Model
+
+Model --> DoneFollowUpCommand
+deactivate Model
+
+create CommandResult
+DoneFollowUpCommand -> CommandResult
+activate CommandResult
+
+CommandResult --> DoneFollowUpCommand
+deactivate CommandResult
+
+DoneFollowUpCommand --> LogicManager : r
+deactivate DoneFollowUpCommand
+
+[<--LogicManager
+deactivate LogicManager
+@enduml

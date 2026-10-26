@@ -238,7 +238,7 @@ TutorLink's command words name a domain and then an action, e.g. `student add`, 
 
 `TutorLinkParser` splits the input into a command word and arguments with one regular expression. The command word is an optional domain (`student`, `interaction` or `followup`) followed by one more word. Matching is case-insensitive, and the command word is normalised to lower case with single spaces before it is compared with each command's `COMMAND_WORD`. So `Student   ADD n/John Tan` is read as `student add` with the arguments ` n/John Tan`.
 
-A domain followed by an unknown action, such as `student fly`, gives `Unknown command.`, the same as any other unknown command.
+A domain followed by an unknown action, such as `student fly`, gives `Unknown command. Did you mean one of these?` followed by the commands in that domain. Any other unknown command word gives `Unknown command.`
 
 #### Design considerations
 
@@ -250,6 +250,96 @@ A domain followed by an unknown action, such as `student fly`, gives `Unknown co
 * **Alternative 2:** One word per command, e.g. `addstudent` or `addinteraction`.
   * Pros: Shorter to type.
   * Cons: Harder to remember and to guess, and the names get long as the number of record types grows.
+
+### Recording interactions
+
+An `Interaction` is one dated note about a lesson or other contact with a student. It has a `LocalDate`, an optional `LocalTime` and a note. Each `Student` keeps its own interactions in a list, in the order they were recorded.
+
+The four interaction commands are `interaction add`, `interaction list`, `interaction edit` and `interaction delete`. Like the student commands, they find the student with `Model#findStudentByName` (see [Finding a student by name](#finding-a-student-by-name)). The sequence diagram in the [Logic component](#logic-component) section shows how `interaction delete n/John Tan i/1` is parsed and executed.
+
+**Parsing the note.** `AddInteractionCommandParser` and `EditInteractionCommandParser` tokenize their input with `ArgumentTokenizer#tokenizeWithTrailingPrefix`, which treats everything after `note/` as the note. So a note such as `note/Discussed n/next steps` keeps `n/next steps` as text instead of reading it as a second name. This is why `note/` must be the last prefix in these commands.
+
+**Stored order and displayed order.** The panel and `interaction list` show interactions in date and time order, from `Student#getInteractionsInChronologicalOrder`. This sorts by `Interaction.CHRONOLOGICAL_ORDER`, which compares the date, then the time. An interaction without a time sorts as `00:00`. The sort is stable, so interactions with the same date and time keep the order they were recorded in.
+
+The `i/INDEX` in `interaction edit` and `interaction delete` is the number the tutor sees, so it refers to the displayed order, not the stored order. For example, suppose the tutor records these interactions for John Tan, in this order:
+
+| Stored position | Date | Displayed as |
+|---|---|---|
+| 0 | 2026-10-08 | 2 |
+| 1 | 2026-10-01 | 1 |
+
+`interaction delete n/John Tan i/1` must delete the 2026-10-01 interaction, which is stored at position 1. `Student#withoutInteractionAtChronologicalIndex` and `Student#withInteractionAtChronologicalIndex` do this mapping: they sort the stored positions in displayed order, look up the stored position for the given index, and change only that entry. Every other interaction keeps its stored position.
+
+**Executing a change.** `AddInteractionCommand`, `EditInteractionCommand` and `DeleteInteractionCommand` all work the same way:
+
+1. Find the student. If there is no match, throw a `CommandException` and change nothing.
+1. For `edit` and `delete`, check that the index is within the displayed list. If not, throw a `CommandException` that gives the valid range, e.g. `Index 3 is out of range: John Tan's interactions are numbered 1 to 2.`
+1. Build an updated `Student` with `Student#withInteraction`, `Student#withInteractionAtChronologicalIndex` or `Student#withoutInteractionAtChronologicalIndex`. `Student` is immutable, so the subjects, follow-ups and other interactions are copied unchanged.
+1. Replace the stored student with `Model#setStudent`. If the student is selected, `ModelManager` selects the updated copy, so the interactions panel updates straight away.
+
+`interaction edit` keeps any field that is not given. A `t/` with no value removes the time. Editing the date or time can move the interaction to a different number, so the success message shows the interaction before and after the change.
+
+#### Design considerations
+
+**Aspect: Where interactions are stored**
+
+* **Alternative 1 (current choice):** Inside each `Student`, as a list field.
+  * Pros: Deleting a student removes their interactions with no extra step, so there are never orphaned records. Renaming a student needs no other change. The JSON file keeps each student's records together.
+  * Cons: Changing one interaction replaces the whole `Student` object.
+* **Alternative 2:** In a separate list in `TutorLink`, with each interaction holding the student's name.
+  * Pros: Interactions can be changed without copying the student.
+  * Cons: Every rename and delete must also update this list. A mistake leaves interactions that point to a student who no longer exists.
+
+**Aspect: What `i/INDEX` refers to**
+
+* **Alternative 1 (current choice):** The displayed date-and-time order.
+  * Pros: The tutor uses the number they see in the panel or in `interaction list`.
+  * Cons: The model must map each displayed index to a stored position. Adding or editing an interaction can change the numbers of others.
+* **Alternative 2:** The stored, recorded order.
+  * Pros: Numbers never change after an add or an edit, and no mapping is needed.
+  * Cons: The numbers would not match the date order the tutor sees, so the tutor could easily edit or delete the wrong interaction.
+
+### Tracking follow-ups
+
+A `FollowUp` is something the tutor wants to revisit with a student by a review date, such as `Review algebra`. It has a description, a review date and a `FollowUpStatus`: `OUTSTANDING`, `DONE` or `CANCELLED`. Each `Student` keeps its follow-ups in a list, in the order they were added. `followup add` creates an `OUTSTANDING` follow-up, and `followup done` and `followup cancel` change its status.
+
+**Outstanding view.** The follow-ups panel and `followup list` show only outstanding follow-ups, earliest review date first, from `Student#getOutstandingFollowUps`. This filters by `FollowUp#isOutstanding` and sorts by `FollowUp.REVIEW_DATE_ORDER`. The sort is stable, so follow-ups with the same review date keep the order they were added in. As with interactions, `i/INDEX` in `followup done` and `followup cancel` refers to this displayed list.
+
+**Adding.** `AddFollowUpCommand` rejects a follow-up when the student already has an outstanding follow-up with the same description and review date. It checks only outstanding follow-ups, so the tutor can add `Review algebra` again after the first one is done.
+
+**Completing and cancelling.** The sequence diagram below shows how `followup done n/John Tan i/1` completes John Tan's first outstanding follow-up.
+
+<img src="images/DoneFollowUpSequenceDiagram.png" width="750" />
+
+<div markdown="span" class="alert alert-info">:information_source: **Note:** The lifeline for `DoneFollowUpCommandParser` should end at the destroy marker (X), but due to a limitation of PlantUML, it continues to the end of the diagram.
+</div>
+
+1. `DoneFollowUpCommandParser` checks that `n/` and `i/` each appear exactly once, and returns a `DoneFollowUpCommand` holding the name and the index.
+1. When executed, `DoneFollowUpCommand` finds the student with `Model#findStudentByName`, then gets the outstanding list with `Student#getOutstandingFollowUps`. If the index is outside this list, it throws a `CommandException`. If the list is empty, the message says so, e.g. `John Tan has no outstanding follow-ups.`
+1. `Student#withOutstandingFollowUpStatus(0, DONE)` finds the stored position of the first outstanding follow-up and replaces it with `FollowUp#withStatus(DONE)`. All other follow-ups keep their stored positions.
+1. `Model#setStudent` replaces the stored student, and the follow-ups panel updates. The completed follow-up drops out of the outstanding view, so the follow-ups after it move up one number.
+
+`followup cancel` works the same way, with `CANCELLED` instead of `DONE`.
+
+#### Design considerations
+
+**Aspect: What happens to a completed or cancelled follow-up**
+
+* **Alternative 1 (current choice):** Keep it in the student's list with status `DONE` or `CANCELLED`, and hide it from the outstanding view.
+  * Pros: Nothing the tutor recorded is lost, and the stored data shows which follow-ups were done and which were dropped. A history view can be added later without changing the data format.
+  * Cons: The stored list grows over time. Every outstanding view must filter by status.
+* **Alternative 2:** Delete it from the list.
+  * Pros: Simpler model with no status field.
+  * Cons: Done and cancelled follow-ups become the same thing, and the record of what was reviewed is lost.
+
+**Aspect: Which follow-ups count as duplicates**
+
+* **Alternative 1 (current choice):** Only outstanding follow-ups with the same description and review date.
+  * Pros: Stops accidental double entry, but still lets the tutor repeat a follow-up that was done or cancelled earlier.
+  * Cons: Two stored follow-ups can have the same description and review date if one is no longer outstanding.
+* **Alternative 2:** Any stored follow-up with the same description and review date.
+  * Pros: Every stored follow-up is unique.
+  * Cons: The tutor could not add the same follow-up again after completing it, which is common for recurring reviews.
 
 --------------------------------------------------------------------------------------------------------------------
 
