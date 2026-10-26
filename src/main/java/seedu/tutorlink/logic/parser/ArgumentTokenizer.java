@@ -89,11 +89,15 @@ public class ArgumentTokenizer {
     /**
      * Returns true if the text at {@code position} is a name connector such as {@code s/o} or {@code d/o},
      * i.e. a prefix followed by the single letter {@code o} and then whitespace or the end of the input.
+     * Case is ignored, so {@code s/O} and {@code D/O} are connectors too.
      */
     private static boolean isNameConnector(String argsString, int position) {
-        return argsString.startsWith(SON_OF, position) && isWordEnd(argsString, position + SON_OF.length())
-                || argsString.startsWith(DAUGHTER_OF, position)
-                && isWordEnd(argsString, position + DAUGHTER_OF.length());
+        return isConnectorAt(argsString, position, SON_OF) || isConnectorAt(argsString, position, DAUGHTER_OF);
+    }
+
+    private static boolean isConnectorAt(String argsString, int position, String connector) {
+        return argsString.regionMatches(true, position, connector, 0, connector.length())
+                && isWordEnd(argsString, position + connector.length());
     }
 
     private static boolean isWordEnd(String argsString, int position) {

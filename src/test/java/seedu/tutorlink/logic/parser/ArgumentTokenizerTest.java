@@ -163,6 +163,13 @@ public class ArgumentTokenizerTest {
         assertArgumentPresent(argMultimap, subject, "Math");
         assertArgumentPresent(argMultimap, date, "2026-10-01 s/o");
 
+        // connectors in any case are kept in the name
+        argMultimap = ArgumentTokenizer.tokenize(
+                " n/Raj s/O Kumar n/Siti d/O Ahmad d/2026-10-01", name, subject, date);
+        assertArgumentPresent(argMultimap, name, "Raj s/O Kumar", "Siti d/O Ahmad");
+        assertArgumentAbsent(argMultimap, subject);
+        assertArgumentPresent(argMultimap, date, "2026-10-01");
+
         // a subject that only starts with "o" is still a subject
         argMultimap = ArgumentTokenizer.tokenize(" n/Raj s/oboe", name, subject);
         assertArgumentPresent(argMultimap, name, "Raj");
