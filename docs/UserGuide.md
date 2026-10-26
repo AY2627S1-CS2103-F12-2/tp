@@ -153,6 +153,7 @@ Format: `find KEYWORD [MORE_KEYWORDS]`
 
 * The search ignores case. `john` matches `John`.
 * Only whole words match. `Jo` does not match `John`.
+* Parts of a name split by a hyphen, apostrophe or full stop count as words too. `connor` and `jones` both match `O'Connor-Jones`.
 * Students matching at least one word are shown. `find Tan Lim` shows both `John Tan` and `Aliyah Lim`.
 * The student list shows `Showing 2 of 46` while the results are filtered. Type `list` to show everyone again.
 

@@ -58,6 +58,13 @@ public class NameContainsKeywordsPredicateTest {
         // Decomposed accent in keyword, composed accent in name
         predicate = new NameContainsKeywordsPredicate(List.of("Jose\u0301"));
         assertTrue(predicate.test(new StudentBuilder().withName("Jos\u00e9 Tan").build()));
+
+        // Whole word, hyphenated part, or part between punctuation
+        Student student = new StudentBuilder().withName("O'Connor-Jones").build();
+        assertTrue(new NameContainsKeywordsPredicate(List.of("o'connor-jones")).test(student));
+        assertTrue(new NameContainsKeywordsPredicate(List.of("O'Connor")).test(student));
+        assertTrue(new NameContainsKeywordsPredicate(List.of("connor")).test(student));
+        assertTrue(new NameContainsKeywordsPredicate(List.of("JONES")).test(student));
     }
 
     @Test
@@ -69,6 +76,10 @@ public class NameContainsKeywordsPredicateTest {
         // Non-matching keyword
         predicate = new NameContainsKeywordsPredicate(List.of("Carol"));
         assertFalse(predicate.test(new StudentBuilder().withName("Alice Bob").build()));
+
+        // Part of a word between punctuation is still not a match
+        predicate = new NameContainsKeywordsPredicate(List.of("Conn"));
+        assertFalse(predicate.test(new StudentBuilder().withName("O'Connor-Jones").build()));
 
         // Keywords match subjects, but do not match name
         predicate = new NameContainsKeywordsPredicate(List.of("Math", "Physics"));
