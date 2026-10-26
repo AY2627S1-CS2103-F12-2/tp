@@ -870,6 +870,10 @@ testers are expected to do more *exploratory* testing.
    1. Test case: `interaction add n/john tan d/2026-10-01 t/14:30 note/Practised algebraic fractions`<br>
       Expected: The result includes `(14:30)`, the note is recorded, and the interaction total increases by one.
 
+   1. Test case: Paste `interaction add n/John Tan d/2026-10-01 note/First line⏎Second line` into the
+      command box, where `⏎` is a pasted line break.<br>
+      Expected: The interaction is recorded with the note `First line Second line`.
+
    1. Test case: `interaction add n/John Tan d/2099-12-31 note/Planned revision`<br>
       Expected: TutorLink warns that the date is in the future, then records the interaction.
 
@@ -882,21 +886,21 @@ testers are expected to do more *exploratory* testing.
       `interaction add n/John Tan d/2026-02-30 note/Bad date`,
       `interaction add n/John Tan d/2026-10-01 t/25:00 note/Bad time`,
       `interaction add n/John Tan d/2026-10-01 note/`,
-      paste a note containing a line break,
       `interaction add n/John Tan d/2026-10-01 d/2026-10-02 note/Duplicate date`<br>
-      Expected: No interaction is recorded. The error explains the invalid or repeated parameter, reports that notes
-      must be on a single line, or shows the correct command format.
+      Expected: No interaction is recorded. The error explains the invalid or repeated parameter, or shows the
+      correct command format.
 
 ### Viewing a student's interactions
 
 1. Listing interactions in chronological order
 
-   1. Prerequisites: John Tan has interactions on at least two different dates, including one without a time.
+   1. Prerequisites: John Tan has interactions on at least two different dates. On one date, record an interaction at
+      `00:00` first, then record another interaction without a time.
 
    1. Test case: `interaction list n/john tan`<br>
-      Expected: The result lists John Tan's interactions from earliest to latest, numbered starting at 1. An
-      interaction without a time appears before a `00:00` interaction on the same date, and entries with the same
-      date and time retain their recording order. The selected student and stored data do not change.
+      Expected: The result lists John Tan's interactions from earliest to latest, numbered starting at 1. The
+      untimed and `00:00` interactions on the same date remain in the order they were recorded, as do entries with
+      the same date and time. The selected student and stored data do not change.
 
 1. Listing an empty or unknown history
 
@@ -947,7 +951,7 @@ testers are expected to do more *exploratory* testing.
 1. Rejecting invalid deletions
 
    1. Test case: `interaction delete n/Roy Balakrishnan i/1` where Roy has no interactions<br>
-      Expected: No data changes. The result says Roy has no interactions.
+      Expected: No data changes. The result says `Roy Balakrishnan has no interactions.`
 
    1. Other incorrect commands to try: `interaction delete`, `interaction delete n/John Tan i/0`,
       `interaction delete n/John Tan i/99`, `interaction delete n/John Tan i/1 i/2`,
