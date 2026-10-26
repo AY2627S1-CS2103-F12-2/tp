@@ -52,6 +52,15 @@ public class JsonAdaptedInteractionTest {
     }
 
     @Test
+    public void toModelType_endOfDayTime_throwsIllegalValueException() {
+        JsonAdaptedInteraction adaptedInteraction = new JsonAdaptedInteraction(
+                "2026-10-01", "24:00", "Discussed revision plan");
+
+        assertThrows(IllegalValueException.class, JsonAdaptedInteraction.INVALID_TIME_MESSAGE,
+                adaptedInteraction::toModelType);
+    }
+
+    @Test
     public void toModelType_missingNote_throwsIllegalValueException() {
         JsonAdaptedInteraction adaptedInteraction = new JsonAdaptedInteraction(
                 "2026-10-01", "14:30", null);

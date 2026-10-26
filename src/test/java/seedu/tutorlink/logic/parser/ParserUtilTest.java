@@ -166,6 +166,14 @@ public class ParserUtilTest {
     @Test
     public void parseInteractionTime_validTime_returnsLocalTime() throws Exception {
         assertEquals(LocalTime.of(14, 30), ParserUtil.parseInteractionTime(" 14:30 "));
+        assertEquals(LocalTime.MIDNIGHT, ParserUtil.parseInteractionTime("00:00"));
+        assertEquals(LocalTime.of(23, 59), ParserUtil.parseInteractionTime("23:59"));
+    }
+
+    @Test
+    public void parseInteractionTime_endOfDayTime_throwsParseException() {
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_TIME, () ->
+                ParserUtil.parseInteractionTime("24:00"));
     }
 
     @Test
