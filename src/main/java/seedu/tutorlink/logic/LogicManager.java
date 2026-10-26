@@ -49,6 +49,7 @@ public class LogicManager implements Logic {
         CommandResult commandResult;
         Command command = tutorLinkParser.parseCommand(commandText);
         TutorLink previousTutorLink = new TutorLink(model.getTutorLink());
+        Student previousSelectedStudent = model.getSelectedStudent().get();
         commandResult = command.execute(model);
 
         if (previousTutorLink.equals(model.getTutorLink())) {
@@ -58,14 +59,24 @@ public class LogicManager implements Logic {
         try {
             storage.saveTutorLink(model.getTutorLink());
         } catch (AccessDeniedException e) {
-            model.setTutorLink(previousTutorLink);
+            restorePreviousState(previousTutorLink, previousSelectedStudent);
             throw new CommandException(String.format(FILE_OPS_PERMISSION_ERROR_FORMAT, e.getMessage()), e);
         } catch (IOException ioe) {
-            model.setTutorLink(previousTutorLink);
+            restorePreviousState(previousTutorLink, previousSelectedStudent);
             throw new CommandException(String.format(FILE_OPS_ERROR_FORMAT, ioe.getMessage()), ioe);
         }
 
         return commandResult;
+    }
+
+    /**
+     * Restores the data after a failed save without losing the student's current context.
+     */
+    private void restorePreviousState(TutorLink previousTutorLink, Student previousSelectedStudent) {
+        model.setTutorLink(previousTutorLink);
+        if (previousSelectedStudent != null) {
+            model.findStudentByName(previousSelectedStudent.getName()).ifPresent(model::setSelectedStudent);
+        }
     }
 
     @Override
