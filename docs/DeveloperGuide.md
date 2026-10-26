@@ -196,7 +196,7 @@ Names are unique in the same way. `UniqueStudentList` treats two students as dup
 
 ### Editing a student
 
-`student edit n/NAME [new/NEW_NAME] [s/SUBJECT]...` renames a student, replaces their subjects, or both. It uses the same name lookup as other commands (see [Finding a student by name](#finding-a-student-by-name)).
+`student edit n/NAME [new/NEW_NAME] [sub/SUBJECT]...` renames a student, replaces their subjects, or both. It uses the same name lookup as other commands (see [Finding a student by name](#finding-a-student-by-name)).
 
 The sequence diagram below shows how `student edit n/john tan new/Jonathan Tan` renames the student `John Tan`.
 
@@ -206,7 +206,7 @@ The sequence diagram below shows how `student edit n/john tan new/Jonathan Tan` 
 </div>
 
 1. `TutorLinkParser` reads the command word `student edit` and passes the rest of the input to a new `EditStudentCommandParser`.
-1. `EditStudentCommandParser` checks that `n/` and `new/` appear at most once, and parses each value with the same rules as `student add`. If neither `new/` nor any `s/` is given, it throws a `ParseException` saying there is nothing to change. Otherwise, it returns an `EditStudentCommand` holding the current name, an optional new name and an optional new list of subjects.
+1. `EditStudentCommandParser` checks that `n/` and `new/` appear at most once, and parses each value with the same rules as `student add`. If neither `new/` nor any `sub/` is given, it throws a `ParseException` saying there is nothing to change. Otherwise, it returns an `EditStudentCommand` holding the current name, an optional new name and an optional new list of subjects.
 1. When executed, `EditStudentCommand` finds the student with `Model#findStudentByName`. If there is no match, it throws a `CommandException` and nothing changes.
 1. `EditStudentCommand#createEditedStudent` builds a new `Student` with the new name (or the old one) and the new subjects (or the old ones). It copies the existing interactions and follow-ups unchanged. `Student` is immutable, so the edit always produces a new object.
 1. If the name changes to that of a *different* student, `Model#hasStudent` returns true and the command throws the same duplicate-student error as `student add`. A rename that only changes casing (`john tan` to `John Tan`) is the same student under `Student#isSameStudent`, so it is allowed.
@@ -214,10 +214,10 @@ The sequence diagram below shows how `student edit n/john tan new/Jonathan Tan` 
 
 #### Design considerations
 
-**Aspect: What `s/` does when editing**
+**Aspect: What `sub/` does when editing**
 
-* **Alternative 1 (current choice):** Any `s/` replaces all existing subjects.
-  * Pros: One command sets the exact subject list, with the same meaning as `s/` in `student add`. The result is easy to predict from the command alone.
+* **Alternative 1 (current choice):** Any `sub/` replaces all existing subjects.
+  * Pros: One command sets the exact subject list, with the same meaning as `sub/` in `student add`. The result is easy to predict from the command alone.
   * Cons: To add one subject, the tutor must retype the existing ones. There is no way to remove all subjects.
 * **Alternative 2:** Separate prefixes to add and remove single subjects (e.g. `s+/` and `s-/`).
   * Pros: Small changes take less typing.
@@ -775,7 +775,7 @@ testers are expected to do more *exploratory* testing.
 
 1. Adding a new student
 
-   1. Test case: `student add n/John Tan s/Math s/Physics`<br>
+   1. Test case: `student add n/John Tan sub/Math sub/Physics`<br>
       Expected: John Tan appears at the bottom of the student list with subjects Math and Physics, and is shown in the detail panel. The result shows `✔ Student added: John Tan (subjects: Math, Physics)` and the new total.
 
    1. Test case: `student add n/Aliyah Lim`<br>
@@ -788,10 +788,10 @@ testers are expected to do more *exploratory* testing.
    1. Test case: `student add n/john tan`<br>
       Expected: No student is added. The error says a student named `John Tan` already exists.
 
-   1. Test case: `student add n/John Tan s/Math s/math`<br>
+   1. Test case: `student add n/John Tan sub/Math sub/math`<br>
       Expected: No student is added. The error says the subject is specified twice.
 
-   1. Other incorrect commands to try: `student add`, `student add n/`, `student add n/12345`, `student add n/Ann s/Math/Physics`<br>
+   1. Other incorrect commands to try: `student add`, `student add n/`, `student add n/12345`, `student add n/Ann sub/Math/Physics`<br>
       Expected: No student is added. The error explains which value is wrong, or shows the correct command format.
 
 ### Viewing a student
@@ -829,7 +829,7 @@ testers are expected to do more *exploratory* testing.
 
    1. Prerequisites: Jonathan Tan exists with subjects Math and Physics.
 
-   1. Test case: `student edit n/Jonathan Tan s/Chemistry`<br>
+   1. Test case: `student edit n/Jonathan Tan sub/Chemistry`<br>
       Expected: Jonathan Tan's only subject is now Chemistry. Math and Physics are gone.
 
 1. Invalid edits
@@ -842,7 +842,7 @@ testers are expected to do more *exploratory* testing.
    1. Test case: `student edit n/Jonathan Tan`<br>
       Expected: Nothing changes. The error says there is nothing to change and shows the correct command format.
 
-   1. Other incorrect commands to try: `student edit n/Nobody Here new/Ann`, `student edit n/Jonathan Tan new/12345`, `student edit n/Jonathan Tan s/Math s/math`, `student edit n/Jonathan Tan new/A new/B`<br>
+   1. Other incorrect commands to try: `student edit n/Nobody Here new/Ann`, `student edit n/Jonathan Tan new/12345`, `student edit n/Jonathan Tan sub/Math sub/math`, `student edit n/Jonathan Tan new/A new/B`<br>
       Expected: Nothing changes. The error says no such student is found, explains which value is wrong, or says a prefix is repeated.
 
 ### Deleting a student

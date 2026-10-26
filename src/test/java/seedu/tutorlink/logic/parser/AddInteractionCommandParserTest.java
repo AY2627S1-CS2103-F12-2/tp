@@ -26,7 +26,7 @@ public class AddInteractionCommandParserTest {
                         "Practised algebraic fractions"));
 
         assertEquals(expected, parser.parse(
-                " n/Alex Tan d/2026-10-01 t/14:30 note/Practised algebraic fractions"));
+                " n/Alex Tan date/2026-10-01 t/14:30 note/Practised algebraic fractions"));
     }
 
     @Test
@@ -34,7 +34,7 @@ public class AddInteractionCommandParserTest {
         AddInteractionCommand expected = new AddInteractionCommand(new Name("Alex Tan"),
                 new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "Discussed revision plan"));
 
-        assertEquals(expected, parser.parse(" n/Alex Tan d/2026-10-01 note/Discussed revision plan"));
+        assertEquals(expected, parser.parse(" n/Alex Tan date/2026-10-01 note/Discussed revision plan"));
     }
 
     @Test
@@ -42,7 +42,7 @@ public class AddInteractionCommandParserTest {
         AddInteractionCommand expected = new AddInteractionCommand(new Name("Alex Tan"),
                 new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "Discussed revision plan"));
 
-        assertEquals(expected, parser.parse(" n/Alex Tan d/2026-10-01 t/ note/Discussed revision plan"));
+        assertEquals(expected, parser.parse(" n/Alex Tan date/2026-10-01 t/ note/Discussed revision plan"));
     }
 
     @Test
@@ -51,7 +51,7 @@ public class AddInteractionCommandParserTest {
                 new Interaction(LocalDate.of(2026, 10, 10), Optional.empty(), "Discussed n/next steps"));
 
         assertEquals(expected, parser.parse(
-                " n/Alex Yeoh d/2026-10-10 note/Discussed n/next steps"));
+                " n/Alex Yeoh date/2026-10-10 note/Discussed n/next steps"));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class AddInteractionCommandParserTest {
                         "Discussed note/next steps n/Bernice Yu"));
 
         assertEquals(expected, parser.parse(
-                " n/Alex Yeoh d/2026-10-10 note/Discussed note/next steps n/Bernice Yu"));
+                " n/Alex Yeoh date/2026-10-10 note/Discussed note/next steps n/Bernice Yu"));
     }
 
     @Test
@@ -71,19 +71,19 @@ public class AddInteractionCommandParserTest {
                         "Discussed graphs t/14:30"));
 
         assertEquals(expected, parser.parse(
-                " n/Alex Yeoh d/2026-10-10 note/Discussed graphs t/14:30"));
+                " n/Alex Yeoh date/2026-10-10 note/Discussed graphs t/14:30"));
     }
 
     @Test
     public void parse_dateAfterNote_doesNotSatisfyRequiredDate() {
         assertThrows(ParseException.class, () -> parser.parse(
-                " n/Alex Yeoh note/Discussed graphs d/2026-10-10"));
+                " n/Alex Yeoh note/Discussed graphs date/2026-10-10"));
     }
 
     @Test
     public void parse_duplicatePrefixBeforeNote_throwsParseException() {
         assertThrows(ParseException.class, () -> parser.parse(
-                " n/Alex Yeoh n/Bernice Yu d/2026-10-10 note/Discussed next steps"));
+                " n/Alex Yeoh n/Bernice Yu date/2026-10-10 note/Discussed next steps"));
     }
 
     @Test
@@ -92,31 +92,31 @@ public class AddInteractionCommandParserTest {
                 AddInteractionCommand.MESSAGE_USAGE);
 
         assertThrows(ParseException.class, expectedMessage, () ->
-                parser.parse(" n/Alex Tan d/2026-10-01"));
+                parser.parse(" n/Alex Tan date/2026-10-01"));
     }
 
     @Test
     public void parse_invalidDate_throwsParseException() {
         assertThrows(ParseException.class, String.format(ParserUtil.MESSAGE_INVALID_CALENDAR_DATE, "2026-02-30"), () ->
-                parser.parse(" n/Alex Tan d/2026-02-30 note/Discussed revision plan"));
+                parser.parse(" n/Alex Tan date/2026-02-30 note/Discussed revision plan"));
     }
 
     @Test
     public void parse_malformedDate_throwsParseException() {
         assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_DATE_FORMAT, () ->
-                parser.parse(" n/Alex Tan d/2026/10/01 note/Discussed revision plan"));
+                parser.parse(" n/Alex Tan date/2026/10/01 note/Discussed revision plan"));
     }
 
     @Test
     public void parse_invalidTime_throwsParseException() {
         assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_TIME, () ->
-                parser.parse(" n/Alex Tan d/2026-10-01 t/25:00 note/Discussed revision plan"));
+                parser.parse(" n/Alex Tan date/2026-10-01 t/25:00 note/Discussed revision plan"));
     }
 
     @Test
     public void parse_blankNote_throwsParseException() {
         assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE, () ->
-                parser.parse(" n/Alex Tan d/2026-10-01 note/   "));
+                parser.parse(" n/Alex Tan date/2026-10-01 note/   "));
     }
 
     @Test
@@ -124,7 +124,7 @@ public class AddInteractionCommandParserTest {
         String tooLongNote = "a".repeat(ParserUtil.MAX_INTERACTION_NOTE_LENGTH + 1);
 
         assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE_LENGTH, () ->
-                parser.parse(" n/Alex Tan d/2026-10-01 note/" + tooLongNote));
+                parser.parse(" n/Alex Tan date/2026-10-01 note/" + tooLongNote));
     }
 
     @Test
@@ -134,15 +134,15 @@ public class AddInteractionCommandParserTest {
         AddInteractionCommand expected = new AddInteractionCommand(new Name("Alex Tan"),
                 new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), maximumEmojiNote));
 
-        assertEquals(expected, parser.parse(" n/Alex Tan d/2026-10-01 note/" + maximumEmojiNote));
+        assertEquals(expected, parser.parse(" n/Alex Tan date/2026-10-01 note/" + maximumEmojiNote));
     }
 
     @Test
     public void parse_multilineNote_throwsParseException() {
         assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE_MULTILINE, () ->
-                parser.parse(" n/Alex Tan d/2026-10-01 note/First line\nSecond line"));
+                parser.parse(" n/Alex Tan date/2026-10-01 note/First line\nSecond line"));
 
         assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE_MULTILINE, () ->
-                parser.parse(" n/Alex Tan d/2026-10-01 note/First line\n\n\nSecond line"));
+                parser.parse(" n/Alex Tan date/2026-10-01 note/First line\n\n\nSecond line"));
     }
 }

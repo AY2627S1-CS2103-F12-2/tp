@@ -60,7 +60,7 @@ public class TutorLinkParserTest {
                 new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "Discussed revision plan"));
 
         assertEquals(expected, parser.parseCommand(
-                "interaction add n/Alex Tan d/2026-10-01 note/Discussed revision plan"));
+                "interaction add n/Alex Tan date/2026-10-01 note/Discussed revision plan"));
     }
 
     @Test

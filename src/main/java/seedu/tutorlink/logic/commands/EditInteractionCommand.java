@@ -25,8 +25,8 @@ public class EditInteractionCommand extends Command {
 
     public static final String COMMAND_WORD = "interaction edit";
     public static final String MESSAGE_USAGE = "Command format: " + COMMAND_WORD
-            + " n/NAME i/INDEX [d/DATE] [t/TIME] [note/TEXT]\n"
-            + "At least one of d/, t/ or note/ must be given, and note/ must be last.\n"
+            + " n/NAME i/INDEX [date/DATE] [t/TIME] [note/TEXT]\n"
+            + "At least one of date/, t/ or note/ must be given, and note/ must be last.\n"
             + "Use t/TIME to replace a time, or t/ with no value to remove it.\n"
             + "Example: " + COMMAND_WORD + " n/John Tan i/1 note/Reviewed fractions";
     public static final String MESSAGE_SUCCESS = "\u2714 Interaction updated for %1$s: %2$s\n"

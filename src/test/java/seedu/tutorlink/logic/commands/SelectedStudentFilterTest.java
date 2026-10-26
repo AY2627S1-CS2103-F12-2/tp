@@ -74,7 +74,7 @@ public class SelectedStudentFilterTest {
     @Test
     public void viewThenFindOtherThenViewHiddenStudentWithRecords_recordsShownAndFilterReset() throws Exception {
         TutorLinkParser parser = new TutorLinkParser();
-        parser.parseCommand("interaction add n/Benson Meier d/2026-10-01 note/Practised algebra").execute(model);
+        parser.parseCommand("interaction add n/Benson Meier date/2026-10-01 note/Practised algebra").execute(model);
         parser.parseCommand("followup add n/Benson Meier desc/Review algebra review/2026-10-15").execute(model);
         parser.parseCommand("student view n/alice pauline").execute(model);
         parser.parseCommand("find alice").execute(model);

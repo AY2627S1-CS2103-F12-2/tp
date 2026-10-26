@@ -14,14 +14,14 @@ TutorLink's first version is planned around six commands:
 
 | Task | Command |
 | --- | --- |
-| Add a student and their subjects | `student add n/NAME [s/SUBJECT]...` |
+| Add a student and their subjects | `student add n/NAME [sub/SUBJECT]...` |
 | View a student's details | `student view n/NAME` |
-| Record an interaction with a note | `interaction add n/NAME d/DATE [t/TIME] note/TEXT` |
+| Record an interaction with a note | `interaction add n/NAME date/DATE [t/TIME] note/TEXT` |
 | View a student's interaction history | `interaction list n/NAME` |
 | Add a follow-up for a student | `followup add n/NAME desc/TEXT review/DATE` |
 | View a student's outstanding follow-ups | `followup list n/NAME` |
 
-For example, a tutor could record a lesson with `interaction add n/Alex Tan d/2026-10-01 note/Practised algebraic fractions`, then add `followup add n/Alex Tan desc/Revisit algebraic fractions review/2026-10-08`. Before the next lesson, `student view`, `interaction list`, and `followup list` would help the tutor regain context.
+For example, a tutor could record a lesson with `interaction add n/Alex Tan date/2026-10-01 note/Practised algebraic fractions`, then add `followup add n/Alex Tan desc/Revisit algebraic fractions review/2026-10-08`. Before the next lesson, `student view`, `interaction list`, and `followup list` would help the tutor regain context.
 
 Dates use `yyyy-MM-dd`, and an optional interaction time uses `HH:mm`. Follow-ups belong to a student. Until a command to complete or cancel them is added, every recorded follow-up is considered outstanding.
 

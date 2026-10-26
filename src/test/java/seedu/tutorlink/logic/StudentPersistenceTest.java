@@ -42,8 +42,8 @@ import seedu.tutorlink.testutil.StudentBuilder;
  */
 public class StudentPersistenceTest {
 
-    private static final String ADD_COMMAND = "student add n/Carl Kurz s/Math";
-    private static final String EDIT_COMMAND = "student edit n/" + AMY.getName() + " new/Amy Tan s/Chemistry";
+    private static final String ADD_COMMAND = "student add n/Carl Kurz sub/Math";
+    private static final String EDIT_COMMAND = "student edit n/" + AMY.getName() + " new/Amy Tan sub/Chemistry";
     private static final String DELETE_COMMAND = "student delete n/" + AMY.getName();
     private static final String RECOVERY_NAME = "Dana Lee";
 
