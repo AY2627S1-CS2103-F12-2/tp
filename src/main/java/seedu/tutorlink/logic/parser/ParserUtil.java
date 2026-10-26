@@ -194,24 +194,24 @@ public class ParserUtil {
     }
 
     /**
-     * Parses an interaction note, trimming leading and trailing whitespaces.
+     * Parses an interaction note, stripping leading and trailing whitespaces.
      *
      * @throws ParseException if the interaction note is blank, too long, or contains a newline.
      */
     public static String parseInteractionNote(String interactionNote) throws ParseException {
         requireNonNull(interactionNote);
-        String trimmedInteractionNote = interactionNote.trim();
-        if (trimmedInteractionNote.isBlank()) {
+        String strippedInteractionNote = interactionNote.strip();
+        if (strippedInteractionNote.isBlank()) {
             throw new ParseException(MESSAGE_INVALID_INTERACTION_NOTE);
         }
-        if (trimmedInteractionNote.contains("\n") || trimmedInteractionNote.contains("\r")) {
+        if (strippedInteractionNote.contains("\n") || strippedInteractionNote.contains("\r")) {
             throw new ParseException(MESSAGE_INVALID_INTERACTION_NOTE_MULTILINE);
         }
-        if (trimmedInteractionNote.codePointCount(0, trimmedInteractionNote.length())
+        if (strippedInteractionNote.codePointCount(0, strippedInteractionNote.length())
                 > MAX_INTERACTION_NOTE_LENGTH) {
             throw new ParseException(MESSAGE_INVALID_INTERACTION_NOTE_LENGTH);
         }
-        return trimmedInteractionNote;
+        return strippedInteractionNote;
     }
 
     /**

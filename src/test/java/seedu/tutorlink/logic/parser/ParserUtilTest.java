@@ -175,12 +175,20 @@ public class ParserUtilTest {
     }
 
     @Test
-    public void parseInteractionNote_validBoundaryLengths_returnsTrimmedNote() throws Exception {
+    public void parseInteractionNote_validBoundaryLengths_returnsStrippedNote() throws Exception {
         String oneCharacterNote = "a";
         String maximumLengthNote = "a".repeat(ParserUtil.MAX_INTERACTION_NOTE_LENGTH);
 
         assertEquals(oneCharacterNote, ParserUtil.parseInteractionNote(oneCharacterNote));
         assertEquals(maximumLengthNote, ParserUtil.parseInteractionNote(maximumLengthNote));
+    }
+
+    @Test
+    public void parseInteractionNote_unicodeBoundaryWhitespace_returnsStrippedNote() throws Exception {
+        String maximumLengthNote = "A".repeat(ParserUtil.MAX_INTERACTION_NOTE_LENGTH);
+        String noteWithUnicodeBoundaryWhitespace = "\u2003" + maximumLengthNote + "\u2003";
+
+        assertEquals(maximumLengthNote, ParserUtil.parseInteractionNote(noteWithUnicodeBoundaryWhitespace));
     }
 
     @Test
