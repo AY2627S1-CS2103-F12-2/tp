@@ -864,29 +864,29 @@ testers are expected to do more *exploratory* testing.
 
    1. Prerequisites: John Tan exists.
 
-   1. Test case: `interaction add n/John Tan d/2026-10-01 note/Discussed revision plan`<br>
+   1. Test case: `interaction add n/John Tan date/2026-10-01 note/Discussed revision plan`<br>
       Expected: The result shows `✔ Interaction recorded for John Tan on 2026-10-01.` and the updated total.
 
-   1. Test case: `interaction add n/john tan d/2026-10-01 t/14:30 note/Practised algebraic fractions`<br>
+   1. Test case: `interaction add n/john tan date/2026-10-01 t/14:30 note/Practised algebraic fractions`<br>
       Expected: The result includes `(14:30)`, the note is recorded, and the interaction total increases by one.
 
-   1. Test case: Paste `interaction add n/John Tan d/2026-10-01 note/First line⏎Second line` into the
+   1. Test case: Paste `interaction add n/John Tan date/2026-10-01 note/First line⏎Second line` into the
       command box, where `⏎` is a pasted line break.<br>
       Expected: The interaction is recorded with the note `First line Second line`.
 
-   1. Test case: `interaction add n/John Tan d/2099-12-31 note/Planned revision`<br>
+   1. Test case: `interaction add n/John Tan date/2099-12-31 note/Planned revision`<br>
       Expected: TutorLink warns that the date is in the future, then records the interaction.
 
 1. Rejecting invalid interaction details
 
-   1. Test case: `interaction add n/Nobody Here d/2026-10-01 note/Unknown student`<br>
+   1. Test case: `interaction add n/Nobody Here date/2026-10-01 note/Unknown student`<br>
       Expected: No interaction is recorded. The error says no student named `Nobody Here` is found.
 
    1. Other incorrect commands to try: `interaction add`, `interaction add n/John Tan note/Missing date`,
-      `interaction add n/John Tan d/2026-02-30 note/Bad date`,
-      `interaction add n/John Tan d/2026-10-01 t/25:00 note/Bad time`,
-      `interaction add n/John Tan d/2026-10-01 note/`,
-      `interaction add n/John Tan d/2026-10-01 d/2026-10-02 note/Duplicate date`<br>
+      `interaction add n/John Tan date/2026-02-30 note/Bad date`,
+      `interaction add n/John Tan date/2026-10-01 t/25:00 note/Bad time`,
+      `interaction add n/John Tan date/2026-10-01 note/`,
+      `interaction add n/John Tan date/2026-10-01 date/2026-10-02 note/Duplicate date`<br>
       Expected: No interaction is recorded. The error explains the invalid or repeated parameter, or shows the
       correct command format.
 
@@ -926,7 +926,7 @@ testers are expected to do more *exploratory* testing.
    1. Test case: `interaction edit n/John Tan i/1 t/`<br>
       Expected: The first interaction's time is removed while its date and note remain unchanged.
 
-   1. Test case: `interaction edit n/John Tan i/1 d/2099-12-31`<br>
+   1. Test case: `interaction edit n/John Tan i/1 date/2099-12-31`<br>
       Expected: TutorLink warns about the future date, updates the interaction, and renumbers the chronological list
       if its position changes.
 
@@ -934,7 +934,7 @@ testers are expected to do more *exploratory* testing.
 
    1. Other incorrect commands to try: `interaction edit n/John Tan i/0 note/New note`,
       `interaction edit n/John Tan i/99 note/New note`, `interaction edit n/John Tan i/1`,
-      `interaction edit n/John Tan i/1 d/2026-02-30`, `interaction edit n/John Tan i/1 note/`<br>
+      `interaction edit n/John Tan i/1 date/2026-02-30`, `interaction edit n/John Tan i/1 note/`<br>
       Expected: Nothing changes. The error identifies the invalid index/value, reports that no field was supplied,
       or shows the correct command format.
 
