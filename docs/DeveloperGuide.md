@@ -9,7 +9,9 @@ title: Developer Guide
 
 ## **Acknowledgements**
 
-* _{List the sources of reused or adapted ideas, code, documentation, and third-party libraries here, with links to the originals.}_
+* TutorLink is adapted from [AddressBook-Level3](https://se-education.org/addressbook-level3/) (AB3) by the [SE-EDU initiative](https://se-education.org). The architecture, much of the parsing, storage and UI code, the app and help icons, and the structure of the User Guide and Developer Guide come from AB3.
+* Libraries used: [JavaFX](https://openjfx.io/) for the GUI, [Jackson](https://github.com/FasterXML/jackson) for reading and writing JSON, and [JUnit 5](https://junit.org/junit5/) for testing.
+* The UML diagrams in this guide are made with [PlantUML](https://plantuml.com/).
 
 --------------------------------------------------------------------------------------------------------------------
 
