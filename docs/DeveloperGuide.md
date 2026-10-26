@@ -693,7 +693,7 @@ TutorLink marks it as cancelled instead of done.
 **MSS**
 
 1.  Tutor requests to find students, giving one or more words from their names.
-2.  TutorLink shows only the students whose names contain any of the words, ignoring case.
+2.  TutorLink shows only the students whose names contain any of the words, ignoring case. A part of a name split by a hyphen, apostrophe or full stop also counts as a word.
 
     Use case ends.
 
