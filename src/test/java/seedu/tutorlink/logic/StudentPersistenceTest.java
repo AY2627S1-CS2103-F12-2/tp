@@ -45,6 +45,8 @@ public class StudentPersistenceTest {
     private static final String ADD_COMMAND = "student add n/Carl Kurz s/Math";
     private static final String EDIT_COMMAND = "student edit n/" + AMY.getName() + " new/Amy Tan s/Chemistry";
     private static final String DELETE_COMMAND = "student delete n/" + AMY.getName();
+    private static final String ADD_INTERACTION_COMMAND =
+            "interaction add n/" + AMY.getName() + " d/2026-04-04 note/Second save failure";
     private static final String RECOVERY_NAME = "Dana Lee";
 
     @TempDir
@@ -94,6 +96,18 @@ public class StudentPersistenceTest {
     @Test
     public void execute_deleteStudentPermissionFailure_restoresData() throws Exception {
         assertSaveFailureRestoresData(DELETE_COMMAND, new AccessDeniedException(dataPath.toString()));
+    }
+
+    @Test
+    public void execute_interactionAddFailure_preservesSelectedStudent() throws Exception {
+        Student selectedStudent = model.findStudentByName(AMY.getName()).orElseThrow();
+        model.setSelectedStudent(selectedStudent);
+        RecoverableTutorLinkStorage storage = useStorage(new AccessDeniedException(dataPath.toString()));
+
+        assertThrows(CommandException.class, () -> logic.execute(ADD_INTERACTION_COMMAND));
+
+        assertEquals(selectedStudent, model.getSelectedStudent().get());
+        assertEquals(1, storage.saveAttempts);
     }
 
     @Test
