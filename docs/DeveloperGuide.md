@@ -234,6 +234,61 @@ The sequence diagram below shows how `student edit n/john tan new/Jonathan Tan` 
   * Pros: No copying.
   * Cons: The UI and other references could see a half-edited student, and the duplicate check would need to happen before any field changes.
 
+### Recording and viewing interactions
+
+An `Interaction` is an immutable record of a dated lesson or other contact with a student. It contains a required
+`LocalDate`, an optional `LocalTime`, and a non-blank note. Interactions are stored inside the corresponding
+`Student`, in the order in which they were recorded.
+
+**Adding an interaction.** `AddInteractionCommandParser` tokenizes the arguments with
+`ArgumentTokenizer#tokenizeWithTrailingPrefix`. The `note/` prefix is treated as the final structured prefix, so
+everything after the first `note/` is kept as note text. This allows notes such as `note/Discussed n/next steps`
+without interpreting the `n/` inside the note as another name prefix. The parser requires exactly one `n/`, `d/`
+and `note/`; `t/` is optional and may be empty. It validates the name, date, optional time and note before creating
+an `AddInteractionCommand`.
+
+When the command executes, `AddInteractionCommand` finds the student with
+`Model#findStudentByName`, appends the interaction with `Student#withInteraction`, and replaces the old immutable
+student through `Model#setStudent`. A future interaction date is still recorded, but the command prepends a warning
+to the success message. The selected student observes the replacement and its interaction panel updates without a
+separate refresh.
+
+**Viewing interaction history.** `ListInteractionsCommand` uses the same name lookup as the other student commands.
+If the student has no interactions, it returns an informational message. Otherwise, it obtains
+`Student#getInteractionsInChronologicalOrder`, numbers the results from one, and formats them with
+`Messages#formatInteraction`.
+
+`Student` keeps the stored list unchanged and derives a displayed list by sorting stored positions with
+`Interaction.CHRONOLOGICAL_ORDER`. Interactions are ordered by date, then by time; an interaction without a time is
+treated as `00:00` and therefore appears before timed interactions on the same date. Java's stable ordering preserves
+the recording order when two interactions have the same date and time. Keeping the stored order separate from the
+displayed order allows later commands to refer to the number shown to the tutor without rewriting the persisted list.
+
+**Persistence.** `JsonAdaptedStudent` serializes each interaction as a `JsonAdaptedInteraction` containing the ISO
+date, an optional `HH:mm` time, and the note. A missing time is stored as `null` and restored as an empty
+`Optional`. When the data file is loaded, the adapter validates the date, time, note length and single-line note
+constraint before reconstructing the immutable `Interaction`; invalid stored values are reported instead of being
+silently accepted.
+
+**Design considerations**
+
+* **Alternative 1 (current choice):** Store each student's interactions inside the `Student` object.
+  * Pros: An interaction is naturally owned by one student, deleting a student cannot leave an orphaned interaction,
+    and the JSON representation keeps related records together.
+  * Cons: Adding an interaction creates a replacement `Student` containing copies of the existing fields.
+* **Alternative 2:** Store all interactions in a separate top-level collection keyed by student name.
+  * Pros: Updating an interaction would not require copying the entire student.
+  * Cons: Renaming or deleting a student would need to update a second collection, creating a risk of orphaned or
+    incorrectly associated interactions.
+
+* **Alternative 1 (current choice):** Display interactions chronologically while preserving their stored order.
+  * Pros: The tutor sees the history in the order in which events happened, while equal date-time entries remain
+    deterministic.
+  * Cons: A displayed number can change when a new interaction is added or an existing one is edited.
+* **Alternative 2:** Display interactions in recording order.
+  * Pros: Displayed numbers never move after an interaction is added.
+  * Cons: The history is less useful chronologically, and the displayed order can differ from the dates shown.
+
 ### Two-word command words
 
 TutorLink's command words name a domain and then an action, e.g. `student add`, `interaction list` and `followup add`. A few app-level commands (`help`, `list`, `find`, `exit`) are one word.
