@@ -25,6 +25,7 @@ import seedu.tutorlink.model.followup.FollowUp;
 import seedu.tutorlink.model.followup.FollowUpStatus;
 import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.Student;
+import seedu.tutorlink.model.student.Subject;
 
 public class JsonTutorLinkStorageTest {
     private static final Path TEST_DATA_FOLDER = Paths.get("src", "test", "data", "JsonTutorLinkStorageTest");
@@ -159,6 +160,36 @@ public class JsonTutorLinkStorageTest {
         Files.writeString(path, json);
 
         assertThrows(DataLoadingException.class, () -> new JsonTutorLinkStorage(path).readTutorLink());
+    }
+
+    @Test
+    public void readAndSave_unicodeSubjects_normalizesAndPreservesOrder() throws Exception {
+        Path path = testFolder.resolve("unicodeSubjects.json");
+        String tamilSubject = "\u0ba4\u0bae\u0bbf\u0bb4\u0bcd";
+        String decomposedSubject = "e\u0301".repeat(Subject.MAX_LENGTH);
+        String json = "{\"students\":[{\"name\":\"John Tan\",\"subjects\":[\"Franc\u0327ais\",\""
+                + tamilSubject + "\",\"" + decomposedSubject + "\"]}]}";
+        Files.writeString(path, json);
+
+        JsonTutorLinkStorage storage = new JsonTutorLinkStorage(path);
+        ReadOnlyTutorLink restored = storage.readTutorLink().orElseThrow();
+        assertEquals(List.of("Fran\u00e7ais", tamilSubject, "\u00e9".repeat(Subject.MAX_LENGTH)),
+                restored.getStudentList().getFirst().getSubjects().stream()
+                        .map(subject -> subject.subjectName).toList());
+
+        storage.saveTutorLink(restored);
+        assertEquals(new TutorLink(restored), new TutorLink(storage.readTutorLink().orElseThrow()));
+    }
+
+    @Test
+    public void read_invalidUnicodeSubjects_throwsDataLoadingException() throws Exception {
+        Path path = testFolder.resolve("invalidUnicodeSubject.json");
+        for (String subject : List.of("\u0327Math", "e\u0301".repeat(Subject.MAX_LENGTH + 1))) {
+            String json = "{\"students\":[{\"name\":\"John Tan\",\"subjects\":[\"" + subject + "\"]}]}";
+            Files.writeString(path, json);
+
+            assertThrows(DataLoadingException.class, () -> new JsonTutorLinkStorage(path).readTutorLink());
+        }
     }
 
     @Test

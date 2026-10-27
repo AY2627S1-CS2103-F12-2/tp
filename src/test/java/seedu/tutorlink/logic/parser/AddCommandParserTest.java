@@ -11,6 +11,7 @@ import static seedu.tutorlink.logic.commands.CommandTestUtil.SUBJECT_DESC_MATH;
 import static seedu.tutorlink.logic.commands.CommandTestUtil.SUBJECT_DESC_PHYSICS;
 import static seedu.tutorlink.logic.commands.CommandTestUtil.VALID_NAME_BOB;
 import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_NAME;
+import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_SUBJECT;
 import static seedu.tutorlink.logic.parser.CommandParserTestUtil.assertParseFailure;
 import static seedu.tutorlink.logic.parser.CommandParserTestUtil.assertParseSuccess;
 import static seedu.tutorlink.testutil.TypicalStudents.AMY;
@@ -63,6 +64,27 @@ public class AddCommandParserTest {
     public void parse_nameWithConnector_success() {
         Student expectedStudent = new StudentBuilder().withName("Raj s/o Kumar").withSubjects("Math").build();
         assertParseSuccess(parser, " n/Raj s/o Kumar s/Math", new AddCommand(expectedStudent));
+    }
+
+    @Test
+    public void parse_unicodeSubjects_success() {
+        String tamilSubject = "\u0ba4\u0bae\u0bbf\u0bb4\u0bcd";
+        Student expectedStudent = new StudentBuilder(BOB)
+                .withSubjects("Fran\u00e7ais", tamilSubject, "\u00e9".repeat(Subject.MAX_LENGTH)).build();
+        String subjectArguments = " " + PREFIX_SUBJECT + " Franc\u0327ais "
+                + " " + PREFIX_SUBJECT + tamilSubject
+                + " " + PREFIX_SUBJECT + "e\u0301".repeat(Subject.MAX_LENGTH);
+
+        assertParseSuccess(parser, NAME_DESC_BOB + subjectArguments, new AddCommand(expectedStudent));
+    }
+
+    @Test
+    public void parse_canonicallyEquivalentSubjects_failure() {
+        String subjectArguments = " " + PREFIX_SUBJECT + "Fran\u00e7ais"
+                + " " + PREFIX_SUBJECT + "Franc\u0327ais";
+
+        assertParseFailure(parser, NAME_DESC_BOB + subjectArguments,
+                String.format(ParserUtil.MESSAGE_DUPLICATE_SUBJECT, "Fran\u00e7ais"));
     }
 
     @Test

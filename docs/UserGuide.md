@@ -99,6 +99,10 @@ Format: `student add n/NAME [s/SUBJECT]…`
 * `NAME` may also contain `s/o` or `d/o` as a separate word, as in `Raj s/o Kumar`. TutorLink reads these as part of the name, not as the start of a subject.
 * Each student's name must be unique, ignoring case. If `John Tan` exists, adding `john tan` is rejected as a duplicate.
 * `SUBJECT` is 1 to 30 characters long and may use letters, digits, spaces, hyphens, `+` and `&`, for example `H2 Math` or `Biology + Chemistry`.
+* Subject names support accented letters and combining marks, such as `Français` and `தமிழ்`.
+  Equivalent accent spellings are treated as the same subject.
+* The subject length limit counts Unicode code points after equivalent accented spellings are normalized.
+  For example, `é` and `e` followed by a combining acute accent both count as one.
 * A student can have any number of subjects, including none. Giving the same subject twice, in any case, is rejected.
 * Subjects are shown in the order you type them.
 
