@@ -240,6 +240,34 @@ public class JsonTutorLinkStorageTest {
     }
 
     @Test
+    public void read_unicodeCaseDuplicateNames_throwsDataLoadingException() throws Exception {
+        Path path = testFolder.resolve("unicodeCaseDuplicateNames.json");
+        String[][] duplicateNames = {
+            {"I\u015f\u0131k", "\u0131\u015f\u0131k"},
+            {"\u0130pek", "ipek"},
+            {"\u03a3", "\u03c2"}
+        };
+        for (String[] names : duplicateNames) {
+            String json = "{\"students\":[{\"name\":\"" + names[0] + "\"},{\"name\":\"" + names[1] + "\"}]}";
+            Files.writeString(path, json);
+
+            assertThrows(DataLoadingException.class, () -> new JsonTutorLinkStorage(path).readTutorLink());
+            assertEquals(json, Files.readString(path));
+        }
+    }
+
+    @Test
+    public void read_distinctAccentedNames_preservesBothStudents() throws Exception {
+        Path path = testFolder.resolve("distinctAccentedNames.json");
+        Files.writeString(path, "{\"students\":[{\"name\":\"Jos\u00e9\"},{\"name\":\"Jose\"}]}");
+
+        ReadOnlyTutorLink restored = new JsonTutorLinkStorage(path).readTutorLink().orElseThrow();
+
+        assertEquals(List.of("Jos\u00e9", "Jose"), restored.getStudentList().stream()
+                .map(student -> student.getName().fullName).toList());
+    }
+
+    @Test
     public void readTutorLink_invalidStudentTutorLink_throwDataLoadingException() {
         assertThrows(DataLoadingException.class, () -> readTutorLink("invalidStudentTutorLink.json"));
     }
