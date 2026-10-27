@@ -2,12 +2,16 @@ package seedu.tutorlink.commons.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import seedu.tutorlink.commons.exceptions.DataLoadingException;
 import seedu.tutorlink.testutil.SerializableTestClass;
 import seedu.tutorlink.testutil.TestUtil;
 
@@ -17,6 +21,39 @@ import seedu.tutorlink.testutil.TestUtil;
 public class JsonUtilTest {
 
     private static final Path SERIALIZATION_FILE = TestUtil.getFilePathInSandboxFolder("serialize.json");
+
+    @TempDir
+    public Path testFolder;
+
+    @Test
+    public void readJsonFile_nullRoot_throwsDataLoadingException() throws IOException {
+        Path file = testFolder.resolve("nullRoot.json");
+        for (String content : new String[]{"null", " \r\nnull\t\n"}) {
+            Files.writeString(file, content);
+
+            assertThrows(DataLoadingException.class, () -> JsonUtil.readJsonFile(file, SerializableTestClass.class));
+            assertEquals(content, Files.readString(file));
+        }
+    }
+
+    @Test
+    public void readJsonFile_missingFile_returnsEmpty() throws DataLoadingException {
+        Path file = testFolder.resolve("missing.json");
+
+        assertTrue(JsonUtil.readJsonFile(file, SerializableTestClass.class).isEmpty());
+    }
+
+    @Test
+    public void readJsonFile_validRoot_returnsObject() throws Exception {
+        Path file = testFolder.resolve("validRoot.json");
+        Files.writeString(file, SerializableTestClass.JSON_STRING_REPRESENTATION);
+
+        SerializableTestClass result = JsonUtil.readJsonFile(file, SerializableTestClass.class).orElseThrow();
+
+        assertEquals(SerializableTestClass.getNameTestValue(), result.getName());
+        assertEquals(SerializableTestClass.getListTestValues(), result.getListOfLocalDateTimes());
+        assertEquals(SerializableTestClass.getHashMapTestValues(), result.getMapOfIntegerToString());
+    }
 
     @Test
     public void serializeObjectToJsonFile_noExceptionThrown() throws IOException {

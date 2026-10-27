@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static seedu.tutorlink.testutil.Assert.assertThrows;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -36,6 +37,17 @@ public class JsonUserPrefsStorageTest {
     @Test
     public void readUserPrefs_missingFile_emptyResult() throws DataLoadingException {
         assertFalse(readUserPrefs("NonExistentFile.json").isPresent());
+    }
+
+    @Test
+    public void readUserPrefs_nullJsonRoot_throwsDataLoadingException() throws IOException {
+        Path path = testFolder.resolve("nullRoot.json");
+        for (String content : new String[]{"null", " \r\nnull\t\n"}) {
+            Files.writeString(path, content);
+
+            assertThrows(DataLoadingException.class, () -> new JsonUserPrefsStorage(path).readUserPrefs());
+            assertEquals(content, Files.readString(path));
+        }
     }
 
     @Test
