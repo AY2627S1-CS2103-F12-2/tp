@@ -3,6 +3,7 @@ package seedu.tutorlink.model.student;
 import static java.util.Objects.requireNonNull;
 import static seedu.tutorlink.commons.util.AppUtil.checkArgument;
 
+import java.text.Normalizer;
 import java.util.Locale;
 
 /**
@@ -17,29 +18,34 @@ public class Subject {
             + " characters long and use only letters, digits, spaces, hyphens, '+' or '&'.";
 
     /*
-     * The first character of the subject must not be a whitespace,
+     * Letters may be followed by combining marks needed for accented text and scripts such as Tamil.
+     * The first character of the subject must not be a whitespace or combining mark,
      * otherwise " " (a blank string) becomes a valid input.
      */
-    public static final String VALIDATION_REGEX = "[\\p{L}\\p{N}+&-][\\p{L}\\p{N} +&-]{0," + (MAX_LENGTH - 1) + "}";
+    public static final String VALIDATION_REGEX = "[\\p{L}\\p{N}+&-][\\p{L}\\p{M}\\p{N} +&-]{0,"
+            + (MAX_LENGTH - 1) + "}";
 
     public final String subjectName;
 
     /**
-     * Constructs a {@code Subject}.
+     * Constructs a {@code Subject}, stored in Unicode NFC form so that canonically equivalent
+     * spellings have the same representation.
      *
      * @param subjectName A valid subject name.
      */
     public Subject(String subjectName) {
         requireNonNull(subjectName);
-        checkArgument(isValidSubject(subjectName), MESSAGE_CONSTRAINTS);
-        this.subjectName = subjectName;
+        String composedSubjectName = Normalizer.normalize(subjectName, Normalizer.Form.NFC);
+        checkArgument(isValidSubject(composedSubjectName), MESSAGE_CONSTRAINTS);
+        this.subjectName = composedSubjectName;
     }
 
     /**
      * Returns true if a given string is a valid subject name.
+     * The length limit counts Unicode code points after NFC normalization.
      */
     public static boolean isValidSubject(String test) {
-        return test.matches(VALIDATION_REGEX);
+        return Normalizer.normalize(test, Normalizer.Form.NFC).matches(VALIDATION_REGEX);
     }
 
     /**
