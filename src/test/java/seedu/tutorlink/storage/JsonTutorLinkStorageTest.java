@@ -210,6 +210,17 @@ public class JsonTutorLinkStorageTest {
     }
 
     @Test
+    public void read_nullJsonRoot_throwsDataLoadingException() throws Exception {
+        Path path = testFolder.resolve("nullRoot.json");
+        for (String content : new String[]{"null", " \r\nnull\t\n"}) {
+            Files.writeString(path, content);
+
+            assertThrows(DataLoadingException.class, () -> new JsonTutorLinkStorage(path).readTutorLink());
+            assertEquals(content, Files.readString(path));
+        }
+    }
+
+    @Test
     public void read_trailingJsonContent_throwsDataLoadingException() throws Exception {
         Path path = testFolder.resolve("trailingJsonContent.json");
         Files.writeString(path, "{\"students\":[] }TRAILING_GARBAGE");
