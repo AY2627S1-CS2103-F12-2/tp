@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -23,6 +24,7 @@ import seedu.tutorlink.model.ReadOnlyTutorLink;
 import seedu.tutorlink.model.TutorLink;
 import seedu.tutorlink.model.followup.FollowUp;
 import seedu.tutorlink.model.followup.FollowUpStatus;
+import seedu.tutorlink.model.interaction.Interaction;
 import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.Student;
 
@@ -31,6 +33,32 @@ public class JsonTutorLinkStorageTest {
 
     @TempDir
     public Path testFolder;
+
+    @Test
+    public void saveAndReload_supplementaryName_preservesStudentRecords() throws Exception {
+        Path path = testFolder.resolve("supplementaryName.json");
+        String name = String.valueOf(Character.toChars(0x20000)).repeat(Name.MAX_LENGTH);
+        Student student = new Student(new Name(name), ALICE.getSubjects(),
+                List.of(new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "Reviewed algebra")),
+                List.of(new FollowUp("Check homework", LocalDate.of(2026, 11, 1))));
+        TutorLink original = getTypicalTutorLink();
+        original.setStudent(ALICE, student);
+        JsonTutorLinkStorage storage = new JsonTutorLinkStorage(path);
+
+        storage.saveTutorLink(original);
+        ReadOnlyTutorLink restored = storage.readTutorLink().orElseThrow();
+
+        assertEquals(original, new TutorLink(restored));
+    }
+
+    @Test
+    public void read_overlongSupplementaryName_throwsDataLoadingException() throws Exception {
+        Path path = testFolder.resolve("overlongSupplementaryName.json");
+        String name = String.valueOf(Character.toChars(0x20000)).repeat(Name.MAX_LENGTH + 1);
+        Files.writeString(path, "{\"students\":[{\"name\":\"" + name + "\",\"subjects\":[]}]}");
+
+        assertThrows(DataLoadingException.class, () -> new JsonTutorLinkStorage(path).readTutorLink());
+    }
 
     @Test
     public void saveAndReload_followUpStatuses_preservesRecordsAndOrder() throws Exception {

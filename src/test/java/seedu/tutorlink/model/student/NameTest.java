@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 
 public class NameTest {
 
+    private static final String SUPPLEMENTARY_LETTER = String.valueOf(Character.toChars(0x20000));
+
     @Test
     public void constructor_null_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> new Name(null));
@@ -110,5 +112,40 @@ public class NameTest {
         // 49 letters + a decomposed e-acute is 51 chars as typed but 50 once composed
         assertTrue(Name.isValidName("a".repeat(49) + "e\u0301"));
         assertFalse(Name.isValidName("a".repeat(50) + "e\u0301"));
+    }
+
+    @Test
+    public void isValidName_supplementaryLetters_countsEachLetterOnce() {
+        for (int length : new int[]{1, 25, 26, Name.MAX_LENGTH}) {
+            assertTrue(Name.isValidName(SUPPLEMENTARY_LETTER.repeat(length)));
+        }
+        assertFalse(Name.isValidName(SUPPLEMENTARY_LETTER.repeat(Name.MAX_LENGTH + 1)));
+    }
+
+    @Test
+    public void constructor_supplementaryLetters_preservesNameAndRejectsOverlongName() {
+        for (int length : new int[]{26, Name.MAX_LENGTH}) {
+            String name = SUPPLEMENTARY_LETTER.repeat(length);
+            assertEquals(name, new Name(name).fullName);
+        }
+        assertThrows(IllegalArgumentException.class, Name.MESSAGE_CONSTRAINTS, () ->
+                new Name(SUPPLEMENTARY_LETTER.repeat(Name.MAX_LENGTH + 1)));
+    }
+
+    @Test
+    public void isValidName_mixedUnicodeLetters_countsAfterComposition() {
+        String name = "a".repeat(Name.MAX_LENGTH - 2) + "e\u0301" + SUPPLEMENTARY_LETTER;
+
+        assertTrue(Name.isValidName(name));
+        assertFalse(Name.isValidName(name + "a"));
+        assertEquals("a".repeat(Name.MAX_LENGTH - 2) + "\u00e9" + SUPPLEMENTARY_LETTER, new Name(name).fullName);
+    }
+
+    @Test
+    public void isValidName_supplementarySymbol_remainsInvalid() {
+        String emoji = String.valueOf(Character.toChars(0x1F600));
+
+        assertFalse(Name.isValidName("John " + emoji));
+        assertThrows(IllegalArgumentException.class, () -> new Name("John " + emoji));
     }
 }
