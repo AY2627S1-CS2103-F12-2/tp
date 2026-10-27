@@ -82,6 +82,16 @@ public class JsonAdaptedInteractionTest {
     }
 
     @Test
+    public void toModelType_unicodeBoundaryWhitespace_returnsStrippedNote() throws Exception {
+        String maximumLengthNote = "A".repeat(JsonAdaptedInteraction.MAX_NOTE_LENGTH);
+        String noteWithUnicodeBoundaryWhitespace = "\u2003" + maximumLengthNote + "\u2003";
+        JsonAdaptedInteraction adaptedInteraction = new JsonAdaptedInteraction(
+                "2026-10-01", "14:30", noteWithUnicodeBoundaryWhitespace);
+
+        assertEquals(maximumLengthNote, adaptedInteraction.toModelType().getNote());
+    }
+
+    @Test
     public void toModelType_overlongNote_throwsIllegalValueException() {
         String overlongNote = "A".repeat(JsonAdaptedInteraction.MAX_NOTE_LENGTH + 1);
         JsonAdaptedInteraction adaptedInteraction = new JsonAdaptedInteraction(
