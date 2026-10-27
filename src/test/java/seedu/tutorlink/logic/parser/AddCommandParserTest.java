@@ -60,6 +60,18 @@ public class AddCommandParserTest {
     }
 
     @Test
+    public void parse_supplementaryNameLengthBoundaries_checksCodePoints() {
+        String letter = String.valueOf(Character.toChars(0x20000));
+        for (int length : new int[]{26, Name.MAX_LENGTH}) {
+            String name = letter.repeat(length);
+            Student expectedStudent = new StudentBuilder().withName(name).withSubjects().build();
+
+            assertParseSuccess(parser, " n/  " + name + "  ", new AddCommand(expectedStudent));
+        }
+        assertParseFailure(parser, " n/" + letter.repeat(Name.MAX_LENGTH + 1), Name.MESSAGE_CONSTRAINTS);
+    }
+
+    @Test
     public void parse_nameWithConnector_success() {
         Student expectedStudent = new StudentBuilder().withName("Raj s/o Kumar").withSubjects("Math").build();
         assertParseSuccess(parser, " n/Raj s/o Kumar s/Math", new AddCommand(expectedStudent));

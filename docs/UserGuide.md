@@ -96,6 +96,9 @@ Adds a student, with the subjects you teach them.
 Format: `student add n/NAME [s/SUBJECT]…`
 
 * `NAME` is 1 to 50 characters long and contains at least one letter. It may use letters (including accented letters such as `é`), spaces, hyphens, apostrophes and full stops, so names such as `Mary-Jane O'Brien` and `Tan Ah Kow Jr.` are accepted.
+  The limit counts Unicode code points after equivalent accented spellings are normalized.
+  A supplementary CJK letter such as `𠀀` counts as one character. An `e` followed by a combining acute
+  accent becomes `é` before counting and also counts as one character.
 * `NAME` may also contain `s/o` or `d/o` as a separate word, as in `Raj s/o Kumar`. TutorLink reads these as part of the name, not as the start of a subject.
 * Each student's name must be unique, ignoring case. If `John Tan` exists, adding `john tan` is rejected as a duplicate.
 * `SUBJECT` is 1 to 30 characters long and may use letters, digits, spaces, hyphens, `+` and `&`, for example `H2 Math` or `Biology + Chemistry`.
