@@ -25,19 +25,32 @@ TutorLink is for one tutor on one computer. It does not schedule lessons, track 
    A window similar to the one below appears in a few seconds. The first time you start TutorLink, it contains some sample students.<br>
    ![Ui](images/Ui.png)
 
-1. Type a command in the command box at the bottom and press Enter. Some commands to try:
+   The window has five main areas:
+
+   * The **student index** on the left shows all students in the current list.
+   * The **command result** at the top confirms the latest command or explains what needs correcting.
+   * The **student card** shows the selected student's name and subjects.
+   * The **interactions** and **outstanding follow-ups** panels show the selected student's lesson history and
+     work that still needs attention.
+   * The **command box** at the bottom is where you type commands.
+
+1. Try this short workflow. Type each command in the command box and press Enter:
 
    * `student add n/John Tan sub/Math sub/Physics` : Adds a student named John Tan who is taught Math and Physics.
 
-   * `student view n/John Tan` : Shows John Tan's details.
+   * `interaction add n/John Tan d/2026-10-01 note/Reviewed algebraic fractions` : Records what happened during a lesson.
 
-   * `list` : Shows all your students.
+   * `followup add n/John Tan desc/Check factorising homework review/2026-11-01` : Adds something to revisit with John.
 
-   * `student delete n/John Tan` : Deletes John Tan.
+   * `student view n/John Tan` : Selects John and shows his details, interaction history and outstanding follow-ups.
+
+   * `followup done n/John Tan i/1` : Marks the first outstanding follow-up as completed.
 
    * `exit` : Exits the app.
 
-1. See [Features](#features) below for the details of each command.
+   TutorLink saves each successful change automatically. There is no separate save command.
+
+1. See [Features](#features) below for every command and its accepted input.
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -153,6 +166,7 @@ Format: `find KEYWORD [MORE_KEYWORDS]`
 
 * The search ignores case. `john` matches `John`.
 * Only whole words match. `Jo` does not match `John`.
+* Parts of a name split by a hyphen, apostrophe or full stop count as words too. `connor` and `jones` both match `O'Connor-Jones`.
 * Students matching at least one word are shown. `find Tan Lim` shows both `John Tan` and `Aliyah Lim`.
 * The student list shows `Showing 2 of 46` while the results are filtered. Type `list` to show everyone again.
 

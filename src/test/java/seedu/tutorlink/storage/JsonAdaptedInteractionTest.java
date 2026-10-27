@@ -52,6 +52,15 @@ public class JsonAdaptedInteractionTest {
     }
 
     @Test
+    public void toModelType_endOfDayTime_throwsIllegalValueException() {
+        JsonAdaptedInteraction adaptedInteraction = new JsonAdaptedInteraction(
+                "2026-10-01", "24:00", "Discussed revision plan");
+
+        assertThrows(IllegalValueException.class, JsonAdaptedInteraction.INVALID_TIME_MESSAGE,
+                adaptedInteraction::toModelType);
+    }
+
+    @Test
     public void toModelType_missingNote_throwsIllegalValueException() {
         JsonAdaptedInteraction adaptedInteraction = new JsonAdaptedInteraction(
                 "2026-10-01", "14:30", null);
@@ -77,6 +86,16 @@ public class JsonAdaptedInteractionTest {
         String maximumLengthNote = "A".repeat(JsonAdaptedInteraction.MAX_NOTE_LENGTH);
         JsonAdaptedInteraction adaptedInteraction = new JsonAdaptedInteraction(
                 "2026-10-01", "14:30", maximumLengthNote);
+
+        assertEquals(maximumLengthNote, adaptedInteraction.toModelType().getNote());
+    }
+
+    @Test
+    public void toModelType_unicodeBoundaryWhitespace_returnsStrippedNote() throws Exception {
+        String maximumLengthNote = "A".repeat(JsonAdaptedInteraction.MAX_NOTE_LENGTH);
+        String noteWithUnicodeBoundaryWhitespace = "\u2003" + maximumLengthNote + "\u2003";
+        JsonAdaptedInteraction adaptedInteraction = new JsonAdaptedInteraction(
+                "2026-10-01", "14:30", noteWithUnicodeBoundaryWhitespace);
 
         assertEquals(maximumLengthNote, adaptedInteraction.toModelType().getNote());
     }

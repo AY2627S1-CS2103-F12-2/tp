@@ -2,7 +2,6 @@ package seedu.tutorlink.logic;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static seedu.tutorlink.testutil.TypicalStudents.AMY;
@@ -155,8 +154,8 @@ public class FollowUpPersistenceTest {
         assertEquals(List.of(originalStudent), displayedStudents);
         assertEquals(originalStudent.getOutstandingFollowUps(),
                 model.findStudentByName(AMY.getName()).orElseThrow().getOutstandingFollowUps());
-        // Rollback restores data through ModelManager.setTutorLink, which clears the selected student.
-        assertNull(selectedStudent.get());
+        // Rollback restores data while retaining the selected student's context.
+        assertEquals(originalStudent, selectedStudent.get());
         assertArrayEquals(originalFile, Files.readAllBytes(dataPath));
         assertEquals(originalData, new TutorLink(new JsonTutorLinkStorage(dataPath).readTutorLink().orElseThrow()));
         return storage;

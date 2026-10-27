@@ -166,6 +166,14 @@ public class ParserUtilTest {
     @Test
     public void parseInteractionTime_validTime_returnsLocalTime() throws Exception {
         assertEquals(LocalTime.of(14, 30), ParserUtil.parseInteractionTime(" 14:30 "));
+        assertEquals(LocalTime.MIDNIGHT, ParserUtil.parseInteractionTime("00:00"));
+        assertEquals(LocalTime.of(23, 59), ParserUtil.parseInteractionTime("23:59"));
+    }
+
+    @Test
+    public void parseInteractionTime_endOfDayTime_throwsParseException() {
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_TIME, () ->
+                ParserUtil.parseInteractionTime("24:00"));
     }
 
     @Test
@@ -175,12 +183,20 @@ public class ParserUtilTest {
     }
 
     @Test
-    public void parseInteractionNote_validBoundaryLengths_returnsTrimmedNote() throws Exception {
+    public void parseInteractionNote_validBoundaryLengths_returnsStrippedNote() throws Exception {
         String oneCharacterNote = "a";
         String maximumLengthNote = "a".repeat(ParserUtil.MAX_INTERACTION_NOTE_LENGTH);
 
         assertEquals(oneCharacterNote, ParserUtil.parseInteractionNote(oneCharacterNote));
         assertEquals(maximumLengthNote, ParserUtil.parseInteractionNote(maximumLengthNote));
+    }
+
+    @Test
+    public void parseInteractionNote_unicodeBoundaryWhitespace_returnsStrippedNote() throws Exception {
+        String maximumLengthNote = "A".repeat(ParserUtil.MAX_INTERACTION_NOTE_LENGTH);
+        String noteWithUnicodeBoundaryWhitespace = "\u2003" + maximumLengthNote + "\u2003";
+
+        assertEquals(maximumLengthNote, ParserUtil.parseInteractionNote(noteWithUnicodeBoundaryWhitespace));
     }
 
     @Test
@@ -212,6 +228,12 @@ public class ParserUtilTest {
     public void parseInteractionNote_multilineNote_throwsParseException() {
         assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE_MULTILINE, () ->
                 ParserUtil.parseInteractionNote("First line\nSecond line"));
+    }
+
+    @Test
+    public void parseInteractionNote_carriageReturnNote_throwsParseException() {
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_INTERACTION_NOTE_MULTILINE, () ->
+                ParserUtil.parseInteractionNote("First line\rSecond line"));
     }
 
     @Test
