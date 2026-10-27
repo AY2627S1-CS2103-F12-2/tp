@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 import static seedu.tutorlink.commons.util.AppUtil.checkArgument;
 
 import java.text.Normalizer;
-import java.util.Locale;
 
 /**
  * Represents a Student's name in TutorLink.
@@ -63,16 +62,18 @@ public class Name {
 
     /**
      * Returns true if both names refer to the same student.
-     * Names are compared ignoring case and differences in whitespace, as real-world names are not case-sensitive.
+     * Names are compared ignoring case and differences in whitespace.
+     * Case comparison follows {@link String#equalsIgnoreCase(String)}, as in name search.
      *
      * @param otherName The name to compare with.
      */
     public boolean isSameName(Name otherName) {
-        return otherName != null && normalize(fullName).equals(normalize(otherName.fullName));
+        return otherName != null
+                && normalizeWhitespace(fullName).equalsIgnoreCase(normalizeWhitespace(otherName.fullName));
     }
 
-    private static String normalize(String name) {
-        return name.trim().replaceAll("\\s+", " ").toLowerCase(Locale.ROOT);
+    private static String normalizeWhitespace(String name) {
+        return name.trim().replaceAll("\\s+", " ");
     }
 
 
