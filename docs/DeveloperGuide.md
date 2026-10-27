@@ -243,7 +243,7 @@ An `Interaction` is an immutable record of a dated lesson or other contact with 
 **Adding an interaction.** `AddInteractionCommandParser` tokenizes the arguments with
 `ArgumentTokenizer#tokenizeWithTrailingPrefix`. The `note/` prefix is treated as the final structured prefix, so
 everything after the first `note/` is kept as note text. This allows notes such as `note/Discussed n/next steps`
-without interpreting the `n/` inside the note as another name prefix. The parser requires exactly one `n/`, `d/`
+without interpreting the `n/` inside the note as another name prefix. The parser requires exactly one `n/`, `date/`
 and `note/`; `t/` is optional and may be empty. It validates the name, date, optional time and note before creating
 an `AddInteractionCommand`.
 

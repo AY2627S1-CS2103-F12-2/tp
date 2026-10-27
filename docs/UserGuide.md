@@ -38,7 +38,7 @@ TutorLink is for one tutor on one computer. It does not schedule lessons, track 
 
    * `student add n/John Tan sub/Math sub/Physics` : Adds a student named John Tan who is taught Math and Physics.
 
-   * `interaction add n/John Tan d/2026-10-01 note/Reviewed algebraic fractions` : Records what happened during a lesson.
+   * `interaction add n/John Tan date/2026-10-01 note/Reviewed algebraic fractions` : Records what happened during a lesson.
 
    * `followup add n/John Tan desc/Check factorising homework review/2026-11-01` : Adds something to revisit with John.
 
