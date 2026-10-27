@@ -62,6 +62,20 @@ public class UiManager implements Ui {
         return new Image(MainApp.class.getResourceAsStream(imagePath));
     }
 
+    /**
+     * Shows a startup error before the main window opens, then terminates the application.
+     *
+     * @param owner The application's primary stage.
+     * @param message The reason startup was blocked.
+     */
+    public static void showStartupErrorAndShutdown(Stage owner, String message) {
+        try {
+            showAlertDialogAndWait(owner, AlertType.ERROR, "TutorLink", "Unable to start TutorLink", message);
+        } finally {
+            Platform.exit();
+        }
+    }
+
     void showAlertDialogAndWait(Alert.AlertType type, String title, String headerText, String contentText) {
         showAlertDialogAndWait(mainWindow.getPrimaryStage(), type, title, headerText, contentText);
     }
