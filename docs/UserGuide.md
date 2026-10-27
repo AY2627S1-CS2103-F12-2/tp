@@ -96,9 +96,16 @@ Adds a student, with the subjects you teach them.
 Format: `student add n/NAME [sub/SUBJECT]…`
 
 * `NAME` is 1 to 50 characters long and contains at least one letter. It may use letters (including accented letters such as `é`), spaces, hyphens, apostrophes and full stops, so names such as `Mary-Jane O'Brien` and `Tan Ah Kow Jr.` are accepted.
+  The limit counts Unicode code points after equivalent accented spellings are normalized.
+  A supplementary CJK letter such as `𠀀` counts as one character. An `e` followed by a combining acute
+  accent becomes `é` before counting and also counts as one character.
 * `NAME` may also contain `s/o` or `d/o` as a separate word, in any case, as in `Raj s/o Kumar` or `Siti D/O Ahmad`.
 * Each student's name must be unique, ignoring case. If `John Tan` exists, adding `john tan` is rejected as a duplicate.
 * `SUBJECT` is 1 to 30 characters long and may use letters, digits, spaces, hyphens, `+` and `&`, for example `H2 Math` or `Biology + Chemistry`.
+* Subject names support accented letters and combining marks, such as `Français` and `தமிழ்`.
+  Equivalent accent spellings are treated as the same subject.
+* The subject length limit counts Unicode code points after equivalent accented spellings are normalized.
+  For example, `é` and `e` followed by a combining acute accent both count as one.
 * A student can have any number of subjects, including none. Giving the same subject twice, in any case, is rejected.
 * Subjects are shown in the order you type them.
 
@@ -345,7 +352,17 @@ Format: `followup add n/NAME desc/TEXT review/DATE`
 * `TEXT` is 1 to 200 characters long after leading and trailing whitespace is removed. It must not be blank and must be on a single line. If you paste text containing line breaks, each line break becomes a space.
   The limit counts Unicode code points: a simple emoji such as 😀 counts as one. A combined emoji or a letter with a combining accent can contain multiple code points and count as more than one.
 * `DATE` must be a real calendar date in `yyyy-MM-dd` format, such as `2026-10-15`. Past, present and future review dates are allowed.
-* Give each parameter exactly once. Missing parameters or repeated prefixes are rejected.
+* Parameters can be in any order; `desc/` does not need to be last.
+* Give each parameter exactly once. Missing parameters or repeated parameter prefixes are rejected.
+* `TEXT` can contain literal text such as `review/worksheet` when you also give a separate `review/DATE`
+  in `yyyy-MM-dd` format. Keep the literal text within the description, before any following parameter.
+  For example, `followup add n/John Tan desc/Discuss review/worksheet review/2026-11-01` records
+  `Discuss review/worksheet` as the description.
+* After a space within `TEXT`, a `review/` value is literal text only if it is non-empty and its first character
+  is not a digit. An empty or number-starting value is treated as a date parameter instead.
+  For example, `review/2026-11-01` cannot be included literally in the description; supplying it alongside
+  another review date is rejected as a repeated parameter.
+* `n/` and `desc/` after a space always start parameters, so they cannot be included literally in `TEXT`.
 * A follow-up belongs to the student. It does not need to be linked to an interaction.
 * An outstanding duplicate with the same description and review date for the same student is rejected. Descriptions are compared after trimming and are case-sensitive: `Review algebra` and `review algebra` are different descriptions. You may add the same description and review date again after the earlier follow-up is completed or cancelled.
 * A failed command leaves your stored data unchanged.
@@ -370,6 +387,8 @@ Invalid input examples:
 * A description longer than 200 characters is rejected with `Description must be 200 characters or fewer.`
 * `review/15-10-2026` is rejected because the required format is `yyyy-MM-dd`.
 * `review/2026-02-30` is rejected because February does not have 30 days.
+* `followup add n/John Tan desc/Discuss review/2026-10-01 review/2026-11-01` is rejected because it
+  contains two review-date parameters.
 * An unknown student is rejected with `No student named 'NAME' found.`
 
 ### Viewing outstanding follow-ups: `followup list`

@@ -44,12 +44,13 @@ public class Name {
     }
 
     /**
-     * Returns true if a given string is a valid name. The length limit applies to the NFC form.
+     * Returns true if a given string is a valid name.
+     * The length limit counts Unicode code points after NFC normalization.
      */
     public static boolean isValidName(String test) {
         String composedTest = toComposedForm(test);
         String testWithoutConnectors = composedTest.replaceAll(CONNECTOR_REGEX, "so");
-        return composedTest.length() <= MAX_LENGTH
+        return composedTest.codePointCount(0, composedTest.length()) <= MAX_LENGTH
                 && testWithoutConnectors.matches(VALIDATION_REGEX)
                 && composedTest.matches(LETTER_REGEX);
     }

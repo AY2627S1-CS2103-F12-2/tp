@@ -8,6 +8,7 @@ import static seedu.tutorlink.logic.commands.CommandTestUtil.SUBJECT_DESC_PHYSIC
 import static seedu.tutorlink.logic.commands.CommandTestUtil.VALID_NAME_AMY;
 import static seedu.tutorlink.logic.commands.CommandTestUtil.VALID_NAME_BOB;
 import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_NEW_NAME;
+import static seedu.tutorlink.logic.parser.CliSyntax.PREFIX_SUBJECT;
 import static seedu.tutorlink.logic.parser.CommandParserTestUtil.assertParseFailure;
 import static seedu.tutorlink.logic.parser.CommandParserTestUtil.assertParseSuccess;
 
@@ -40,6 +41,26 @@ public class EditStudentCommandParserTest {
         List<Subject> subjects = List.of(new Subject("Math"), new Subject("Physics"));
         assertParseSuccess(parser, NAME_DESC_AMY + SUBJECT_DESC_MATH + SUBJECT_DESC_PHYSICS,
                 new EditStudentCommand(new Name(VALID_NAME_AMY), Optional.empty(), Optional.of(subjects)));
+    }
+
+    @Test
+    public void parse_unicodeSubjects_success() {
+        String tamilSubject = "\u0ba4\u0bae\u0bbf\u0bb4\u0bcd";
+        List<Subject> subjects = List.of(new Subject(tamilSubject), new Subject("Fran\u00e7ais"));
+        String subjectArguments = " " + PREFIX_SUBJECT + tamilSubject
+                + " " + PREFIX_SUBJECT + " Franc\u0327ais ";
+
+        assertParseSuccess(parser, NAME_DESC_AMY + subjectArguments,
+                new EditStudentCommand(new Name(VALID_NAME_AMY), Optional.empty(), Optional.of(subjects)));
+    }
+
+    @Test
+    public void parse_canonicallyEquivalentSubjects_failure() {
+        String subjectArguments = " " + PREFIX_SUBJECT + "Franc\u0327ais"
+                + " " + PREFIX_SUBJECT + "FRAN\u00c7AIS";
+
+        assertParseFailure(parser, NAME_DESC_AMY + subjectArguments,
+                String.format(ParserUtil.MESSAGE_DUPLICATE_SUBJECT, "FRAN\u00c7AIS"));
     }
 
     @Test

@@ -131,6 +131,15 @@ public class JsonAdaptedStudentTest {
     }
 
     @Test
+    public void toModelType_canonicallyEquivalentSubjects_throwsIllegalValueException() {
+        JsonAdaptedStudent student = new JsonAdaptedStudent(VALID_NAME,
+                List.of("Fran\u00e7ais", " FRANC\u0327AIS "));
+        String expectedMessage = "Subject 'FRANC\u0327AIS' is specified twice for the same student.";
+
+        assertThrows(IllegalValueException.class, expectedMessage, student::toModelType);
+    }
+
+    @Test
     public void toModelType_distinctSubjectsWithSurroundingSpaces_trimsAndKeepsOrder() throws Exception {
         JsonAdaptedStudent student = new JsonAdaptedStudent(VALID_NAME, List.of(" Physics ", "Math", "Chemistry "));
 

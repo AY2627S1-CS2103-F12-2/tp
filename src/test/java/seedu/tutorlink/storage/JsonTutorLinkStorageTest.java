@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -23,14 +24,42 @@ import seedu.tutorlink.model.ReadOnlyTutorLink;
 import seedu.tutorlink.model.TutorLink;
 import seedu.tutorlink.model.followup.FollowUp;
 import seedu.tutorlink.model.followup.FollowUpStatus;
+import seedu.tutorlink.model.interaction.Interaction;
 import seedu.tutorlink.model.student.Name;
 import seedu.tutorlink.model.student.Student;
+import seedu.tutorlink.model.student.Subject;
 
 public class JsonTutorLinkStorageTest {
     private static final Path TEST_DATA_FOLDER = Paths.get("src", "test", "data", "JsonTutorLinkStorageTest");
 
     @TempDir
     public Path testFolder;
+
+    @Test
+    public void saveAndReload_supplementaryName_preservesStudentRecords() throws Exception {
+        Path path = testFolder.resolve("supplementaryName.json");
+        String name = String.valueOf(Character.toChars(0x20000)).repeat(Name.MAX_LENGTH);
+        Student student = new Student(new Name(name), ALICE.getSubjects(),
+                List.of(new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "Reviewed algebra")),
+                List.of(new FollowUp("Check homework", LocalDate.of(2026, 11, 1))));
+        TutorLink original = getTypicalTutorLink();
+        original.setStudent(ALICE, student);
+        JsonTutorLinkStorage storage = new JsonTutorLinkStorage(path);
+
+        storage.saveTutorLink(original);
+        ReadOnlyTutorLink restored = storage.readTutorLink().orElseThrow();
+
+        assertEquals(original, new TutorLink(restored));
+    }
+
+    @Test
+    public void read_overlongSupplementaryName_throwsDataLoadingException() throws Exception {
+        Path path = testFolder.resolve("overlongSupplementaryName.json");
+        String name = String.valueOf(Character.toChars(0x20000)).repeat(Name.MAX_LENGTH + 1);
+        Files.writeString(path, "{\"students\":[{\"name\":\"" + name + "\",\"subjects\":[]}]}");
+
+        assertThrows(DataLoadingException.class, () -> new JsonTutorLinkStorage(path).readTutorLink());
+    }
 
     @Test
     public void saveAndReload_followUpStatuses_preservesRecordsAndOrder() throws Exception {
@@ -162,6 +191,36 @@ public class JsonTutorLinkStorageTest {
     }
 
     @Test
+    public void readAndSave_unicodeSubjects_normalizesAndPreservesOrder() throws Exception {
+        Path path = testFolder.resolve("unicodeSubjects.json");
+        String tamilSubject = "\u0ba4\u0bae\u0bbf\u0bb4\u0bcd";
+        String decomposedSubject = "e\u0301".repeat(Subject.MAX_LENGTH);
+        String json = "{\"students\":[{\"name\":\"John Tan\",\"subjects\":[\"Franc\u0327ais\",\""
+                + tamilSubject + "\",\"" + decomposedSubject + "\"]}]}";
+        Files.writeString(path, json);
+
+        JsonTutorLinkStorage storage = new JsonTutorLinkStorage(path);
+        ReadOnlyTutorLink restored = storage.readTutorLink().orElseThrow();
+        assertEquals(List.of("Fran\u00e7ais", tamilSubject, "\u00e9".repeat(Subject.MAX_LENGTH)),
+                restored.getStudentList().getFirst().getSubjects().stream()
+                        .map(subject -> subject.subjectName).toList());
+
+        storage.saveTutorLink(restored);
+        assertEquals(new TutorLink(restored), new TutorLink(storage.readTutorLink().orElseThrow()));
+    }
+
+    @Test
+    public void read_invalidUnicodeSubjects_throwsDataLoadingException() throws Exception {
+        Path path = testFolder.resolve("invalidUnicodeSubject.json");
+        for (String subject : List.of("\u0327Math", "e\u0301".repeat(Subject.MAX_LENGTH + 1))) {
+            String json = "{\"students\":[{\"name\":\"John Tan\",\"subjects\":[\"" + subject + "\"]}]}";
+            Files.writeString(path, json);
+
+            assertThrows(DataLoadingException.class, () -> new JsonTutorLinkStorage(path).readTutorLink());
+        }
+    }
+
+    @Test
     public void read_overlongEmojiStoredInteraction_throwsDataLoadingException() throws Exception {
         Path path = testFolder.resolve("overlongEmojiInteraction.json");
         String emoji = String.valueOf(Character.toChars(0x1F600));
@@ -207,6 +266,17 @@ public class JsonTutorLinkStorageTest {
     @Test
     public void read_missingFile_emptyResult() throws Exception {
         assertFalse(readTutorLink("NonExistentFile.json").isPresent());
+    }
+
+    @Test
+    public void read_nullJsonRoot_throwsDataLoadingException() throws Exception {
+        Path path = testFolder.resolve("nullRoot.json");
+        for (String content : new String[]{"null", " \r\nnull\t\n"}) {
+            Files.writeString(path, content);
+
+            assertThrows(DataLoadingException.class, () -> new JsonTutorLinkStorage(path).readTutorLink());
+            assertEquals(content, Files.readString(path));
+        }
     }
 
     @Test
