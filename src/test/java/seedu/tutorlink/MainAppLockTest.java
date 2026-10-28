@@ -33,6 +33,11 @@ import seedu.tutorlink.storage.JsonTutorLinkStorage;
  */
 public class MainAppLockTest {
 
+    private static final String ALREADY_RUNNING_MESSAGE = "TutorLink is already using this data folder. "
+            + "Close the other TutorLink window and try again.";
+    private static final String FOLDER_UNAVAILABLE_MESSAGE = "TutorLink could not open its data folder safely. "
+            + "Check that the folder is writable and try again.";
+
     @TempDir
     public Path temporaryFolder;
 
@@ -49,6 +54,7 @@ public class MainAppLockTest {
             byte[] savedPrefs = Files.readAllBytes(prefsFile);
 
             try (AppProcess second = new AppProcess(folder, "probe")) {
+                second.expect("ERROR: " + ALREADY_RUNNING_MESSAGE);
                 second.expect("BLOCKED");
                 second.awaitNormalExit();
             }
@@ -128,6 +134,7 @@ public class MainAppLockTest {
             assertTrue(DataFileLock.tryAcquire(dataFile).isEmpty());
             assertTrue(DataFileLock.tryAcquire(dataFile).isEmpty());
             try (AppProcess second = new AppProcess(folder, "probe")) {
+                second.expect("ERROR: " + ALREADY_RUNNING_MESSAGE);
                 second.expect("BLOCKED");
                 second.awaitNormalExit();
             }
@@ -145,6 +152,7 @@ public class MainAppLockTest {
         byte[] originalPrefs = Files.readAllBytes(prefsFile);
 
         try (AppProcess application = new AppProcess(folder, "probe")) {
+            application.expect("ERROR: " + FOLDER_UNAVAILABLE_MESSAGE);
             application.expect("BLOCKED");
             application.awaitNormalExit();
         }

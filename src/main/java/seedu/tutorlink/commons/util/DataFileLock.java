@@ -2,6 +2,7 @@ package seedu.tutorlink.commons.util;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
@@ -17,7 +18,7 @@ import java.util.Optional;
  * Holds an exclusive operating-system lock on a data file's companion {@code .lock} file.
  * The companion file remains after closing; its existence does not indicate ownership.
  */
-public final class DataFileLock implements AutoCloseable {
+public final class DataFileLock implements Closeable {
 
     // Reusing one channel per path avoids releasing another local owner's lock when a channel closes.
     private static final Map<Path, DataFileLock> ACTIVE_LOCKS = new HashMap<>();

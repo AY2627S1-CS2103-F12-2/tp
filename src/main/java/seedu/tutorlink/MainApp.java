@@ -1,11 +1,13 @@
 package seedu.tutorlink;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.logging.Logger;
 
 import javafx.application.Application;
@@ -53,12 +55,18 @@ public class MainApp extends Application {
     private static final Path TUTOR_LINK_FILE_PATH = Paths.get("data", "tutorlink.json");
 
     protected Ui ui;
+
+    /**
+     * Presents errors that prevent the main window from opening.
+     */
+    protected BiConsumer<Stage, String> startupErrorHandler = UiManager::showStartupErrorAndShutdown;
+
     protected Logic logic;
     protected Storage storage;
     protected Model model;
     private Optional<String> startupWarning = Optional.empty();
     private Optional<String> startupError = Optional.empty();
-    private DataFileLock dataFileLock;
+    private Closeable dataFileLock;
 
     @Override
     public void init() throws Exception {
@@ -202,7 +210,7 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) {
         logger.info("Starting TutorLink " + MainApp.VERSION);
         if (startupError.isPresent()) {
-            UiManager.showStartupErrorAndShutdown(primaryStage, startupError.get());
+            startupErrorHandler.accept(primaryStage, startupError.get());
             return;
         }
         try {

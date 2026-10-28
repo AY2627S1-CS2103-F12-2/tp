@@ -6,8 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.tutorlink.testutil.Assert.assertThrows;
 
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -60,6 +63,21 @@ public class DataFileLockTest {
         }
 
         try (DataFileLock nextOwner = DataFileLock.tryAcquire(dataFile).orElseThrow()) {
+            assertTrue(DataFileLock.tryAcquire(dataFile).isEmpty());
+        }
+    }
+
+    @Test
+    public void tryAcquire_lockHeldOutsideRegistry_returnsEmpty() throws Exception {
+        Path dataFile = temporaryFolder.resolve("tutorlink.json");
+        Path lockFile = dataFile.resolveSibling("tutorlink.json.lock");
+        try (FileChannel channel = FileChannel.open(lockFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+                FileLock externalOwner = channel.lock()) {
+            assertTrue(DataFileLock.tryAcquire(dataFile).isEmpty());
+            assertFalse(Files.exists(dataFile));
+        }
+
+        try (DataFileLock owner = DataFileLock.tryAcquire(dataFile).orElseThrow()) {
             assertTrue(DataFileLock.tryAcquire(dataFile).isEmpty());
         }
     }

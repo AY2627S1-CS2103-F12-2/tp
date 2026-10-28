@@ -3,12 +3,14 @@ package seedu.tutorlink;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import seedu.tutorlink.model.UserPrefs;
 import seedu.tutorlink.storage.JsonUserPrefsStorage;
 
 /**
- * Runs application initialization in a separate JVM without starting the JavaFX toolkit.
+ * Runs initialization and startup control flow without starting the JavaFX toolkit.
  * Receives commands on standard input so lock tests can control the process lifetime.
  */
 public class MainAppLockProcess {
@@ -43,7 +45,7 @@ public class MainAppLockProcess {
                 report("FAILED");
             } else {
                 application.init();
-                report(application.model == null ? "BLOCKED" : "READY");
+                startWithoutWindows(application);
             }
             if (!mode.equals("probe")) {
                 receiveCommands(application);
@@ -63,6 +65,28 @@ public class MainAppLockProcess {
             };
         }
         return new MainApp();
+    }
+
+    private static void startWithoutWindows(MainApp application) {
+        List<String> errors = new ArrayList<>();
+        boolean[] mainWindowStarted = {false};
+        application.startupErrorHandler = (stage, message) -> errors.add(message);
+        application.ui = stage -> mainWindowStarted[0] = true;
+
+        application.start(null);
+
+        if (application.model == null) {
+            if (mainWindowStarted[0] || errors.size() != 1) {
+                throw new AssertionError("Blocked startup must show one error and skip the main window");
+            }
+            report("ERROR: " + errors.getFirst());
+            report("BLOCKED");
+        } else {
+            if (!mainWindowStarted[0] || !errors.isEmpty()) {
+                throw new AssertionError("Successful startup must open the main window without errors");
+            }
+            report("READY");
+        }
     }
 
     private static void receiveCommands(MainApp application) throws Exception {
