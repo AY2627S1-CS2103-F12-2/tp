@@ -22,6 +22,9 @@ TutorLink is for one tutor on one computer. It does not schedule lessons, track 
 1. Copy the file to the folder you want TutorLink to keep its data in. This is TutorLink's _home folder_. Choose a folder you can write to, not a write-protected folder such as a system folder, because TutorLink saves its data there.
 
 1. Open a terminal, `cd` to that folder, and run `java -jar tutorlink.jar`. Double-clicking the JAR file may not work on some computers, so use this command.<br>
+   Open one TutorLink window per home folder. If the folder is already in use, a second launch shows
+   `TutorLink is already using this data folder. Close the other TutorLink window and try again.`
+   Close that dialog and continue in the existing window, or close the existing window before launching again.<br>
    A window similar to the one below appears in a few seconds. The first time you start TutorLink, it contains some sample students.<br>
    ![Ui](images/Ui.png)
 
@@ -517,6 +520,13 @@ Format: `exit`
 
 TutorLink saves your data to your computer after every command that changes it. You do not need to save manually.
 
+Only one running copy of TutorLink can use a home folder at a time. Copies started from different home folders
+keep separate data.
+
+TutorLink creates `data/tutorlink.json.lock` to coordinate access to the data file. This file stores no student data
+and can remain after a normal exit or a crash. Once the previous TutorLink process has stopped, the file does not
+prevent the next launch. Leave it in place; do not delete or rename it while TutorLink is running.
+
 ### Editing the data file
 
 TutorLink keeps its data in the JSON file `data/tutorlink.json` inside its home folder (the folder containing `tutorlink.jar`). Advanced users can edit this file directly.
@@ -546,7 +556,11 @@ Some edits can also make TutorLink behave unexpectedly, for example a value outs
 
 1. **When using multiple screens**, if you move TutorLink to a secondary screen and later switch to using only the primary screen, the window opens off-screen. To fix this, delete the `preferences.json` file in the home folder before running TutorLink again.
 2. **If you minimize the help window** and then run `help` again (or use the `Help` menu, or press `F1`), the minimized help window stays minimized and no new one appears. Restore the minimized window manually.
-3. **If TutorLink is in a write-protected folder**, it cannot save your data and each command that changes data shows `Could not save data to file ... due to insufficient permissions to write to the file or the folder.` Move `tutorlink.jar` to a folder you can write to, such as one in your home directory, and start it again.
+3. **If TutorLink is in a write-protected folder**, it cannot start when its data lock cannot be created or opened.
+   It shows `TutorLink could not open its data folder safely. Check that the folder is writable and try again.`
+   If the app opens but lacks permission to save student data, commands that change data report insufficient
+   permissions. Close TutorLink and move `tutorlink.jar` and any existing `data` folder to a writable home folder,
+   then start it again.
 4. **On macOS, if TutorLink is in full-screen mode**, the help window also opens in full-screen mode, in its own space. Closing it takes you to the desktop instead of back to TutorLink, which is still open in its own full-screen space. Switch back to TutorLink with `Cmd+Tab` or by swiping between spaces, or exit full-screen mode before using `help`.
 
 --------------------------------------------------------------------------------------------------------------------

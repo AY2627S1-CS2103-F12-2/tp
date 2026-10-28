@@ -1,17 +1,20 @@
 package seedu.tutorlink;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.logging.Logger;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
 import seedu.tutorlink.commons.core.LogsCenter;
 import seedu.tutorlink.commons.exceptions.DataLoadingException;
+import seedu.tutorlink.commons.util.DataFileLock;
 import seedu.tutorlink.commons.util.StringUtil;
 import seedu.tutorlink.logic.Logic;
 import seedu.tutorlink.logic.LogicManager;
@@ -42,32 +45,87 @@ public class MainApp extends Application {
     static final String MESSAGE_UNREADABLE_DATA_NOT_BACKED_UP = "\u26a0 The data file %1$s could not be read, so "
             + "TutorLink started with no students.\nA backup copy could not be saved. "
             + "Your next change will overwrite %1$s, so copy it elsewhere first if you want to keep it.";
+    private static final String MESSAGE_DATA_ALREADY_OPEN = "TutorLink is already using this data folder. "
+            + "Close the other TutorLink window and try again.";
+    private static final String MESSAGE_DATA_FOLDER_UNAVAILABLE = "TutorLink could not open its data folder safely. "
+            + "Check that the folder is writable and try again.";
 
     private static final Logger logger = LogsCenter.getLogger(MainApp.class);
     private static final Path USER_PREFS_FILE_PATH = Paths.get("preferences.json");
     private static final Path TUTOR_LINK_FILE_PATH = Paths.get("data", "tutorlink.json");
 
     protected Ui ui;
+
+    /**
+     * Presents errors that prevent the main window from opening.
+     */
+    protected BiConsumer<Stage, String> startupErrorHandler = UiManager::showStartupErrorAndShutdown;
+
     protected Logic logic;
     protected Storage storage;
     protected Model model;
     private Optional<String> startupWarning = Optional.empty();
+    private Optional<String> startupError = Optional.empty();
+    private Closeable dataFileLock;
 
     @Override
     public void init() throws Exception {
         logger.info("=============================[ Initializing TutorLink ]===========================");
         super.init();
 
-        JsonUserPrefsStorage userPrefsStorage = new JsonUserPrefsStorage(USER_PREFS_FILE_PATH);
-        UserPrefs userPrefs = initPrefs(userPrefsStorage);
-        JsonTutorLinkStorage tutorLinkStorage = new JsonTutorLinkStorage(TUTOR_LINK_FILE_PATH);
-        storage = new StorageManager(tutorLinkStorage, userPrefsStorage);
+        if (!acquireDataFileLock(TUTOR_LINK_FILE_PATH)) {
+            return;
+        }
+        try {
+            JsonUserPrefsStorage userPrefsStorage = new JsonUserPrefsStorage(USER_PREFS_FILE_PATH);
+            UserPrefs userPrefs = initPrefs(userPrefsStorage);
+            JsonTutorLinkStorage tutorLinkStorage = new JsonTutorLinkStorage(TUTOR_LINK_FILE_PATH);
+            storage = new StorageManager(tutorLinkStorage, userPrefsStorage);
 
-        model = initModelManager(storage, userPrefs);
+            model = initModelManager(storage, userPrefs);
 
-        logic = new LogicManager(model, storage);
+            logic = new LogicManager(model, storage);
 
-        ui = new UiManager(logic, storage.getTutorLinkFilePath(), startupWarning);
+            ui = new UiManager(logic, storage.getTutorLinkFilePath(), startupWarning);
+        } catch (RuntimeException | Error e) {
+            releaseDataFileLock();
+            throw e;
+        }
+    }
+
+    /**
+     * Acquires ownership before startup can read or modify persistent data.
+     */
+    private boolean acquireDataFileLock(Path dataFile) {
+        try {
+            dataFileLock = DataFileLock.tryAcquire(dataFile).orElse(null);
+            if (dataFileLock == null) {
+                startupError = Optional.of(MESSAGE_DATA_ALREADY_OPEN);
+                logger.warning(MESSAGE_DATA_ALREADY_OPEN);
+                return false;
+            }
+            return true;
+        } catch (IOException e) {
+            startupError = Optional.of(MESSAGE_DATA_FOLDER_UNAVAILABLE);
+            logger.severe("Failed to acquire data file lock: " + StringUtil.getDetails(e));
+            return false;
+        }
+    }
+
+    /**
+     * Releases any acquired lock after shutdown or incomplete startup.
+     */
+    private void releaseDataFileLock() {
+        if (dataFileLock == null) {
+            return;
+        }
+        try {
+            dataFileLock.close();
+        } catch (IOException e) {
+            logger.severe("Failed to release data file lock: " + StringUtil.getDetails(e));
+        } finally {
+            dataFileLock = null;
+        }
     }
 
     /**
@@ -151,16 +209,29 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         logger.info("Starting TutorLink " + MainApp.VERSION);
-        ui.start(primaryStage);
+        if (startupError.isPresent()) {
+            startupErrorHandler.accept(primaryStage, startupError.get());
+            return;
+        }
+        try {
+            ui.start(primaryStage);
+        } catch (RuntimeException | Error e) {
+            releaseDataFileLock();
+            throw e;
+        }
     }
 
     @Override
     public void stop() {
         logger.info("============================ [ Stopping TutorLink ] =============================");
         try {
-            storage.saveUserPrefs(model.getUserPrefs());
+            if (dataFileLock != null && storage != null && model != null) {
+                storage.saveUserPrefs(model.getUserPrefs());
+            }
         } catch (IOException e) {
             logger.severe("Failed to save preferences " + StringUtil.getDetails(e));
+        } finally {
+            releaseDataFileLock();
         }
     }
 }

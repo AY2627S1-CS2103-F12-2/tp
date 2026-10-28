@@ -62,19 +62,36 @@ public class UiManager implements Ui {
         return new Image(MainApp.class.getResourceAsStream(imagePath));
     }
 
+    /**
+     * Shows a startup error before the main window opens, then terminates the application.
+     *
+     * @param owner The application's primary stage.
+     * @param message The reason startup was blocked.
+     */
+    public static void showStartupErrorAndShutdown(Stage owner, String message) {
+        try {
+            showAlertDialogAndWait(owner, AlertType.ERROR, "TutorLink", "Unable to start TutorLink", message);
+        } finally {
+            Platform.exit();
+        }
+    }
+
     void showAlertDialogAndWait(Alert.AlertType type, String title, String headerText, String contentText) {
         showAlertDialogAndWait(mainWindow.getPrimaryStage(), type, title, headerText, contentText);
     }
 
     /**
-     * Shows an alert dialog on {@code owner} with the given parameters.
+     * Shows an alert dialog with the given parameters, using {@code owner} when its scene is ready.
+     * Startup alerts have no owner when the primary stage does not yet have a scene.
      * This method only returns after the user has closed the alert dialog.
      */
     private static void showAlertDialogAndWait(Stage owner, AlertType type, String title, String headerText,
                                                String contentText) {
         final Alert alert = new Alert(type);
         alert.getDialogPane().getStylesheets().add("view/TutorLinkTheme.css");
-        alert.initOwner(owner);
+        if (owner != null && owner.getScene() != null) {
+            alert.initOwner(owner);
+        }
         alert.setTitle(title);
         alert.setHeaderText(headerText);
         alert.setContentText(contentText);

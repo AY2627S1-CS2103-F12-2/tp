@@ -30,6 +30,9 @@ checkstyle {
 
 test {
     useJUnitPlatform()
+    doFirst {
+        systemProperty 'tutorlink.test.runtimeClasspath', classpath.asPath
+    }
     finalizedBy jacocoTestReport
 }
 
