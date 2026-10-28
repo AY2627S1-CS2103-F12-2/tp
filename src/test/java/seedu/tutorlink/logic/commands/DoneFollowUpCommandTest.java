@@ -107,6 +107,7 @@ public class DoneFollowUpCommandTest {
         assertTrue(command.equals(new DoneFollowUpCommand(BENSON.getName(), Index.fromOneBased(1))));
         assertFalse(command.equals(null));
         assertFalse(command.equals("followup done"));
+        assertFalse(command.equals(new CancelFollowUpCommand(BENSON.getName(), Index.fromOneBased(1))));
         assertFalse(command.equals(new DoneFollowUpCommand(new Name("Other Student"), Index.fromOneBased(1))));
         assertFalse(command.equals(new DoneFollowUpCommand(BENSON.getName(), Index.fromOneBased(2))));
         assertEquals(DoneFollowUpCommand.class.getCanonicalName() + "{name=" + BENSON.getName() + ", index="
