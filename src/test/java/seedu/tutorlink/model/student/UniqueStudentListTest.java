@@ -55,6 +55,16 @@ public class UniqueStudentListTest {
     }
 
     @Test
+    public void add_unicodeCaseVariant_throwsDuplicateStudentException() {
+        Student student = new StudentBuilder().withName("I\u015f\u0131k").build();
+        Student caseVariant = new StudentBuilder().withName("\u0131\u015f\u0131k").build();
+        uniqueStudentList.add(student);
+
+        assertThrows(DuplicateStudentException.class, () -> uniqueStudentList.add(caseVariant));
+        assertEquals(List.of(student), uniqueStudentList.asUnmodifiableObservableList());
+    }
+
+    @Test
     public void setStudent_nullTargetStudent_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> uniqueStudentList.setStudent(null, ALICE));
     }

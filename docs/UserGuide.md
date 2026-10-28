@@ -79,6 +79,9 @@ TutorLink is for one tutor on one computer. It does not schedule lessons, track 
   For example, `help 123` is read as `help`.
 
 * Every command that takes `n/NAME` finds the student by name, ignoring upper and lower case. `n/john tan` finds the student added as `John Tan`.
+  The same Unicode case matching is used for `find`, student lookup and duplicate checks.
+  For example, `Işık` and `ışık` match the same student. Accents remain significant:
+  `José` and `Jose` are different names.
 
 * If you are using a PDF version of this document, take care when copying commands that span several lines, because the spaces around line breaks may be lost.
 </div>
@@ -517,6 +520,10 @@ TutorLink saves your data to your computer after every command that changes it. 
 ### Editing the data file
 
 TutorLink keeps its data in the JSON file `data/tutorlink.json` inside its home folder (the folder containing `tutorlink.jar`). Advanced users can edit this file directly.
+
+Student names in the file must be unique under the same rules for ignoring case as commands.
+An older file containing both `Işık` and `ışık` is invalid, so the recovery steps below apply.
+To preserve both records, give one student a distinct name in a copy of the file before restoring it.
 
 <div markdown="span" class="alert alert-warning">:exclamation: **Caution:**
 If your changes make the data file invalid, TutorLink starts with no students the next time it runs and shows a warning. It saves a copy of the invalid file as `data/tutorlink.json.bak` (replacing any earlier copy), because your next command that changes data overwrites `data/tutorlink.json`. To recover, close TutorLink, fix the copy and rename it back to `tutorlink.json`. Back up the file before editing it.<br>

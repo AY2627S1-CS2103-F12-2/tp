@@ -91,6 +91,17 @@ public class ModelManagerTest {
     }
 
     @Test
+    public void findStudentByName_unicodeCaseVariantFoundByFilter_returnsSameStudent() {
+        Student student = new StudentBuilder().withName("I\u015f\u0131k").build();
+        modelManager.addStudent(student);
+        Name query = new Name("\u0131\u015f\u0131k");
+        modelManager.updateFilteredStudentList(new NameContainsKeywordsPredicate(List.of(query.fullName)));
+
+        assertEquals(List.of(student), modelManager.getFilteredStudentList());
+        assertEquals(Optional.of(student), modelManager.findStudentByName(query));
+    }
+
+    @Test
     public void getFilteredStudentList_modifyList_throwsUnsupportedOperationException() {
         assertThrows(UnsupportedOperationException.class, () -> modelManager.getFilteredStudentList().remove(0));
     }

@@ -96,6 +96,49 @@ public class NameTest {
     }
 
     @Test
+    public void isSameName_unicodeCaseVariants_returnsTrue() {
+        String[][] caseVariants = {
+            {"I\u015f\u0131k", "\u0131\u015f\u0131k"}, // Turkish dotless I
+            {"\u0130pek", "ipek"}, // Turkish dotted I
+            {"\u03a3", "\u03c2"}, // Greek capital and final sigma
+            {"\uD801\uDC00", "\uD801\uDC28"} // Deseret capital and small letters
+        };
+        for (String[] caseVariant : caseVariants) {
+            Name upperCaseName = new Name(caseVariant[0]);
+            Name lowerCaseName = new Name(caseVariant[1]);
+
+            assertTrue(upperCaseName.isSameName(lowerCaseName));
+            assertTrue(lowerCaseName.isSameName(upperCaseName));
+        }
+    }
+
+    @Test
+    public void isSameName_unicodeCaseWithSpacingAndAccentNormalization_returnsTrue() {
+        Name name = new Name("I\u015f\u0131k Jos\u00e9");
+        Name differentlyTypedName = new Name("\u0131\u015f\u0131k   Jose\u0301 ");
+
+        assertTrue(name.isSameName(differentlyTypedName));
+    }
+
+    @Test
+    public void isSameName_distinctUnicodeLetters_returnsFalse() {
+        assertFalse(new Name("Jos\u00e9").isSameName(new Name("Jose")));
+        assertFalse(new Name("I\u015f\u0131k").isSameName(new Name("Isik")));
+        assertFalse(new Name("Stra\u00dfe").isSameName(new Name("Strasse")));
+    }
+
+    @Test
+    public void equals_unicodeCaseVariants_returnsFalse() {
+        Name name = new Name("I\u015f\u0131k");
+        Name caseVariant = new Name("\u0131\u015f\u0131k");
+
+        assertTrue(name.isSameName(caseVariant));
+        assertFalse(name.equals(caseVariant));
+        assertEquals("I\u015f\u0131k", name.fullName);
+        assertEquals("\u0131\u015f\u0131k", caseVariant.fullName);
+    }
+
+    @Test
     public void constructor_decomposedAccent_storesComposedForm() {
         String composed = "Jos\u00e9";
         String decomposed = "Jose\u0301";
