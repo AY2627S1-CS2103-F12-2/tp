@@ -1016,6 +1016,172 @@ testers are expected to do more *exploratory* testing.
       Expected: No interaction is deleted. The error explains the invalid or repeated parameter, gives the valid
       range, or says no such student is found.
 
+### Adding a follow-up
+
+Run the follow-up sections below in order in a disposable test folder. Start with no students named `Followup Test`, `Followup Empty` or `Nobody Here`. Enter each command in TutorLink's command box.
+
+1. Recording follow-ups for an existing student
+
+   1. Prerequisites: Run `student add n/Followup Test`, `student add n/Followup Empty`, then `student view n/Followup Test`. Both students have no follow-ups.
+
+   1. Test case: `followup add n/Followup Test desc/Check calculus review/2026-11-03`<br>
+      Expected: The result shows `✔ Follow-up added for Followup Test — review on 2026-11-03: "Check calculus"` and `Total outstanding follow-ups for Followup Test: 1`. The outstanding follow-ups panel shows the new record.
+
+   1. Test case: `followup add n/Followup Test desc/Review algebra review/2026-11-01`<br>
+      Expected: The follow-up is added and the outstanding count becomes 2. The panel places `Review algebra` before `Check calculus`, because its review date is earlier.
+
+   1. Test case: `followup add review/2026-11-01 desc/Discuss graphs n/followup test`<br>
+      Expected: The follow-up is added to `Followup Test` and the outstanding count becomes 3. Parameters in a different order and a name with different casing are accepted. The panel places `Discuss graphs` after `Review algebra`, because they share a review date and algebra was added first.
+
+1. Rejecting duplicate or invalid follow-ups
+
+   1. Prerequisites: Complete the valid additions above. Each rejected command below must leave both students' follow-ups unchanged, with 3 outstanding follow-ups for `Followup Test` and none for `Followup Empty`.
+
+   1. Test case: `followup add n/Followup Test desc/Review algebra review/2026-11-01`<br>
+      Expected: No follow-up is added. The error says `A follow-up with the same description and review date already exists for this student.`
+
+   1. Test case: `followup add n/Nobody Here desc/Check homework review/2026-11-01`<br>
+      Expected: No student or follow-up is created. The error says `No student named 'Nobody Here' found.`
+
+   1. Test case: `followup add n/Followup Test desc/ review/2026-11-01`<br>
+      Expected: The error says `Description cannot be empty.`
+
+   1. Test case: `followup add n/Followup Test desc/Check homework review/01-11-2026`<br>
+      Expected: The error says `Date must be in format yyyy-MM-dd (e.g. 2026-09-14).`
+
+   1. Test case: `followup add n/Followup Test desc/Check homework review/2026-02-30`<br>
+      Expected: The error says `'2026-02-30' is not a valid calendar date.`
+
+   1. Other incorrect commands to try: `followup add`, `followup add n/Followup Test desc/Missing date`<br>
+      Expected: The error shows the correct `followup add n/NAME desc/TEXT review/DATE` command format.
+
+   1. Test case: `followup add n/Followup Test desc/Check homework review/2026-11-01 review/2026-11-02`<br>
+      Expected: The error reports multiple values for `review/`. Neither date is silently treated as description text.
+
+### Viewing a student's outstanding follow-ups
+
+1. Listing follow-ups in review-date order
+
+   1. Prerequisites: Complete the additions above, then run `student view n/Followup Empty`.
+
+   1. Test case: `followup list n/followup   TEST`<br>
+      Expected: The result lists the 3 outstanding follow-ups as shown below. The earlier review date comes first, and records with the same review date keep the order they were added. `Followup Empty` remains selected in the panels, and no stored data changes.
+
+      ```text
+      ✔ Outstanding follow-ups for Followup Test (3):
+      1. 2026-11-01 — Review algebra
+      2. 2026-11-01 — Discuss graphs
+      3. 2026-11-03 — Check calculus
+      ```
+
+1. Listing an empty or unknown record
+
+   1. Test case: `followup list n/Followup Empty`<br>
+      Expected: The result says `ℹ No outstanding follow-ups for Followup Empty.` No stored data changes.
+
+   1. Test case: `followup list n/Nobody Here`<br>
+      Expected: The error says `No student named 'Nobody Here' found.` The selected student and stored data do not change.
+
+   1. Test case: `followup list`<br>
+      Expected: The error shows the correct `followup list n/NAME` command format. The selected student and stored data do not change.
+
+   1. Test case: `followup list n/Followup Test n/Followup Empty`<br>
+      Expected: The error reports multiple values for `n/`. The selected student and stored data do not change.
+
+### Completing a follow-up
+
+1. Completing by the displayed outstanding index
+
+   1. Prerequisites: Complete the follow-up addition and listing sections above. Run `student view n/Followup Test`, then `followup list n/Followup Test`. Algebra, graphs and calculus are displayed as items 1, 2 and 3 respectively.
+
+   1. Test case: `followup done n/followup test i/1`<br>
+      Expected: The result shows `✔ Follow-up completed for Followup Test — review on 2026-11-01: "Review algebra"` and `Total outstanding follow-ups for Followup Test: 2`. Algebra disappears from the outstanding follow-ups panel, while graphs and calculus remain.
+
+   1. Test case: `followup list n/Followup Test`<br>
+      Expected: `Discuss graphs` is now item 1 and `Check calculus` is item 2. The completed algebra record is excluded from this list; it remains saved with status `DONE`.
+
+1. Rejecting invalid completions
+
+   1. Prerequisites: Complete algebra as above. Each rejected command below must leave the 2 outstanding follow-ups and the selected student unchanged.
+
+   1. Test case: `followup done n/Followup Test i/3`<br>
+      Expected: The error says `Index 3 is out of range: Followup Test's outstanding follow-ups are numbered 1 to 2.` The index is checked against the outstanding list, not the 3 stored records.
+
+   1. Test case: `followup done n/Followup Empty i/1`<br>
+      Expected: The error says `Followup Empty has no outstanding follow-ups.`
+
+   1. Test case: `followup done n/Nobody Here i/1`<br>
+      Expected: The error says `No student named 'Nobody Here' found.`
+
+   1. Other incorrect commands to try: `followup done n/Followup Test i/`, `followup done n/Followup Test i/0`, `followup done n/Followup Test i/-1`, `followup done n/Followup Test i/1.5`, `followup done n/Followup Test i/2147483648`<br>
+      Expected: The error says `Index must be a positive integer.`
+
+   1. Other incorrect commands to try: `followup done`, `followup done n/Followup Test`, `followup done i/1`<br>
+      Expected: The error shows the correct `followup done n/NAME i/INDEX` command format.
+
+   1. Test case: `followup done n/Followup Test i/1 i/2`<br>
+      Expected: The error reports multiple values for `i/`.
+
+### Cancelling a follow-up
+
+1. Cancelling by the renumbered outstanding index
+
+   1. Prerequisites: Complete the completion section above, then run `followup list n/Followup Test`. Graphs is item 1 and calculus is item 2; `Followup Test` is still selected.
+
+   1. Test case: `followup cancel i/1 n/Followup Test`<br>
+      Expected: The result shows `✔ Follow-up cancelled for Followup Test — review on 2026-11-01: "Discuss graphs"` and `Total outstanding follow-ups for Followup Test: 1`. Graphs disappears from the outstanding follow-ups panel. Putting `i/` before `n/` is accepted.
+
+   1. Test case: `followup list n/Followup Test`<br>
+      Expected: Only `Check calculus` remains, renumbered as item 1 with review date `2026-11-03`. The cancelled graphs record remains saved with status `CANCELLED`, and algebra remains `DONE`.
+
+1. Rejecting invalid cancellations
+
+   1. Prerequisites: Cancel graphs as above. Each rejected command below must leave calculus as the only outstanding follow-up and keep `Followup Test` selected.
+
+   1. Test case: `followup cancel n/Followup Test i/2`<br>
+      Expected: The error says `Index 2 is out of range: Followup Test's outstanding follow-ups are numbered 1 to 1.`
+
+   1. Test case: `followup cancel n/Followup Empty i/1`<br>
+      Expected: The error says `Followup Empty has no outstanding follow-ups.`
+
+   1. Test case: `followup cancel n/Nobody Here i/1`<br>
+      Expected: The error says `No student named 'Nobody Here' found.`
+
+   1. Other incorrect commands to try: `followup cancel n/Followup Test i/0`, `followup cancel n/Followup Test i/abc`<br>
+      Expected: The error says `Index must be a positive integer.`
+
+   1. Other incorrect commands to try: `followup cancel`, `followup cancel n/Followup Test`<br>
+      Expected: The error shows the correct `followup cancel n/NAME i/INDEX` command format.
+
+   1. Test case: `followup cancel n/Followup Test n/Followup Empty i/1`<br>
+      Expected: The error reports multiple values for `n/`.
+
+### Keeping follow-up history after a restart
+
+1. Retaining outstanding, completed and cancelled records
+
+   1. Prerequisites: Complete the follow-up sections above. Calculus is outstanding, algebra is completed, and graphs is cancelled.
+
+   1. Test case: Run `exit` in TutorLink. After the app closes, open `data/tutorlink.json` in a text editor without changing it.<br>
+      Expected: The `Followup Test` student's `followUps` array still contains all 3 records in their original insertion order: `Check calculus` (`2026-11-03`, `OUTSTANDING`), `Review algebra` (`2026-11-01`, `DONE`), then `Discuss graphs` (`2026-11-01`, `CANCELLED`). `Followup Empty` still has no follow-ups.
+
+   1. Test case: In a terminal, relaunch the same JAR from the same test folder with `java -jar tutorlink.jar`. In TutorLink's command box, run `student view n/Followup Test`, then `followup list n/Followup Test`.<br>
+      Expected: Only calculus is listed and shown in the outstanding follow-ups panel, as item 1. The completed and cancelled records do not become outstanding again.
+
+1. Reusing a completed or cancelled description and review date
+
+   1. Test case: `followup add n/Followup Test desc/Review algebra review/2026-11-01`<br>
+      Expected: A new outstanding algebra follow-up is added, bringing the outstanding count to 2. The older `DONE` record does not prevent this addition.
+
+   1. Test case: Repeat `followup add n/Followup Test desc/Review algebra review/2026-11-01`.<br>
+      Expected: The error says `A follow-up with the same description and review date already exists for this student.` The outstanding count stays at 2 because the new algebra record is outstanding.
+
+   1. Test case: `followup add n/Followup Test desc/Discuss graphs review/2026-11-01`<br>
+      Expected: A new outstanding graphs follow-up is added, bringing the outstanding count to 3. The older `CANCELLED` record does not prevent this addition.
+
+   1. Test case: Run `followup list n/Followup Test`, then `exit`. After the app closes, inspect `data/tutorlink.json` without changing it.<br>
+      Expected: The list shows algebra, graphs and calculus as items 1, 2 and 3 respectively. The saved student has 5 follow-up records: the original calculus record, the completed algebra and cancelled graphs records, and the 2 newly added outstanding records. The original statuses are preserved.
+
 ### Saving data
 
 1. Data is kept after a restart
