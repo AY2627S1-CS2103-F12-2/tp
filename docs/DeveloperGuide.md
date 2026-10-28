@@ -1016,6 +1016,78 @@ testers are expected to do more *exploratory* testing.
       Expected: No interaction is deleted. The error explains the invalid or repeated parameter, gives the valid
       range, or says no such student is found.
 
+### Adding a follow-up
+
+Run the follow-up sections below in order in a disposable test folder. Start with no students named `Followup Test`, `Followup Empty` or `Nobody Here`. Enter each command in TutorLink's command box.
+
+1. Recording follow-ups for an existing student
+
+   1. Prerequisites: Run `student add n/Followup Test`, `student add n/Followup Empty`, then `student view n/Followup Test`. Both students have no follow-ups.
+
+   1. Test case: `followup add n/Followup Test desc/Check calculus review/2026-11-03`<br>
+      Expected: The result shows `✔ Follow-up added for Followup Test — review on 2026-11-03: "Check calculus"` and `Total outstanding follow-ups for Followup Test: 1`. The outstanding follow-ups panel shows the new record.
+
+   1. Test case: `followup add n/Followup Test desc/Review algebra review/2026-11-01`<br>
+      Expected: The follow-up is added and the outstanding count becomes 2. The panel places `Review algebra` before `Check calculus`, because its review date is earlier.
+
+   1. Test case: `followup add review/2026-11-01 desc/Discuss graphs n/followup test`<br>
+      Expected: The follow-up is added to `Followup Test` and the outstanding count becomes 3. Parameters in a different order and a name with different casing are accepted. The panel places `Discuss graphs` after `Review algebra`, because they share a review date and algebra was added first.
+
+1. Rejecting duplicate or invalid follow-ups
+
+   1. Prerequisites: Complete the valid additions above. Each rejected command below must leave both students' follow-ups unchanged, with 3 outstanding follow-ups for `Followup Test` and none for `Followup Empty`.
+
+   1. Test case: `followup add n/Followup Test desc/Review algebra review/2026-11-01`<br>
+      Expected: No follow-up is added. The error says `A follow-up with the same description and review date already exists for this student.`
+
+   1. Test case: `followup add n/Nobody Here desc/Check homework review/2026-11-01`<br>
+      Expected: No student or follow-up is created. The error says `No student named 'Nobody Here' found.`
+
+   1. Test case: `followup add n/Followup Test desc/ review/2026-11-01`<br>
+      Expected: The error says `Description cannot be empty.`
+
+   1. Test case: `followup add n/Followup Test desc/Check homework review/01-11-2026`<br>
+      Expected: The error says `Date must be in format yyyy-MM-dd (e.g. 2026-09-14).`
+
+   1. Test case: `followup add n/Followup Test desc/Check homework review/2026-02-30`<br>
+      Expected: The error says `'2026-02-30' is not a valid calendar date.`
+
+   1. Other incorrect commands to try: `followup add`, `followup add n/Followup Test desc/Missing date`<br>
+      Expected: The error shows the correct `followup add n/NAME desc/TEXT review/DATE` command format.
+
+   1. Test case: `followup add n/Followup Test desc/Check homework review/2026-11-01 review/2026-11-02`<br>
+      Expected: The error reports multiple values for `review/`. Neither date is silently treated as description text.
+
+### Viewing a student's outstanding follow-ups
+
+1. Listing follow-ups in review-date order
+
+   1. Prerequisites: Complete the additions above, then run `student view n/Followup Empty`.
+
+   1. Test case: `followup list n/followup   TEST`<br>
+      Expected: The result lists the 3 outstanding follow-ups as shown below. The earlier review date comes first, and records with the same review date keep the order they were added. `Followup Empty` remains selected in the panels, and no stored data changes.
+
+      ```text
+      ✔ Outstanding follow-ups for Followup Test (3):
+      1. 2026-11-01 — Review algebra
+      2. 2026-11-01 — Discuss graphs
+      3. 2026-11-03 — Check calculus
+      ```
+
+1. Listing an empty or unknown record
+
+   1. Test case: `followup list n/Followup Empty`<br>
+      Expected: The result says `ℹ No outstanding follow-ups for Followup Empty.` No stored data changes.
+
+   1. Test case: `followup list n/Nobody Here`<br>
+      Expected: The error says `No student named 'Nobody Here' found.` The selected student and stored data do not change.
+
+   1. Test case: `followup list`<br>
+      Expected: The error shows the correct `followup list n/NAME` command format. The selected student and stored data do not change.
+
+   1. Test case: `followup list n/Followup Test n/Followup Empty`<br>
+      Expected: The error reports multiple values for `n/`. The selected student and stored data do not change.
+
 ### Saving data
 
 1. Data is kept after a restart
