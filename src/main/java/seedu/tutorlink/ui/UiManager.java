@@ -81,14 +81,17 @@ public class UiManager implements Ui {
     }
 
     /**
-     * Shows an alert dialog on {@code owner} with the given parameters.
+     * Shows an alert dialog with the given parameters, using {@code owner} when its scene is ready.
+     * Startup alerts have no owner when the primary stage does not yet have a scene.
      * This method only returns after the user has closed the alert dialog.
      */
     private static void showAlertDialogAndWait(Stage owner, AlertType type, String title, String headerText,
                                                String contentText) {
         final Alert alert = new Alert(type);
         alert.getDialogPane().getStylesheets().add("view/TutorLinkTheme.css");
-        alert.initOwner(owner);
+        if (owner != null && owner.getScene() != null) {
+            alert.initOwner(owner);
+        }
         alert.setTitle(title);
         alert.setHeaderText(headerText);
         alert.setContentText(contentText);
