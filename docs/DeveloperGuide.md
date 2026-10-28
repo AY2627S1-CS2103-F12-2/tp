@@ -1088,6 +1088,100 @@ Run the follow-up sections below in order in a disposable test folder. Start wit
    1. Test case: `followup list n/Followup Test n/Followup Empty`<br>
       Expected: The error reports multiple values for `n/`. The selected student and stored data do not change.
 
+### Completing a follow-up
+
+1. Completing by the displayed outstanding index
+
+   1. Prerequisites: Complete the follow-up addition and listing sections above. Run `student view n/Followup Test`, then `followup list n/Followup Test`. Algebra, graphs and calculus are displayed as items 1, 2 and 3 respectively.
+
+   1. Test case: `followup done n/followup test i/1`<br>
+      Expected: The result shows `✔ Follow-up completed for Followup Test — review on 2026-11-01: "Review algebra"` and `Total outstanding follow-ups for Followup Test: 2`. Algebra disappears from the outstanding follow-ups panel, while graphs and calculus remain.
+
+   1. Test case: `followup list n/Followup Test`<br>
+      Expected: `Discuss graphs` is now item 1 and `Check calculus` is item 2. The completed algebra record is excluded from this list; it remains saved with status `DONE`.
+
+1. Rejecting invalid completions
+
+   1. Prerequisites: Complete algebra as above. Each rejected command below must leave the 2 outstanding follow-ups and the selected student unchanged.
+
+   1. Test case: `followup done n/Followup Test i/3`<br>
+      Expected: The error says `Index 3 is out of range: Followup Test's outstanding follow-ups are numbered 1 to 2.` The index is checked against the outstanding list, not the 3 stored records.
+
+   1. Test case: `followup done n/Followup Empty i/1`<br>
+      Expected: The error says `Followup Empty has no outstanding follow-ups.`
+
+   1. Test case: `followup done n/Nobody Here i/1`<br>
+      Expected: The error says `No student named 'Nobody Here' found.`
+
+   1. Other incorrect commands to try: `followup done n/Followup Test i/`, `followup done n/Followup Test i/0`, `followup done n/Followup Test i/-1`, `followup done n/Followup Test i/1.5`, `followup done n/Followup Test i/2147483648`<br>
+      Expected: The error says `Index must be a positive integer.`
+
+   1. Other incorrect commands to try: `followup done`, `followup done n/Followup Test`, `followup done i/1`<br>
+      Expected: The error shows the correct `followup done n/NAME i/INDEX` command format.
+
+   1. Test case: `followup done n/Followup Test i/1 i/2`<br>
+      Expected: The error reports multiple values for `i/`.
+
+### Cancelling a follow-up
+
+1. Cancelling by the renumbered outstanding index
+
+   1. Prerequisites: Complete the completion section above, then run `followup list n/Followup Test`. Graphs is item 1 and calculus is item 2; `Followup Test` is still selected.
+
+   1. Test case: `followup cancel i/1 n/Followup Test`<br>
+      Expected: The result shows `✔ Follow-up cancelled for Followup Test — review on 2026-11-01: "Discuss graphs"` and `Total outstanding follow-ups for Followup Test: 1`. Graphs disappears from the outstanding follow-ups panel. Putting `i/` before `n/` is accepted.
+
+   1. Test case: `followup list n/Followup Test`<br>
+      Expected: Only `Check calculus` remains, renumbered as item 1 with review date `2026-11-03`. The cancelled graphs record remains saved with status `CANCELLED`, and algebra remains `DONE`.
+
+1. Rejecting invalid cancellations
+
+   1. Prerequisites: Cancel graphs as above. Each rejected command below must leave calculus as the only outstanding follow-up and keep `Followup Test` selected.
+
+   1. Test case: `followup cancel n/Followup Test i/2`<br>
+      Expected: The error says `Index 2 is out of range: Followup Test's outstanding follow-ups are numbered 1 to 1.`
+
+   1. Test case: `followup cancel n/Followup Empty i/1`<br>
+      Expected: The error says `Followup Empty has no outstanding follow-ups.`
+
+   1. Test case: `followup cancel n/Nobody Here i/1`<br>
+      Expected: The error says `No student named 'Nobody Here' found.`
+
+   1. Other incorrect commands to try: `followup cancel n/Followup Test i/0`, `followup cancel n/Followup Test i/abc`<br>
+      Expected: The error says `Index must be a positive integer.`
+
+   1. Other incorrect commands to try: `followup cancel`, `followup cancel n/Followup Test`<br>
+      Expected: The error shows the correct `followup cancel n/NAME i/INDEX` command format.
+
+   1. Test case: `followup cancel n/Followup Test n/Followup Empty i/1`<br>
+      Expected: The error reports multiple values for `n/`.
+
+### Keeping follow-up history after a restart
+
+1. Retaining outstanding, completed and cancelled records
+
+   1. Prerequisites: Complete the follow-up sections above. Calculus is outstanding, algebra is completed, and graphs is cancelled.
+
+   1. Test case: Run `exit` in TutorLink. After the app closes, open `data/tutorlink.json` in a text editor without changing it.<br>
+      Expected: The `Followup Test` student's `followUps` array still contains all 3 records in their original insertion order: `Check calculus` (`2026-11-03`, `OUTSTANDING`), `Review algebra` (`2026-11-01`, `DONE`), then `Discuss graphs` (`2026-11-01`, `CANCELLED`). `Followup Empty` still has no follow-ups.
+
+   1. Test case: In a terminal, relaunch the same JAR from the same test folder with `java -jar tutorlink.jar`. In TutorLink's command box, run `student view n/Followup Test`, then `followup list n/Followup Test`.<br>
+      Expected: Only calculus is listed and shown in the outstanding follow-ups panel, as item 1. The completed and cancelled records do not become outstanding again.
+
+1. Reusing a completed or cancelled description and review date
+
+   1. Test case: `followup add n/Followup Test desc/Review algebra review/2026-11-01`<br>
+      Expected: A new outstanding algebra follow-up is added, bringing the outstanding count to 2. The older `DONE` record does not prevent this addition.
+
+   1. Test case: Repeat `followup add n/Followup Test desc/Review algebra review/2026-11-01`.<br>
+      Expected: The error says `A follow-up with the same description and review date already exists for this student.` The outstanding count stays at 2 because the new algebra record is outstanding.
+
+   1. Test case: `followup add n/Followup Test desc/Discuss graphs review/2026-11-01`<br>
+      Expected: A new outstanding graphs follow-up is added, bringing the outstanding count to 3. The older `CANCELLED` record does not prevent this addition.
+
+   1. Test case: Run `followup list n/Followup Test`, then `exit`. After the app closes, inspect `data/tutorlink.json` without changing it.<br>
+      Expected: The list shows algebra, graphs and calculus as items 1, 2 and 3 respectively. The saved student has 5 follow-up records: the original calculus record, the completed algebra and cancelled graphs records, and the 2 newly added outstanding records. The original statuses are preserved.
+
 ### Saving data
 
 1. Data is kept after a restart
