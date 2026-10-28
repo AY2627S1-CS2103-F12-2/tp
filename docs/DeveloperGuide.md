@@ -260,9 +260,9 @@ If the student has no interactions, it returns an informational message. Otherwi
 
 `Student` keeps the stored list unchanged and derives a displayed list by sorting stored positions with
 `Interaction.CHRONOLOGICAL_ORDER`. Interactions are ordered by date, then by time; an interaction without a time is
-treated as `00:00` and therefore appears before timed interactions on the same date. Java's stable ordering preserves
-the recording order when two interactions have the same date and time. Keeping the stored order separate from the
-displayed order allows later commands to refer to the number shown to the tutor without rewriting the persisted list.
+treated as `00:00`, so it appears before later timed interactions on the same date; ties keep their recording order.
+Keeping the stored order separate from the displayed order allows later commands to refer to the number shown to the
+tutor without rewriting the persisted list.
 
 **Persistence.** `JsonAdaptedStudent` serializes each interaction as a `JsonAdaptedInteraction` containing the ISO
 date, an optional `HH:mm` time, and the note. A missing time is stored as `null` and restored as an empty
@@ -272,6 +272,8 @@ silently accepted.
 
 **Design considerations**
 
+**Aspect: Where interactions are stored**
+
 * **Alternative 1 (current choice):** Store each student's interactions inside the `Student` object.
   * Pros: An interaction is naturally owned by one student, deleting a student cannot leave an orphaned interaction,
     and the JSON representation keeps related records together.
@@ -280,6 +282,8 @@ silently accepted.
   * Pros: Updating an interaction would not require copying the entire student.
   * Cons: Renaming or deleting a student would need to update a second collection, creating a risk of orphaned or
     incorrectly associated interactions.
+
+**Aspect: Display order**
 
 * **Alternative 1 (current choice):** Display interactions chronologically while preserving their stored order.
   * Pros: The tutor sees the history in the order in which events happened, while equal date-time entries remain
