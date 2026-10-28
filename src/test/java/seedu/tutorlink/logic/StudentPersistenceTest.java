@@ -42,11 +42,11 @@ import seedu.tutorlink.testutil.StudentBuilder;
  */
 public class StudentPersistenceTest {
 
-    private static final String ADD_COMMAND = "student add n/Carl Kurz s/Math";
-    private static final String EDIT_COMMAND = "student edit n/" + AMY.getName() + " new/Amy Tan s/Chemistry";
+    private static final String ADD_COMMAND = "student add n/Carl Kurz sub/Math";
+    private static final String EDIT_COMMAND = "student edit n/" + AMY.getName() + " new/Amy Tan sub/Chemistry";
     private static final String DELETE_COMMAND = "student delete n/" + AMY.getName();
     private static final String ADD_INTERACTION_COMMAND =
-            "interaction add n/" + AMY.getName() + " d/2026-04-04 note/Second save failure";
+            "interaction add n/" + AMY.getName() + " date/2026-04-04 note/Second save failure";
     private static final String RECOVERY_NAME = "Dana Lee";
 
     @TempDir

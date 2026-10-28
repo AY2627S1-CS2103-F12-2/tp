@@ -39,9 +39,9 @@ TutorLink is for one tutor on one computer. It does not schedule lessons, track 
 
 1. Try this short workflow. Type each command in the command box and press Enter:
 
-   * `student add n/John Tan s/Math s/Physics` : Adds a student named John Tan who is taught Math and Physics.
+   * `student add n/John Tan sub/Math sub/Physics` : Adds a student named John Tan who is taught Math and Physics.
 
-   * `interaction add n/John Tan d/2026-10-01 note/Reviewed algebraic fractions` : Records what happened during a lesson.
+   * `interaction add n/John Tan date/2026-10-01 note/Reviewed algebraic fractions` : Records what happened during a lesson.
 
    * `followup add n/John Tan desc/Check factorising homework review/2026-11-01` : Adds something to revisit with John.
 
@@ -67,13 +67,13 @@ TutorLink is for one tutor on one computer. It does not schedule lessons, track 
   For example, in `student add n/NAME`, replace `NAME` with a name such as `John Tan`.
 
 * Items in square brackets are optional.<br>
-  For example, `n/NAME [s/SUBJECT]` can be used as `n/John Tan s/Math` or as `n/John Tan`.
+  For example, `n/NAME [sub/SUBJECT]` can be used as `n/John Tan sub/Math` or as `n/John Tan`.
 
 * Items followed by `…` can appear any number of times, including zero.<br>
-  For example, `[s/SUBJECT]…` can be left out, or written as `s/Math` or `s/Math s/Physics`.
+  For example, `[sub/SUBJECT]…` can be left out, or written as `sub/Math` or `sub/Math sub/Physics`.
 
 * Parameters can be in any order unless a command's instructions say otherwise.<br>
-  For example, `s/Math n/John Tan` works the same as `n/John Tan s/Math`.
+  For example, `sub/Math n/John Tan` works the same as `n/John Tan sub/Math`.
   For `interaction add`, `note/` must be last because everything after it is note text.
 
 * Command words are not case-sensitive. `Student Add` works the same as `student add`.
@@ -99,13 +99,13 @@ Format: `help`
 
 Adds a student, with the subjects you teach them.
 
-Format: `student add n/NAME [s/SUBJECT]…`
+Format: `student add n/NAME [sub/SUBJECT]…`
 
 * `NAME` is 1 to 50 characters long and contains at least one letter. It may use letters (including accented letters such as `é`), spaces, hyphens, apostrophes and full stops, so names such as `Mary-Jane O'Brien` and `Tan Ah Kow Jr.` are accepted.
   The limit counts Unicode code points after equivalent accented spellings are normalized.
   A supplementary CJK letter such as `𠀀` counts as one character. An `e` followed by a combining acute
   accent becomes `é` before counting and also counts as one character.
-* `NAME` may also contain `s/o` or `d/o` as a separate word, as in `Raj s/o Kumar`. TutorLink reads these as part of the name, not as the start of a subject.
+* `NAME` may also contain `s/o` or `d/o` as a separate word, in any case, as in `Raj s/o Kumar` or `Siti D/O Ahmad`.
 * Each student's name must be unique, ignoring case. If `John Tan` exists, adding `john tan` is rejected as a duplicate.
 * `SUBJECT` is 1 to 30 characters long and may use letters, digits, spaces, hyphens, `+` and `&`, for example `H2 Math` or `Biology + Chemistry`.
 * Subject names support accented letters and combining marks, such as `Français` and `தமிழ்`.
@@ -116,7 +116,7 @@ Format: `student add n/NAME [s/SUBJECT]…`
 * Subjects are shown in the order you type them.
 
 Examples:
-* `student add n/John Tan s/Math s/Physics`
+* `student add n/John Tan sub/Math sub/Physics`
 * `student add n/Aliyah Lim`
 
 On success, TutorLink shows the student and the new total:
@@ -142,18 +142,18 @@ Example:
 
 Renames a student, replaces their subjects, or both. Their interactions and follow-ups are kept.
 
-Format: `student edit n/NAME [new/NEW_NAME] [s/SUBJECT]…`
+Format: `student edit n/NAME [new/NEW_NAME] [sub/SUBJECT]…`
 
 * `NAME` is the student's current full name, ignoring case.
-* Give at least one of `new/` or `s/`.
+* Give at least one of `new/` or `sub/`.
 * `NEW_NAME` follows the same rules as in [`student add`](#adding-a-student-student-add). Renaming to the name of another existing student, ignoring case, is rejected as a duplicate. Changing only the casing, such as `john tan` to `John Tan`, is allowed.
-* If you give any `s/`, the subjects you give replace **all** the student's existing subjects. Without `s/`, the subjects stay the same.
+* If you give any `sub/`, the subjects you give replace **all** the student's existing subjects. Without `sub/`, the subjects stay the same.
 * If the new name and subjects are exactly the same as the current ones, nothing changes and TutorLink shows `No changes made: John Tan already has this name and these subjects.`
 * If the student is shown in the panels, the panels update straight away. If you used `find` and the new name no longer matches it, the student leaves the filtered list and the panels are cleared. Use `list` to see all students again.
 
 Examples:
 * `student edit n/John Tan new/Jonathan Tan` renames John Tan.
-* `student edit n/John Tan s/Math s/Chemistry` changes John Tan's subjects to Math and Chemistry.
+* `student edit n/John Tan sub/Math sub/Chemistry` changes John Tan's subjects to Math and Chemistry.
 
 On success, TutorLink shows the updated student:
 
@@ -193,7 +193,7 @@ Examples:
 
 Records a dated note about a lesson or other discussion with an existing student.
 
-Format: `interaction add n/NAME d/DATE [t/TIME] note/TEXT`
+Format: `interaction add n/NAME date/DATE [t/TIME] note/TEXT`
 
 * `NAME` identifies an existing student by their full name, ignoring case.
 * `DATE` must be a real calendar date in `yyyy-MM-dd` format, such as `2026-10-01`.
@@ -203,18 +203,18 @@ Format: `interaction add n/NAME d/DATE [t/TIME] note/TEXT`
   It must not be blank and must be on a single line. If you paste text containing line breaks, each line break becomes a space,
   so a pasted `First line⏎Second line` is recorded as `First line Second line`.
   The limit counts Unicode code points: a simple emoji such as 😀 counts as one. A combined emoji or a letter with a combining accent can contain multiple code points and count as more than one.
-* The `n/`, `d/` and optional `t/` parameters may appear in any order before `note/`.
+* The `n/`, `date/` and optional `t/` parameters may appear in any order before `note/`.
   The `note/` parameter must be last. Everything after `note/` is treated as note text.
-  Missing required parameters (`n/`, `d/`, or `note/`), repeated `n/`, `d/`, or `t/` parameters,
+  Missing required parameters (`n/`, `date/`, or `note/`), repeated `n/`, `date/`, or `t/` parameters,
   and text before the first parameter are rejected.
 * Multiple interactions may have the same date and time. Each note is recorded separately.
 * A failed command leaves your stored data unchanged.
 
 Examples:
 
-* `interaction add n/John Tan d/2026-10-01 note/Discussed revision plan`
-* `interaction add n/john tan d/2026-10-01 t/14:30 note/Practised algebraic fractions`
-* `interaction add n/John Tan d/2026-10-15 note/Reviewed algebraic fractions`
+* `interaction add n/John Tan date/2026-10-01 note/Discussed revision plan`
+* `interaction add n/john tan date/2026-10-01 t/14:30 note/Practised algebraic fractions`
+* `interaction add n/John Tan date/2026-10-15 note/Reviewed algebraic fractions`
 
 After the first example, TutorLink shows:
 
@@ -242,10 +242,10 @@ Invalid input examples:
 
 * `note/` with no text is rejected with `Note cannot be empty.`
 * A note longer than 500 characters is rejected with `Note must be 500 characters or fewer.`
-* Repeated `n/`, `d/` or `t/` parameters before `note/` are rejected. A `note/` appearing
+* Repeated `n/`, `date/` or `t/` parameters before `note/` are rejected. A `note/` appearing
   after the first `note/` is retained as part of the note text.
-* `d/01-10-2026` is rejected because the required format is `yyyy-MM-dd`.
-* `d/2026-02-30` is rejected because February does not have 30 days.
+* `date/01-10-2026` is rejected because the required format is `yyyy-MM-dd`.
+* `date/2026-02-30` is rejected because February does not have 30 days.
 * `t/25:00` is rejected because the time must be valid and use `HH:mm`.
 * An unknown student is rejected with `No student named 'NAME' found.`
 
@@ -283,10 +283,10 @@ are rejected.
 
 Corrects one or more fields of an interaction in an existing student's history.
 
-Format: `interaction edit n/NAME i/INDEX [d/DATE] [t/TIME] [note/TEXT]`
+Format: `interaction edit n/NAME i/INDEX [date/DATE] [t/TIME] [note/TEXT]`
 
 * `INDEX` is the interaction number shown by `interaction list n/NAME` and must be a positive integer.
-* At least one of `d/`, `t/` or `note/` must be supplied. Fields that are not supplied remain unchanged.
+* At least one of `date/`, `t/` or `note/` must be supplied. Fields that are not supplied remain unchanged.
 * Date, time, and note values follow the same rules as `interaction add`. A future replacement date is allowed
   with a warning. The `note/` parameter must be last, and everything after it is treated as note text.
 * An existing time can be replaced using `t/TIME`, removed using `t/` with no value,
@@ -297,8 +297,8 @@ Format: `interaction edit n/NAME i/INDEX [d/DATE] [t/TIME] [note/TEXT]`
 Examples:
 
 * `interaction edit n/John Tan i/2 note/Practised algebraic fractions and equations`
-* `interaction edit n/John Tan i/2 d/2026-10-02 t/15:00`
-* `interaction edit n/John Tan i/2 d/2026-10-02 t/ note/Reviewed algebra`
+* `interaction edit n/John Tan i/2 date/2026-10-02 t/15:00`
+* `interaction edit n/John Tan i/2 date/2026-10-02 t/ note/Reviewed algebra`
 
 After the first example, TutorLink shows the original and updated interaction:
 
@@ -569,14 +569,14 @@ Some edits can also make TutorLink behave unexpectedly, for example a value outs
 
 Action | Format, Examples
 --------|------------------
-**Add student** | `student add n/NAME [s/SUBJECT]…`<br> e.g., `student add n/John Tan s/Math s/Physics`
+**Add student** | `student add n/NAME [sub/SUBJECT]…`<br> e.g., `student add n/John Tan sub/Math sub/Physics`
 **View student** | `student view n/NAME`<br> e.g., `student view n/John Tan`
-**Edit student** | `student edit n/NAME [new/NEW_NAME] [s/SUBJECT]…`<br> e.g., `student edit n/John Tan new/Jonathan Tan s/Math`
+**Edit student** | `student edit n/NAME [new/NEW_NAME] [sub/SUBJECT]…`<br> e.g., `student edit n/John Tan new/Jonathan Tan sub/Math`
 **List students** | `list`
 **Find students** | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find tan lim`
-**Add interaction** | `interaction add n/NAME d/DATE [t/TIME] note/TEXT`<br> e.g., `interaction add n/John Tan d/2026-10-01 note/Discussed revision plan`
+**Add interaction** | `interaction add n/NAME date/DATE [t/TIME] note/TEXT`<br> e.g., `interaction add n/John Tan date/2026-10-01 note/Discussed revision plan`
 **List interactions** | `interaction list n/NAME`<br> e.g., `interaction list n/John Tan`
-**Edit interaction** | `interaction edit n/NAME i/INDEX [d/DATE] [t/TIME] [note/TEXT]`<br> e.g., `interaction edit n/John Tan i/2 note/Corrected lesson note`
+**Edit interaction** | `interaction edit n/NAME i/INDEX [date/DATE] [t/TIME] [note/TEXT]`<br> e.g., `interaction edit n/John Tan i/2 note/Corrected lesson note`
 **Delete interaction** | `interaction delete n/NAME i/INDEX`<br> e.g., `interaction delete n/John Tan i/2`
 **Add follow-up** | `followup add n/NAME desc/TEXT review/DATE`<br> e.g., `followup add n/John Tan desc/Review algebra review/2026-10-15`
 **View follow-ups** | `followup list n/NAME`<br> e.g., `followup list n/John Tan`

@@ -198,7 +198,7 @@ Names are unique in the same way. `UniqueStudentList` treats two students as dup
 
 ### Editing a student
 
-`student edit n/NAME [new/NEW_NAME] [s/SUBJECT]...` renames a student, replaces their subjects, or both. It uses the same name lookup as other commands (see [Finding a student by name](#finding-a-student-by-name)).
+`student edit n/NAME [new/NEW_NAME] [sub/SUBJECT]...` renames a student, replaces their subjects, or both. It uses the same name lookup as other commands (see [Finding a student by name](#finding-a-student-by-name)).
 
 The sequence diagram below shows how `student edit n/john tan new/Jonathan Tan` renames the student `John Tan`.
 
@@ -208,7 +208,7 @@ The sequence diagram below shows how `student edit n/john tan new/Jonathan Tan` 
 </div>
 
 1. `TutorLinkParser` reads the command word `student edit` and passes the rest of the input to a new `EditStudentCommandParser`.
-1. `EditStudentCommandParser` checks that `n/` and `new/` appear at most once, and parses each value with the same rules as `student add`. If neither `new/` nor any `s/` is given, it throws a `ParseException` saying there is nothing to change. Otherwise, it returns an `EditStudentCommand` holding the current name, an optional new name and an optional new list of subjects.
+1. `EditStudentCommandParser` checks that `n/` and `new/` appear at most once, and parses each value with the same rules as `student add`. If neither `new/` nor any `sub/` is given, it throws a `ParseException` saying there is nothing to change. Otherwise, it returns an `EditStudentCommand` holding the current name, an optional new name and an optional new list of subjects.
 1. When executed, `EditStudentCommand` finds the student with `Model#findStudentByName`. If there is no match, it throws a `CommandException` and nothing changes.
 1. `EditStudentCommand#createEditedStudent` builds a new `Student` with the new name (or the old one) and the new subjects (or the old ones). It copies the existing interactions and follow-ups unchanged. `Student` is immutable, so the edit always produces a new object.
 1. If the name changes to that of a *different* student, `Model#hasStudent` returns true and the command throws the same duplicate-student error as `student add`. A rename that only changes casing (`john tan` to `John Tan`) is the same student under `Student#isSameStudent`, so it is allowed.
@@ -216,10 +216,10 @@ The sequence diagram below shows how `student edit n/john tan new/Jonathan Tan` 
 
 #### Design considerations
 
-**Aspect: What `s/` does when editing**
+**Aspect: What `sub/` does when editing**
 
-* **Alternative 1 (current choice):** Any `s/` replaces all existing subjects.
-  * Pros: One command sets the exact subject list, with the same meaning as `s/` in `student add`. The result is easy to predict from the command alone.
+* **Alternative 1 (current choice):** Any `sub/` replaces all existing subjects.
+  * Pros: One command sets the exact subject list, with the same meaning as `sub/` in `student add`. The result is easy to predict from the command alone.
   * Cons: To add one subject, the tutor must retype the existing ones. There is no way to remove all subjects.
 * **Alternative 2:** Separate prefixes to add and remove single subjects (e.g. `s+/` and `s-/`).
   * Pros: Small changes take less typing.
@@ -243,7 +243,7 @@ An `Interaction` is an immutable record of a dated lesson or other contact with 
 **Adding an interaction.** `AddInteractionCommandParser` tokenizes the arguments with
 `ArgumentTokenizer#tokenizeWithTrailingPrefix`. The `note/` prefix is treated as the final structured prefix, so
 everything after the first `note/` is kept as note text. This allows notes such as `note/Discussed n/next steps`
-without interpreting the `n/` inside the note as another name prefix. The parser requires exactly one `n/`, `d/`
+without interpreting the `n/` inside the note as another name prefix. The parser requires exactly one `n/`, `date/`
 and `note/`; `t/` is optional and may be empty. It validates the name, date, optional time and note before creating
 an `AddInteractionCommand`.
 
@@ -832,7 +832,7 @@ testers are expected to do more *exploratory* testing.
 
 1. Adding a new student
 
-   1. Test case: `student add n/John Tan s/Math s/Physics`<br>
+   1. Test case: `student add n/John Tan sub/Math sub/Physics`<br>
       Expected: John Tan appears at the bottom of the student list with subjects Math and Physics, and is shown in the detail panel. The result shows `✔ Student added: John Tan (subjects: Math, Physics)` and the new total.
 
    1. Test case: `student add n/Aliyah Lim`<br>
@@ -845,10 +845,10 @@ testers are expected to do more *exploratory* testing.
    1. Test case: `student add n/john tan`<br>
       Expected: No student is added. The error says a student named `John Tan` already exists.
 
-   1. Test case: `student add n/John Tan s/Math s/math`<br>
+   1. Test case: `student add n/John Tan sub/Math sub/math`<br>
       Expected: No student is added. The error says the subject is specified twice.
 
-   1. Other incorrect commands to try: `student add`, `student add n/`, `student add n/12345`, `student add n/Ann s/Math/Physics`<br>
+   1. Other incorrect commands to try: `student add`, `student add n/`, `student add n/12345`, `student add n/Ann sub/Math/Physics`<br>
       Expected: No student is added. The error explains which value is wrong, or shows the correct command format.
 
 ### Viewing a student
@@ -886,7 +886,7 @@ testers are expected to do more *exploratory* testing.
 
    1. Prerequisites: Jonathan Tan exists with subjects Math and Physics.
 
-   1. Test case: `student edit n/Jonathan Tan s/Chemistry`<br>
+   1. Test case: `student edit n/Jonathan Tan sub/Chemistry`<br>
       Expected: Jonathan Tan's only subject is now Chemistry. Math and Physics are gone.
 
 1. Invalid edits
@@ -899,7 +899,7 @@ testers are expected to do more *exploratory* testing.
    1. Test case: `student edit n/Jonathan Tan`<br>
       Expected: Nothing changes. The error says there is nothing to change and shows the correct command format.
 
-   1. Other incorrect commands to try: `student edit n/Nobody Here new/Ann`, `student edit n/Jonathan Tan new/12345`, `student edit n/Jonathan Tan s/Math s/math`, `student edit n/Jonathan Tan new/A new/B`<br>
+   1. Other incorrect commands to try: `student edit n/Nobody Here new/Ann`, `student edit n/Jonathan Tan new/12345`, `student edit n/Jonathan Tan sub/Math sub/math`, `student edit n/Jonathan Tan new/A new/B`<br>
       Expected: Nothing changes. The error says no such student is found, explains which value is wrong, or says a prefix is repeated.
 
 ### Deleting a student
@@ -921,29 +921,29 @@ testers are expected to do more *exploratory* testing.
 
    1. Prerequisites: John Tan exists.
 
-   1. Test case: `interaction add n/John Tan d/2026-10-01 note/Discussed revision plan`<br>
+   1. Test case: `interaction add n/John Tan date/2026-10-01 note/Discussed revision plan`<br>
       Expected: The result shows `✔ Interaction recorded for John Tan on 2026-10-01.` and the updated total.
 
-   1. Test case: `interaction add n/john tan d/2026-10-01 t/14:30 note/Practised algebraic fractions`<br>
+   1. Test case: `interaction add n/john tan date/2026-10-01 t/14:30 note/Practised algebraic fractions`<br>
       Expected: The result includes `(14:30)`, the note is recorded, and the interaction total increases by one.
 
-   1. Test case: Paste `interaction add n/John Tan d/2026-10-01 note/First line⏎Second line` into the
+   1. Test case: Paste `interaction add n/John Tan date/2026-10-01 note/First line⏎Second line` into the
       command box, where `⏎` is a pasted line break.<br>
       Expected: The interaction is recorded with the note `First line Second line`.
 
-   1. Test case: `interaction add n/John Tan d/2099-12-31 note/Planned revision`<br>
+   1. Test case: `interaction add n/John Tan date/2099-12-31 note/Planned revision`<br>
       Expected: TutorLink warns that the date is in the future, then records the interaction.
 
 1. Rejecting invalid interaction details
 
-   1. Test case: `interaction add n/Nobody Here d/2026-10-01 note/Unknown student`<br>
+   1. Test case: `interaction add n/Nobody Here date/2026-10-01 note/Unknown student`<br>
       Expected: No interaction is recorded. The error says no student named `Nobody Here` is found.
 
    1. Other incorrect commands to try: `interaction add`, `interaction add n/John Tan note/Missing date`,
-      `interaction add n/John Tan d/2026-02-30 note/Bad date`,
-      `interaction add n/John Tan d/2026-10-01 t/25:00 note/Bad time`,
-      `interaction add n/John Tan d/2026-10-01 note/`,
-      `interaction add n/John Tan d/2026-10-01 d/2026-10-02 note/Duplicate date`<br>
+      `interaction add n/John Tan date/2026-02-30 note/Bad date`,
+      `interaction add n/John Tan date/2026-10-01 t/25:00 note/Bad time`,
+      `interaction add n/John Tan date/2026-10-01 note/`,
+      `interaction add n/John Tan date/2026-10-01 date/2026-10-02 note/Duplicate date`<br>
       Expected: No interaction is recorded. The error explains the invalid or repeated parameter, or shows the
       correct command format.
 
@@ -983,7 +983,7 @@ testers are expected to do more *exploratory* testing.
    1. Test case: `interaction edit n/John Tan i/1 t/`<br>
       Expected: The first interaction's time is removed while its date and note remain unchanged.
 
-   1. Test case: `interaction edit n/John Tan i/1 d/2099-12-31`<br>
+   1. Test case: `interaction edit n/John Tan i/1 date/2099-12-31`<br>
       Expected: TutorLink warns about the future date, updates the interaction, and renumbers the chronological list
       if its position changes.
 
@@ -991,7 +991,7 @@ testers are expected to do more *exploratory* testing.
 
    1. Other incorrect commands to try: `interaction edit n/John Tan i/0 note/New note`,
       `interaction edit n/John Tan i/99 note/New note`, `interaction edit n/John Tan i/1`,
-      `interaction edit n/John Tan i/1 d/2026-02-30`, `interaction edit n/John Tan i/1 note/`<br>
+      `interaction edit n/John Tan i/1 date/2026-02-30`, `interaction edit n/John Tan i/1 note/`<br>
       Expected: Nothing changes. The error identifies the invalid index/value, reports that no field was supplied,
       or shows the correct command format.
 

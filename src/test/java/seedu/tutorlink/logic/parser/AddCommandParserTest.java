@@ -75,7 +75,11 @@ public class AddCommandParserTest {
     @Test
     public void parse_nameWithConnector_success() {
         Student expectedStudent = new StudentBuilder().withName("Raj s/o Kumar").withSubjects("Math").build();
-        assertParseSuccess(parser, " n/Raj s/o Kumar s/Math", new AddCommand(expectedStudent));
+        assertParseSuccess(parser, " n/Raj s/o Kumar sub/Math", new AddCommand(expectedStudent));
+
+        // connectors in any case, and a subject starting with "O"
+        expectedStudent = new StudentBuilder().withName("Siti D/O Ahmad").withSubjects("O Level Math").build();
+        assertParseSuccess(parser, " n/Siti D/O Ahmad sub/O Level Math", new AddCommand(expectedStudent));
     }
 
     @Test
@@ -120,7 +124,7 @@ public class AddCommandParserTest {
                 String.format(ParserUtil.MESSAGE_INVALID_SUBJECT, "Math/Physics", Subject.MESSAGE_CONSTRAINTS));
 
         // same subject twice, ignoring case
-        assertParseFailure(parser, NAME_DESC_BOB + SUBJECT_DESC_MATH + " s/math",
+        assertParseFailure(parser, NAME_DESC_BOB + SUBJECT_DESC_MATH + " sub/math",
                 String.format(ParserUtil.MESSAGE_DUPLICATE_SUBJECT, "math"));
 
         // non-empty preamble

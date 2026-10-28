@@ -80,7 +80,7 @@ public class LogicManagerTest {
         logic.execute(AddCommand.COMMAND_WORD + " n/Alex Tan");
 
         String interactionCommand = AddInteractionCommand.COMMAND_WORD
-                + " n/Alex Tan d/2026-10-01 t/14:30 note/Practised algebraic fractions";
+                + " n/Alex Tan date/2026-10-01 t/14:30 note/Practised algebraic fractions";
         CommandResult result = logic.execute(interactionCommand);
 
         Interaction expectedInteraction = new Interaction(LocalDate.of(2026, 10, 1),
@@ -103,7 +103,7 @@ public class LogicManagerTest {
 
         LocalDate futureDate = LocalDate.now().plusDays(1);
         String interactionCommand = AddInteractionCommand.COMMAND_WORD
-                + " n/Alex Tan d/" + futureDate + " note/Planned lesson";
+                + " n/Alex Tan date/" + futureDate + " note/Planned lesson";
         CommandResult result = logic.execute(interactionCommand);
 
         String expectedMessage = String.format(AddInteractionCommand.MESSAGE_FUTURE_DATE_WARNING,
@@ -120,11 +120,11 @@ public class LogicManagerTest {
     public void execute_addInteraction_reportsUpdatedInteractionCount() throws Exception {
         logic.execute(AddCommand.COMMAND_WORD + " n/Alex Tan");
         logic.execute(AddInteractionCommand.COMMAND_WORD
-                + " n/Alex Tan d/2026-10-01 note/First lesson");
+                + " n/Alex Tan date/2026-10-01 note/First lesson");
 
         LocalDate secondDate = LocalDate.of(2026, 10, 2);
         CommandResult result = logic.execute(AddInteractionCommand.COMMAND_WORD
-                + " n/Alex Tan d/" + secondDate + " note/Second lesson");
+                + " n/Alex Tan date/" + secondDate + " note/Second lesson");
 
         assertEquals(String.format(AddInteractionCommand.MESSAGE_SUCCESS, "Alex Tan", secondDate, "", 2),
                 result.getFeedbackToUser());
@@ -134,9 +134,9 @@ public class LogicManagerTest {
     public void execute_listInteractions_returnsChronologicalHistory() throws Exception {
         logic.execute(AddCommand.COMMAND_WORD + " n/Alex Tan");
         logic.execute(AddInteractionCommand.COMMAND_WORD
-                + " n/Alex Tan d/2026-10-02 t/14:30 note/Practised fractions");
+                + " n/Alex Tan date/2026-10-02 t/14:30 note/Practised fractions");
         logic.execute(AddInteractionCommand.COMMAND_WORD
-                + " n/Alex Tan d/2026-10-01 note/Discussed revision plan");
+                + " n/Alex Tan date/2026-10-01 note/Discussed revision plan");
 
         CommandResult result = logic.execute(ListInteractionsCommand.COMMAND_WORD + " n/Alex Tan");
 
@@ -184,7 +184,7 @@ public class LogicManagerTest {
     public void execute_interactionAddStorageFailure_restoresModel() {
         model.addStudent(new StudentBuilder(AMY).build());
         String command = AddInteractionCommand.COMMAND_WORD
-                + " n/" + AMY.getName() + " d/2026-10-01 note/Save failure interaction";
+                + " n/" + AMY.getName() + " date/2026-10-01 note/Save failure interaction";
 
         assertCommandFailureForExceptionFromStorage(DUMMY_IO_EXCEPTION,
                 String.format(LogicManager.FILE_OPS_ERROR_FORMAT, DUMMY_IO_EXCEPTION.getMessage()), command);
@@ -257,7 +257,7 @@ public class LogicManagerTest {
     private void assertCommandFailureForExceptionFromStorage(IOException e, String expectedMessage) {
         model.addStudent(new StudentBuilder(AMY).build());
         String interactionCommand = AddInteractionCommand.COMMAND_WORD
-                + " n/" + AMY.getName() + " d/2026-10-01 note/Storage failure interaction";
+                + " n/" + AMY.getName() + " date/2026-10-01 note/Storage failure interaction";
         assertCommandFailureForExceptionFromStorage(e, expectedMessage, interactionCommand);
     }
 
