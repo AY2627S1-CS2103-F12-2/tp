@@ -74,6 +74,8 @@ The **API** of this component is specified in [`Ui.java`](https://github.com/AY2
 
 ![Structure of the UI Component](images/UiClassDiagram.png)
 
+The diagram focuses on ownership and dependencies. Common inheritance from `UiPart` is stated in the diagram's legend instead of drawing an arrow from every UI part.
+
 The UI consists of a `MainWindow` and its parts, such as `CommandBox`, `ResultDisplay`, `StudentListPanel`, `StudentDetailPanel`, `InteractionPanel`, `FollowUpPanel` and `StatusBarFooter`. All of these, including `MainWindow`, inherit from the abstract `UiPart` class, which captures common behavior among classes that represent visible GUI parts.
 
 The `UI` component uses the JavaFX UI framework. The layouts of these UI parts are defined in matching `.fxml` files in `src/main/resources/view`. For example, [`MainWindow.fxml`](https://github.com/AY2627S1-CS2103-F12-2/tp/tree/master/src/main/resources/view/MainWindow.fxml) specifies the layout of [`MainWindow`](https://github.com/AY2627S1-CS2103-F12-2/tp/tree/master/src/main/java/seedu/tutorlink/ui/MainWindow.java).
@@ -292,6 +294,70 @@ silently accepted.
 * **Alternative 2:** Display interactions in recording order.
   * Pros: Displayed numbers never move after an interaction is added.
   * Cons: The history is less useful chronologically, and the displayed order can differ from the dates shown.
+
+### Managing follow-ups
+
+A `FollowUp` is an immutable record owned by one `Student`, containing a description, a `LocalDate` review date and a `FollowUpStatus`. It belongs to the student rather than to an interaction. New records are `OUTSTANDING`; completing or cancelling a record changes its status to `DONE` or `CANCELLED` while retaining it in the student's history. The [model component](#model-component) shows these relationships.
+
+#### Adding and listing follow-ups
+
+`AddFollowUpCommandParser` requires exactly one `n/`, `desc/` and `review/` parameter, in any order. It uses `ParserUtil` to validate the student name, a non-blank single-line description of at most 200 Unicode code points after surrounding whitespace is removed, and a real calendar date in `yyyy-MM-dd` format. Review dates may be in the past, present or future.
+
+The parser uses a command-specific tokenizer so that non-empty, nonnumeric `review/` text inside a description can remain literal text when a separate date-shaped `review/` argument is present. Calendar validation happens after tokenization. Empty or number-starting review values remain parameters, so repeated dates and malformed numeric dates cannot be silently included in the description. A space followed by `n/` or `desc/` always starts another parameter.
+
+`AddFollowUpCommand` finds the student through `Model#findStudentByName` and rejects a follow-up equal to an existing outstanding record. Equality compares the trimmed description, review date and status; description comparison is case-sensitive. Records with status `DONE` or `CANCELLED` do not block a new outstanding record with the same description and date. The command appends the record through `Student#withFollowUp`, then replaces the immutable student through `Model#setStudent`.
+
+`ListFollowUpsCommand` obtains `Student#getOutstandingFollowUps`, formats the returned records with indices starting at 1, and returns an informational message when the list is empty. This derived list contains only outstanding records, sorted by review date, earliest first. Equal dates retain insertion order. Listing does not modify the stored order, select a different student or save data.
+
+#### Completing and cancelling follow-ups
+
+`DoneFollowUpCommandParser` and `CancelFollowUpCommandParser` extend `ChangeFollowUpStatusCommandParser<T>`. Each supplies its usage message and command constructor. The shared parser rejects missing or repeated `n/` and `i/` parameters and unexpected preamble text, then validates the name and positive integer index before creating the concrete command. Either parameter order is accepted.
+
+The partial class diagrams below show where the shared parsing and execution methods are implemented. Each concrete parser binds `T` to its corresponding command type.
+
+<img src="images/FollowUpStatusParserClassDiagram.png" alt="Class diagram of the shared follow-up status parser and its concrete subclasses" width="650" />
+
+<img src="images/FollowUpStatusCommandClassDiagram.png" alt="Class diagram of the shared follow-up status command and its concrete subclasses" width="650" />
+
+`DoneFollowUpCommand` and `CancelFollowUpCommand` extend `ChangeFollowUpStatusCommand`, supplying `DONE` or `CANCELLED` and their respective success-message formats. The shared execution flow is:
+
+1. Find the student by name. An unknown student produces an error before any update.
+1. Obtain the outstanding list and check the requested index against its size. The `Index` object converts the user's index starting at 1 into an index starting at 0. An empty list or an index beyond its end produces an error before any update.
+1. Call `Student#withOutstandingFollowUpStatus` with the index starting at 0 and the target status. `Student` maps the displayed index back to a stored position by filtering and sorting the positions of outstanding records. It replaces that follow-up with a copy from `FollowUp#withStatus` and returns a new student, preserving every other record and the stored order.
+1. Replace the old student through `Model#setStudent`. If that student is selected, `ModelManager` updates the selection to the new student, and `FollowUpPanel` observes the change and refreshes its outstanding list.
+1. Return the affected record's description and review date with the remaining outstanding count. The shared command also logs the action and uses internal assertions to check that history size is unchanged, the outstanding count decreases by one, and the model contains the replacement student.
+
+After a status change, the remaining outstanding records are renumbered. A displayed index therefore refers to the latest outstanding list, rather than a permanent record identifier or a position in the JSON array.
+
+The sequence diagram below follows `followup done n/John Tan i/1` through successful execution and saving, assuming John Tan has an outstanding follow-up. `name` is the parsed `Name` for John Tan. Parsing, internal assertions and UI notifications are omitted from the message flow. Cancellation follows the same execution method with `CANCELLED` as the target status.
+
+<img src="images/DoneFollowUpSequenceDiagram.png" alt="Sequence diagram showing completion of the first outstanding follow-up and saving the updated data" width="900" />
+
+#### Persistence and failed saves
+
+`JsonAdaptedStudent` stores the full follow-up history through `JsonAdaptedFollowUp`. Each entry contains `description`, `reviewDate` in ISO date format and `status` as `OUTSTANDING`, `DONE` or `CANCELLED`. Loading validates the description, calendar date and status before reconstructing the immutable record. A missing status defaults to `OUTSTANDING` for compatibility with older data files; an unrecognised status is rejected.
+
+After a command changes student data, `LogicManager` saves through `Storage#saveTutorLink`. If saving throws an `IOException`, it restores the previous data and selected student and reports an error instead of returning the command's success message. Read-only commands such as `followup list` skip saving because they leave the student data unchanged. Completed and cancelled records remain in the saved history and are excluded from the outstanding list after a restart.
+
+#### Design considerations
+
+**Aspect: How completed and cancelled follow-ups are retained**
+
+* **Alternative 1 (current choice):** Keep the record and change its status.
+  * Pros: Preserves the description, review date and outcome as history. A new outstanding follow-up can reuse a completed or cancelled description and date without changing the historical record.
+  * Cons: Stored history grows, and every outstanding view must filter out terminal statuses.
+* **Alternative 2:** Remove the record when it is completed or cancelled.
+  * Pros: Keeps the stored collection smaller and removes the need for status filtering.
+  * Cons: Loses the history and prevents distinguishing completed work from cancelled work.
+
+**Aspect: How completion and cancellation share behaviour**
+
+* **Alternative 1 (current choice):** Use shared command and parser superclasses with concrete completion and cancellation subclasses.
+  * Pros: Keeps validation, index lookup, immutable updates, assertions and logging in one place while preserving distinct command types and messages.
+  * Cons: Understanding either action requires reading its superclass, and changes to shared behaviour affect both actions.
+* **Alternative 2:** Implement each command and parser independently.
+  * Pros: Each action can evolve without changing a shared superclass.
+  * Cons: Duplicates validation and update logic, so fixes must be applied twice and the actions can drift apart.
 
 ### Two-word command words
 
@@ -553,9 +619,15 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 
       Use case ends without changing any stored data.
 
-* 2b. The description is empty or the review date is invalid.
+* 2b. The description is invalid (e.g. blank or longer than the permitted length), or the review date is invalid.
 
     * 2b1. TutorLink shows an error message.
+
+      Use case ends without changing any stored data.
+
+* 2c. The student already has an outstanding follow-up with the same description and review date.
+
+    * 2c1. TutorLink shows an error message.
 
       Use case ends without changing any stored data.
 
@@ -584,9 +656,9 @@ The IDs follow the team's original list of 62 stories. The following IDs were re
 
       Use case ends.
 
-* 3a. The student has no follow-ups.
+* 3a. The student has no outstanding follow-ups, even if completed or cancelled records remain in their history.
 
-    * 3a1. TutorLink tells the tutor that no follow-ups were found for the student.
+    * 3a1. TutorLink tells the tutor that no outstanding follow-ups were found for the student.
 
       Use case ends.
 

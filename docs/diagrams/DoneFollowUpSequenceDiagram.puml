@@ -1,0 +1,72 @@
+@startuml
+!include style.puml
+skinparam ArrowFontStyle plain
+skinparam dpi 150
+
+box Logic LOGIC_COLOR_T1
+participant ":LogicManager" as LogicManager LOGIC_COLOR
+participant "c:DoneFollowUpCommand" as DoneFollowUpCommand LOGIC_COLOR
+end box
+
+box Model MODEL_COLOR_T1
+participant "m:Model" as Model MODEL_COLOR
+participant "s:Student" as Student MODEL_COLOR
+end box
+
+box Storage STORAGE_COLOR_T1
+participant ":Storage" as Storage STORAGE_COLOR
+end box
+
+[-> LogicManager : execute(commandText)
+activate LogicManager
+
+note over LogicManager
+    Command parsing and the rollback
+    snapshot are prepared before execute(m).
+end note
+
+LogicManager -> DoneFollowUpCommand : execute(m)
+activate DoneFollowUpCommand
+
+DoneFollowUpCommand -> Model : findStudentByName(name)
+activate Model
+Model --> DoneFollowUpCommand : Optional[s]
+deactivate Model
+
+DoneFollowUpCommand -> Student : getOutstandingFollowUps()
+activate Student
+Student --> DoneFollowUpCommand : outstanding
+deactivate Student
+
+note over DoneFollowUpCommand
+    The displayed index 1 is in range.
+    execute is inherited from
+    ChangeFollowUpStatusCommand.
+end note
+
+DoneFollowUpCommand -> Student : withOutstandingFollowUpStatus(0, DONE)
+activate Student
+Student --> DoneFollowUpCommand : updatedStudent
+deactivate Student
+
+DoneFollowUpCommand -> Model : setStudent(s, updatedStudent)
+activate Model
+Model --> DoneFollowUpCommand
+deactivate Model
+
+DoneFollowUpCommand --> LogicManager : r:CommandResult
+deactivate DoneFollowUpCommand
+
+LogicManager -> Model : getTutorLink()
+activate Model
+Model --> LogicManager : currentData
+deactivate Model
+
+LogicManager -> Storage : saveTutorLink(currentData)
+activate Storage
+Storage --> LogicManager
+deactivate Storage
+
+[<--LogicManager : r
+deactivate LogicManager
+@enduml

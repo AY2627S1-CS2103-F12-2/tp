@@ -1,0 +1,34 @@
+@startuml
+!pragma layout smetana
+!include style.puml
+skinparam arrowThickness 1.1
+skinparam arrowColor LOGIC_COLOR_T4
+skinparam classBackgroundColor LOGIC_COLOR
+skinparam classAttributeFontColor #FFFFFF
+skinparam classAttributeIconSize 0
+skinparam dpi 150
+
+abstract class Command
+abstract class ChangeFollowUpStatusCommand {
+    - targetStatus: FollowUpStatus
+    + execute(model: Model): CommandResult
+}
+class DoneFollowUpCommand
+class CancelFollowUpCommand
+
+show ChangeFollowUpStatusCommand members
+
+ChangeFollowUpStatusCommand -up-|> Command
+DoneFollowUpCommand -up-|> ChangeFollowUpStatusCommand
+CancelFollowUpCommand -up-|> ChangeFollowUpStatusCommand
+
+note bottom of DoneFollowUpCommand
+    Supplies DONE and its
+    success message.
+end note
+
+note bottom of CancelFollowUpCommand
+    Supplies CANCELLED and its
+    success message.
+end note
+@enduml
