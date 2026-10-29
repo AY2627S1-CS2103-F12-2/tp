@@ -3,21 +3,28 @@
 skinparam arrowThickness 1.1
 skinparam arrowColor UI_COLOR_T4
 skinparam classBackgroundColor UI_COLOR
+skinparam linetype polyline
+skinparam nodesep 35
+skinparam ranksep 45
+skinparam dpi 150
 
 package UI <<Rectangle>>{
 Class "<<interface>>\nUi" as Ui
-Class "{abstract}\nUiPart" as UiPart
 Class UiManager
 Class MainWindow
-Class HelpWindow
+together {
+Class CommandBox
 Class ResultDisplay
+Class StatusBarFooter
+Class HelpWindow
+}
+together {
 Class StudentListPanel
-Class StudentCard
 Class StudentDetailPanel
 Class InteractionPanel
 Class FollowUpPanel
-Class StatusBarFooter
-Class CommandBox
+}
+Class StudentCard
 }
 
 package Model <<Rectangle>> {
@@ -40,33 +47,27 @@ MainWindow *-down-> "1" StudentDetailPanel
 MainWindow *-down-> "1" InteractionPanel
 MainWindow *-down-> "1" FollowUpPanel
 MainWindow *-down-> "1" StatusBarFooter
-MainWindow --> "0..1" HelpWindow
+MainWindow -down-> "1" HelpWindow
 
 StudentListPanel -down-> "*" StudentCard
 
-MainWindow -left-|> UiPart
-
-ResultDisplay --|> UiPart
-CommandBox --|> UiPart
-StudentListPanel --|> UiPart
-StudentCard --|> UiPart
-StudentDetailPanel --|> UiPart
-InteractionPanel --|> UiPart
-FollowUpPanel --|> UiPart
-StatusBarFooter --|> UiPart
-HelpWindow --|> UiPart
-
-StudentCard ..> Model
-StudentDetailPanel ..> Model
-InteractionPanel ..> Model
-FollowUpPanel ..> Model
+StudentCard .right.> Model
+StudentDetailPanel .down.> Model
+InteractionPanel .down.> Model
+FollowUpPanel .down.> Model
 UiManager -right-> Logic
-MainWindow -left-> Logic
+MainWindow -right-> Logic
 
-StudentListPanel -[hidden]left- HelpWindow
-HelpWindow -[hidden]left- CommandBox
-CommandBox -[hidden]left- ResultDisplay
-ResultDisplay -[hidden]left- StatusBarFooter
+CommandBox -[hidden]right-> ResultDisplay
+ResultDisplay -[hidden]right-> StatusBarFooter
+StatusBarFooter -[hidden]right-> HelpWindow
+StudentListPanel -[hidden]right-> StudentDetailPanel
+StudentDetailPanel -[hidden]right-> InteractionPanel
+InteractionPanel -[hidden]right-> FollowUpPanel
+CommandBox -[hidden]down-> StudentListPanel
 
-MainWindow -[hidden]-|> UiPart
+legend bottom
+    All shown UI classes except Ui and UiManager extend UiPart.
+    Common inheritance arrows are omitted for clarity.
+endlegend
 @enduml

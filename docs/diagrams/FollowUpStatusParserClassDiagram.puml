@@ -1,0 +1,40 @@
+@startuml
+!pragma layout smetana
+!include style.puml
+skinparam arrowThickness 1.1
+skinparam arrowColor LOGIC_COLOR_T4
+skinparam classBackgroundColor LOGIC_COLOR
+skinparam classAttributeFontColor #FFFFFF
+skinparam classAttributeIconSize 0
+skinparam genericDisplay old
+skinparam dpi 150
+
+class "<<interface>>\nParser" as Parser
+abstract class "ChangeFollowUpStatusCommandParser<T>" as StatusParser {
+    + parse(args: String): T
+}
+class DoneFollowUpCommandParser
+class CancelFollowUpCommandParser
+
+show StatusParser members
+
+StatusParser .up.|> Parser
+DoneFollowUpCommandParser -up-|> StatusParser
+CancelFollowUpCommandParser -up-|> StatusParser
+
+note bottom of DoneFollowUpCommandParser
+    Type parameter:
+    T = DoneFollowUpCommand
+end note
+
+note bottom of CancelFollowUpCommandParser
+    Type parameter:
+    T = CancelFollowUpCommand
+end note
+
+legend bottom
+    For ChangeFollowUpStatusCommandParser:
+    T extends ChangeFollowUpStatusCommand.
+    Concrete parsers supply constructors and usage text.
+endlegend
+@enduml

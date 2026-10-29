@@ -74,6 +74,8 @@ The **API** of this component is specified in [`Ui.java`](https://github.com/AY2
 
 ![Structure of the UI Component](images/UiClassDiagram.png)
 
+The diagram focuses on ownership and dependencies. Common inheritance from `UiPart` is stated in the diagram's legend instead of drawing an arrow from every UI part.
+
 The UI consists of a `MainWindow` and its parts, such as `CommandBox`, `ResultDisplay`, `StudentListPanel`, `StudentDetailPanel`, `InteractionPanel`, `FollowUpPanel` and `StatusBarFooter`. All of these, including `MainWindow`, inherit from the abstract `UiPart` class, which captures common behavior among classes that represent visible GUI parts.
 
 The `UI` component uses the JavaFX UI framework. The layouts of these UI parts are defined in matching `.fxml` files in `src/main/resources/view`. For example, [`MainWindow.fxml`](https://github.com/AY2627S1-CS2103-F12-2/tp/tree/master/src/main/resources/view/MainWindow.fxml) specifies the layout of [`MainWindow`](https://github.com/AY2627S1-CS2103-F12-2/tp/tree/master/src/main/java/seedu/tutorlink/ui/MainWindow.java).
@@ -311,6 +313,12 @@ The parser uses a command-specific tokenizer so that non-empty, nonnumeric `revi
 
 `DoneFollowUpCommandParser` and `CancelFollowUpCommandParser` extend `ChangeFollowUpStatusCommandParser<T>`. Each supplies its usage message and command constructor. The shared parser rejects missing or repeated `n/` and `i/` parameters and unexpected preamble text, then validates the name and positive integer index before creating the concrete command. Either parameter order is accepted.
 
+The partial class diagrams below show where the shared parsing and execution methods are implemented. Each concrete parser binds `T` to its corresponding command type.
+
+<img src="images/FollowUpStatusParserClassDiagram.png" alt="Class diagram of the shared follow-up status parser and its concrete subclasses" width="650" />
+
+<img src="images/FollowUpStatusCommandClassDiagram.png" alt="Class diagram of the shared follow-up status command and its concrete subclasses" width="650" />
+
 `DoneFollowUpCommand` and `CancelFollowUpCommand` extend `ChangeFollowUpStatusCommand`, supplying `DONE` or `CANCELLED` and their respective success-message formats. The shared execution flow is:
 
 1. Find the student by name. An unknown student produces an error before any update.
@@ -320,6 +328,10 @@ The parser uses a command-specific tokenizer so that non-empty, nonnumeric `revi
 1. Return the affected record's description and review date with the remaining outstanding count. The shared command also logs the action and uses internal assertions to check that history size is unchanged, the outstanding count decreases by one, and the model contains the replacement student.
 
 After a status change, the remaining outstanding records are renumbered. A displayed index therefore refers to the latest outstanding list, rather than a permanent record identifier or a position in the JSON array.
+
+The sequence diagram below follows `followup done n/John Tan i/1` through successful execution and saving, assuming John Tan has an outstanding follow-up. `name` is the parsed `Name` for John Tan. Parsing, internal assertions and UI notifications are omitted from the message flow. Cancellation follows the same execution method with `CANCELLED` as the target status.
+
+<img src="images/DoneFollowUpSequenceDiagram.png" alt="Sequence diagram showing completion of the first outstanding follow-up and saving the updated data" width="900" />
 
 #### Persistence and failed saves
 
