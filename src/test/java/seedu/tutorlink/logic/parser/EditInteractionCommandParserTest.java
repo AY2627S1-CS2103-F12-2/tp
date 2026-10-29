@@ -68,6 +68,27 @@ public class EditInteractionCommandParserTest {
     }
 
     @Test
+    public void parse_obsoleteDatePrefix_throwsParseException() {
+        assertThrows(ParseException.class, () -> parser.parse(
+                " n/John Tan i/1 d/2026-10-02 note/Corrected note"));
+    }
+
+    @Test
+    public void parse_duplicateDatePrefix_throwsParseException() {
+        assertThrows(ParseException.class, () -> parser.parse(
+                " n/John Tan i/1 date/2026-10-02 date/2026-10-03"));
+    }
+
+    @Test
+    public void parse_prefixLikeTextAfterNote_returnsCompleteNote() throws Exception {
+        String note = "Corrected d/2026-10-02 s/O Kumar date/2026-10-03 sub/Math";
+        EditInteractionCommand expected = new EditInteractionCommand(new Name("John Tan"), Index.fromOneBased(1),
+                Optional.empty(), Optional.empty(), Optional.of(note));
+
+        assertEquals(expected, parser.parse(" n/John Tan i/1 note/" + note));
+    }
+
+    @Test
     public void parse_missingRequiredOrEditField_throwsParseException() {
         String message = String.format(MESSAGE_INVALID_COMMAND_FORMAT, EditInteractionCommand.MESSAGE_USAGE);
         for (String args : new String[]{"", " n/John Tan i/1", " n/John Tan note/New",

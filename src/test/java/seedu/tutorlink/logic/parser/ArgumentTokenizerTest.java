@@ -138,14 +138,14 @@ public class ArgumentTokenizerTest {
 
     @Test
     public void tokenizeWithTrailingPrefix_keepsPrefixLikeTextInTrailingValue() {
-        String argsString = " n/Alex Yeoh d/2026-10-10 note/Discussed n/next steps "
+        String argsString = " n/Alex Yeoh date/2026-10-10 note/Discussed n/next steps "
                 + "t/14:30 note/another note";
         ArgumentMultimap argMultimap = ArgumentTokenizer.tokenizeWithTrailingPrefix(
-                argsString, new Prefix("note/"), new Prefix("n/"), new Prefix("d/"), new Prefix("t/"));
+                argsString, new Prefix("note/"), new Prefix("n/"), new Prefix("date/"), new Prefix("t/"));
 
         assertPreambleEmpty(argMultimap);
         assertArgumentPresent(argMultimap, new Prefix("n/"), "Alex Yeoh");
-        assertArgumentPresent(argMultimap, new Prefix("d/"), "2026-10-10");
+        assertArgumentPresent(argMultimap, new Prefix("date/"), "2026-10-10");
         assertArgumentAbsent(argMultimap, new Prefix("t/"));
         assertArgumentPresent(argMultimap, new Prefix("note/"),
                 "Discussed n/next steps t/14:30 note/another note");

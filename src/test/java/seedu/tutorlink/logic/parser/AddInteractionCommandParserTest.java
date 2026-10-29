@@ -38,6 +38,36 @@ public class AddInteractionCommandParserTest {
     }
 
     @Test
+    public void parse_nameWithNameConnectorsAndDatePrefix_returnsCommand() throws Exception {
+        AddInteractionCommand expected = new AddInteractionCommand(new Name("Raj s/O Kumar d/o Ahmad"),
+                new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "Discussed revision plan"));
+
+        assertEquals(expected, parser.parse(
+                " n/Raj s/O Kumar d/o Ahmad date/2026-10-01 note/Discussed revision plan"));
+    }
+
+    @Test
+    public void parse_obsoleteDatePrefix_throwsParseException() {
+        assertThrows(ParseException.class, () -> parser.parse(
+                " n/Alex Tan d/2026-10-01 note/Discussed revision plan"));
+    }
+
+    @Test
+    public void parse_duplicateDatePrefix_throwsParseException() {
+        assertThrows(ParseException.class, () -> parser.parse(
+                " n/Alex Tan date/2026-10-01 date/2026-10-02 note/Discussed revision plan"));
+    }
+
+    @Test
+    public void parse_prefixLikeTextAfterNote_returnsCompleteNote() throws Exception {
+        String note = "Discussed d/2026-10-10 s/O Kumar date/2026-10-11 sub/Math";
+        AddInteractionCommand expected = new AddInteractionCommand(new Name("Alex Yeoh"),
+                new Interaction(LocalDate.of(2026, 10, 10), Optional.empty(), note));
+
+        assertEquals(expected, parser.parse(" n/Alex Yeoh date/2026-10-10 note/" + note));
+    }
+
+    @Test
     public void parse_emptyTime_returnsCommandWithNoTime() throws Exception {
         AddInteractionCommand expected = new AddInteractionCommand(new Name("Alex Tan"),
                 new Interaction(LocalDate.of(2026, 10, 1), Optional.empty(), "Discussed revision plan"));
