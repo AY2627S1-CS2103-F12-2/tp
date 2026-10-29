@@ -124,6 +124,18 @@ public class EditInteractionCommandTest {
     }
 
     @Test
+    public void execute_unchangedValues_throwsCommandException() {
+        Student student = BENSON.withInteraction(LATER);
+        model.setStudent(BENSON, student);
+        String message = String.format(EditInteractionCommand.MESSAGE_NO_CHANGE, 1, student.getName());
+
+        assertCommandFailure(new EditInteractionCommand(student.getName(), Index.fromOneBased(1),
+                Optional.empty(), Optional.empty(), true, Optional.empty()), model, message);
+        assertCommandFailure(new EditInteractionCommand(student.getName(), Index.fromOneBased(1),
+                Optional.of(LATER.getDate()), Optional.empty(), Optional.of(LATER.getNote())), model, message);
+    }
+
+    @Test
     public void execute_unknownStudentOrOutOfRange_throwsCommandException() {
         EditInteractionCommand missing = new EditInteractionCommand(new Name("Missing Student"),
                 Index.fromOneBased(1), Optional.empty(), Optional.empty(), Optional.of("New"));
