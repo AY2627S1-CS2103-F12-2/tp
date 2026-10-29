@@ -87,7 +87,7 @@ public class AddFollowUpCommandParserTest {
 
     @Test
     public void parse_literalReviewWithoutDate_throwsParseException() {
-        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_DATE_FORMAT, () ->
+        assertThrows(ParseException.class, String.format(ParserUtil.MESSAGE_INVALID_DATE_FORMAT, "worksheet"), () ->
                 parser.parse(" n/John Tan desc/Discuss review/worksheet"));
     }
 
@@ -184,7 +184,7 @@ public class AddFollowUpCommandParserTest {
 
     @Test
     public void parse_invalidReviewDate_throwsParseException() {
-        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_DATE_FORMAT, () ->
+        assertThrows(ParseException.class, String.format(ParserUtil.MESSAGE_INVALID_DATE_FORMAT, "15-10-2026"), () ->
                 parser.parse(" n/John Tan desc/Review algebra review/15-10-2026"));
         assertThrows(ParseException.class, String.format(ParserUtil.MESSAGE_INVALID_CALENDAR_DATE, "2026-02-30"), () ->
                 parser.parse(" n/John Tan desc/Review algebra review/2026-02-30"));
