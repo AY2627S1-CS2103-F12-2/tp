@@ -23,7 +23,10 @@ public class Interaction {
     public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm")
             .withResolverStyle(ResolverStyle.STRICT);
 
-    /** Orders interactions oldest first; an interaction without a time comes before timed ones on the same date. */
+    /**
+     * Orders interactions oldest first; an interaction without a time is treated as {@code 00:00},
+     * so it comes before later timed interactions on the same date; ties keep their recording order.
+     */
     public static final Comparator<Interaction> CHRONOLOGICAL_ORDER = Comparator
             .comparing(Interaction::getDate)
             .thenComparing(interaction -> interaction.getTime().orElse(LocalTime.MIN));
