@@ -114,6 +114,7 @@ Format: `student add n/NAME [sub/SUBJECT]…`
   For example, `é` and `e` followed by a combining acute accent both count as one.
 * A student can have any number of subjects, including none. Giving the same subject twice, in any case, is rejected.
 * Subjects are shown in the order you type them.
+* The new student is selected. If a [`find`](#finding-students-by-name-find) is active, the student list shows all your students again so the new student is in it.
 
 Examples:
 * `student add n/John Tan sub/Math sub/Physics`
