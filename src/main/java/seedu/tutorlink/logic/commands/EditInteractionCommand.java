@@ -31,6 +31,8 @@ public class EditInteractionCommand extends Command {
             + "Example: " + COMMAND_WORD + " n/John Tan i/1 note/Reviewed fractions";
     public static final String MESSAGE_SUCCESS = "\u2714 Interaction updated for %1$s: %2$s\n"
             + "Updated to: %3$s";
+    public static final String MESSAGE_NO_CHANGE =
+            "No changes made: interaction %1$d for %2$s already has these values.";
 
     private static final Logger logger = LogsCenter.getLogger(EditInteractionCommand.class);
 
@@ -84,6 +86,9 @@ public class EditInteractionCommand extends Command {
         Optional<LocalTime> editedTime = isTimeEdited ? time : original.getTime();
         Interaction edited = new Interaction(date.orElse(original.getDate()),
                 editedTime, note.orElse(original.getNote()));
+        if (edited.equals(original)) {
+            throw new CommandException(String.format(MESSAGE_NO_CHANGE, index.getOneBased(), student.getName()));
+        }
         Student updatedStudent = student.withInteractionAtChronologicalIndex(index.getZeroBased(), edited);
         assert updatedStudent.getInteractions().size() == student.getInteractions().size()
                 : "Editing should preserve the interaction count";

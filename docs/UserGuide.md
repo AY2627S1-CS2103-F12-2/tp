@@ -293,6 +293,7 @@ Format: `interaction edit n/NAME i/INDEX [date/DATE] [t/TIME] [note/TEXT]`
 * An existing time can be replaced using `t/TIME`, removed using `t/` with no value,
   or preserved by omitting `t/`.
 * Changing the date or time can renumber the list. Run `interaction list` again before choosing another item.
+* If the supplied values match the interaction's current values, TutorLink reports that no changes were made.
 * A failed command leaves your stored data unchanged.
 
 Examples:
