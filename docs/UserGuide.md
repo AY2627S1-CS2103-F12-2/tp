@@ -197,7 +197,8 @@ Records a dated note about a lesson or other discussion with an existing student
 Format: `interaction add n/NAME date/DATE [t/TIME] note/TEXT`
 
 * `NAME` identifies an existing student by their full name, ignoring case.
-* `DATE` must be a real calendar date in `yyyy-MM-dd` format, such as `2026-10-01`.
+* `DATE` must be a valid calendar date in `yyyy-MM-dd` format, such as `2026-10-01`. The year must have exactly four digits, from `0000` to `9999` inclusive.
+  Dates such as `0000-01-01` and `0001-01-01` are accepted without a warning; check the year before running the command.
   A future date is allowed, but TutorLink warns you before recording it.
 * `TIME` is optional. If given, it must be a valid 24-hour time from `00:00` to `23:59`,
   inclusive, in `HH:mm` format, such as `14:30`. A `t/` with no value records the interaction without a time.
@@ -360,7 +361,8 @@ Format: `followup add n/NAME desc/TEXT review/DATE`
 * `NAME` identifies an existing student by their full name, ignoring case.
 * `TEXT` is 1 to 200 characters long after leading and trailing whitespace is removed. It must not be blank and must be on a single line. If you paste text containing line breaks, each line break becomes a space.
   The limit counts Unicode code points: a simple emoji such as 😀 counts as one. A combined emoji or a letter with a combining accent can contain multiple code points and count as more than one.
-* `DATE` must be a real calendar date in `yyyy-MM-dd` format, such as `2026-10-15`. Past, present and future review dates are allowed.
+* `DATE` must be a valid calendar date in `yyyy-MM-dd` format, such as `2026-10-15`. The year must have exactly four digits, from `0000` to `9999` inclusive. Past, present and future review dates are allowed.
+  Dates such as `0000-01-01` and `0001-01-01` are accepted without a warning; check the year before running the command.
 * Parameters can be in any order; `desc/` does not need to be last.
 * Give each parameter exactly once. Missing parameters or repeated parameter prefixes are rejected.
 * `TEXT` can contain literal text such as `review/worksheet` when you also give a separate `review/DATE`
