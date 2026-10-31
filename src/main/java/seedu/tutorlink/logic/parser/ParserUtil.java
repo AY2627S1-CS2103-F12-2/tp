@@ -34,7 +34,7 @@ public class ParserUtil {
     public static final String MESSAGE_INVALID_SUBJECT = "Subject '%1$s' is not valid. %2$s";
     public static final String MESSAGE_DUPLICATE_SUBJECT = "Subject '%1$s' is specified twice for the same student.";
     public static final String MESSAGE_INVALID_DATE_FORMAT =
-            "Date must be in format yyyy-MM-dd (e.g. 2026-09-14).";
+            "'%1$s' is not a date in yyyy-MM-dd format (e.g. 2026-09-14).";
     public static final String MESSAGE_INVALID_CALENDAR_DATE = "'%1$s' is not a valid calendar date.";
     public static final String MESSAGE_INVALID_INTERACTION_TIME =
             "Interaction time must be a valid time in HH:mm format.";
@@ -163,7 +163,7 @@ public class ParserUtil {
         String trimmedDate = date.trim();
         if (!trimmedDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
             verifyNoUnknownPrefix(trimmedDate);
-            throw new ParseException(MESSAGE_INVALID_DATE_FORMAT);
+            throw new ParseException(String.format(MESSAGE_INVALID_DATE_FORMAT, trimmedDate));
         }
         try {
             return LocalDate.parse(trimmedDate, DateTimeFormatter.ISO_LOCAL_DATE);

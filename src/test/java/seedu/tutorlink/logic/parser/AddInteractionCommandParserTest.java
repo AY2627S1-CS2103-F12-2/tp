@@ -133,7 +133,7 @@ public class AddInteractionCommandParserTest {
 
     @Test
     public void parse_malformedDate_throwsParseException() {
-        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_DATE_FORMAT, () ->
+        assertThrows(ParseException.class, String.format(ParserUtil.MESSAGE_INVALID_DATE_FORMAT, "2026/10/01"), () ->
                 parser.parse(" n/Alex Tan date/2026/10/01 note/Discussed revision plan"));
     }
 

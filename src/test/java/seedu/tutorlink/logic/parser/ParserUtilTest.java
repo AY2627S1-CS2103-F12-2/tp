@@ -125,9 +125,14 @@ public class ParserUtilTest {
 
     @Test
     public void parseReviewDate_malformedDate_throwsParseException() {
-        assertThrows(ParseException.class, MESSAGE_INVALID_DATE_FORMAT, () -> ParserUtil.parseReviewDate(""));
-        assertThrows(ParseException.class, MESSAGE_INVALID_DATE_FORMAT, () -> ParserUtil.parseReviewDate("2026-1-08"));
-        assertThrows(ParseException.class, MESSAGE_INVALID_DATE_FORMAT, () -> ParserUtil.parseReviewDate("2026/10/08"));
+        assertThrows(ParseException.class, String.format(MESSAGE_INVALID_DATE_FORMAT, ""), () ->
+                ParserUtil.parseReviewDate(""));
+        assertThrows(ParseException.class, String.format(MESSAGE_INVALID_DATE_FORMAT, "2026-1-08"), () ->
+                ParserUtil.parseReviewDate("2026-1-08"));
+        assertThrows(ParseException.class, String.format(MESSAGE_INVALID_DATE_FORMAT, "2026/10/08"), () ->
+                ParserUtil.parseReviewDate("2026/10/08"));
+        assertThrows(ParseException.class, String.format(MESSAGE_INVALID_DATE_FORMAT, "2026-11-01 extra"), () ->
+                ParserUtil.parseReviewDate("2026-11-01 extra"));
     }
 
     @Test
@@ -152,8 +157,8 @@ public class ParserUtilTest {
 
     @Test
     public void parseInteractionDate_malformedDate_throwsParseException() {
-        assertThrows(ParseException.class, MESSAGE_INVALID_DATE_FORMAT, () -> ParserUtil.parseInteractionDate(
-                "2026/10/01"));
+        assertThrows(ParseException.class, String.format(MESSAGE_INVALID_DATE_FORMAT, "2026/10/01"), () ->
+                ParserUtil.parseInteractionDate("2026/10/01"));
     }
 
     @Test

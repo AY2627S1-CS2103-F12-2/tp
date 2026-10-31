@@ -1123,7 +1123,7 @@ Run the follow-up sections below in order in a disposable test folder. Start wit
       Expected: The error says `Description cannot be empty.`
 
    1. Test case: `followup add n/Followup Test desc/Check homework review/01-11-2026`<br>
-      Expected: The error says `Date must be in format yyyy-MM-dd (e.g. 2026-09-14).`
+      Expected: The error says `'01-11-2026' is not a date in yyyy-MM-dd format (e.g. 2026-09-14).`
 
    1. Test case: `followup add n/Followup Test desc/Check homework review/2026-02-30`<br>
       Expected: The error says `'2026-02-30' is not a valid calendar date.`
