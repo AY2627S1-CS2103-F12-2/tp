@@ -183,6 +183,7 @@ Format: `find KEYWORD [MORE_KEYWORDS]`
 * Parts of a name split by a hyphen, apostrophe or full stop count as words too. `connor` and `jones` both match `O'Connor-Jones`.
 * Students matching at least one word are shown. `find Tan Lim` shows both `John Tan` and `Aliyah Lim`.
 * The student list shows `Showing 2 of 46` while the results are filtered. Type `list` to show everyone again.
+* `find` takes plain keywords, not parameters. `find n/Tan` is rejected with `'n/' is not a parameter of this command.` Use `find Tan` instead.
 
 Examples:
 * `find tan` shows `John Tan` and `Tan Wei Ling`.
