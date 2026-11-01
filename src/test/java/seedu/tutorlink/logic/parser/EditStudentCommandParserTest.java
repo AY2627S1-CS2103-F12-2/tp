@@ -71,6 +71,18 @@ public class EditStudentCommandParserTest {
     }
 
     @Test
+    public void parse_singleEmptySubject_clearsSubjects() {
+        assertParseSuccess(parser, NAME_DESC_AMY + " " + PREFIX_SUBJECT,
+                new EditStudentCommand(new Name(VALID_NAME_AMY), Optional.empty(), Optional.of(List.of())));
+    }
+
+    @Test
+    public void parse_emptySubjectWithOtherSubjects_failure() {
+        assertParseFailure(parser, NAME_DESC_AMY + " " + PREFIX_SUBJECT + SUBJECT_DESC_MATH,
+                String.format(ParserUtil.MESSAGE_INVALID_SUBJECT, "", Subject.MESSAGE_CONSTRAINTS));
+    }
+
+    @Test
     public void parse_nothingToEdit_failure() {
         assertParseFailure(parser, NAME_DESC_AMY, EditStudentCommand.MESSAGE_NOTHING_TO_EDIT);
     }

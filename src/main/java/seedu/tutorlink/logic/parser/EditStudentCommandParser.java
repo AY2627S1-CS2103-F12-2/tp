@@ -52,10 +52,16 @@ public class EditStudentCommandParser implements Parser<EditStudentCommand> {
         return Optional.of(ParserUtil.parseName(newName.get()));
     }
 
+    /**
+     * Returns the replacement subjects, or an empty list if a single empty {@code sub/} asks to clear them all.
+     */
     private static Optional<List<Subject>> parseNewSubjects(ArgumentMultimap argMultimap) throws ParseException {
         List<String> subjects = argMultimap.getAllValues(PREFIX_SUBJECT);
         if (subjects.isEmpty()) {
             return Optional.empty();
+        }
+        if (subjects.equals(List.of(""))) {
+            return Optional.of(List.of());
         }
         return Optional.of(ParserUtil.parseSubjects(subjects));
     }

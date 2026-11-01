@@ -30,7 +30,8 @@ public class EditStudentCommand extends Command {
             + "[" + PREFIX_NEW_NAME + "NEW_NAME] "
             + "[" + PREFIX_SUBJECT + "SUBJECT]...\n"
             + "Give at least one of " + PREFIX_NEW_NAME + " or " + PREFIX_SUBJECT
-            + ". Any " + PREFIX_SUBJECT + " replaces all existing subjects.\n"
+            + ". Any " + PREFIX_SUBJECT + " replaces all existing subjects, and a single empty "
+            + PREFIX_SUBJECT + " removes them all.\n"
             + "Example: " + COMMAND_WORD + " "
             + PREFIX_NAME + "John Tan "
             + PREFIX_NEW_NAME + "Jonathan Tan "
