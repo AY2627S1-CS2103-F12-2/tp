@@ -31,4 +31,18 @@ public class FindCommandParserTest {
         assertParseSuccess(parser, " \n Alice \n \t Bob  \t", expectedFindCommand);
     }
 
+    @Test
+    public void parse_prefixKeyword_throwsParseException() {
+        String expectedMessage = String.format(ParserUtil.MESSAGE_UNKNOWN_PREFIX, "n/") + "\n"
+                + FindCommand.MESSAGE_USAGE;
+        assertParseFailure(parser, "n/Ann", expectedMessage);
+        assertParseFailure(parser, "Tan n/", expectedMessage);
+    }
+
+    @Test
+    public void parse_nameConnectorKeyword_returnsFindCommand() {
+        assertParseSuccess(parser, "s/o D/O",
+                new FindCommand(new NameContainsKeywordsPredicate(List.of("s/o", "D/O"))));
+    }
+
 }
