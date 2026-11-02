@@ -2,6 +2,7 @@ package seedu.tutorlink.logic;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -50,6 +51,7 @@ public class LogicManager implements Logic {
         Command command = tutorLinkParser.parseCommand(commandText);
         TutorLink previousTutorLink = new TutorLink(model.getTutorLink());
         Student previousSelectedStudent = model.getSelectedStudent().get();
+        Predicate<Student> previousFilter = model.getFilteredStudentPredicate();
         commandResult = command.execute(model);
 
         if (previousTutorLink.equals(model.getTutorLink())) {
@@ -59,10 +61,10 @@ public class LogicManager implements Logic {
         try {
             storage.saveTutorLink(model.getTutorLink());
         } catch (AccessDeniedException e) {
-            restorePreviousState(previousTutorLink, previousSelectedStudent);
+            restorePreviousState(previousTutorLink, previousSelectedStudent, previousFilter);
             throw new CommandException(String.format(FILE_OPS_PERMISSION_ERROR_FORMAT, e.getMessage()), e);
         } catch (IOException ioe) {
-            restorePreviousState(previousTutorLink, previousSelectedStudent);
+            restorePreviousState(previousTutorLink, previousSelectedStudent, previousFilter);
             throw new CommandException(String.format(FILE_OPS_ERROR_FORMAT, ioe.getMessage()), ioe);
         }
 
@@ -70,10 +72,12 @@ public class LogicManager implements Logic {
     }
 
     /**
-     * Restores the data after a failed save without losing the student's current context.
+     * Restores the data after a failed save without losing the selected student or the active filter.
      */
-    private void restorePreviousState(TutorLink previousTutorLink, Student previousSelectedStudent) {
+    private void restorePreviousState(TutorLink previousTutorLink, Student previousSelectedStudent,
+            Predicate<Student> previousFilter) {
         model.setTutorLink(previousTutorLink);
+        model.updateFilteredStudentList(previousFilter);
         if (previousSelectedStudent != null) {
             model.findStudentByName(previousSelectedStudent.getName()).ifPresent(model::setSelectedStudent);
         }

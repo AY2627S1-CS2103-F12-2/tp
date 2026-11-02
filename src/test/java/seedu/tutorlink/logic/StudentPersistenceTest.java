@@ -111,6 +111,19 @@ public class StudentPersistenceTest {
     }
 
     @Test
+    public void execute_addStudentFailure_preservesFindFilter() throws Exception {
+        RecoverableTutorLinkStorage storage = useStorage(new AccessDeniedException(dataPath.toString()));
+        logic.execute("student view n/" + BOB.getName());
+        logic.execute("find " + BOB.getName().fullName.split(" ")[0]);
+
+        assertThrows(CommandException.class, () -> logic.execute(ADD_COMMAND));
+
+        assertEquals(List.of(BOB), model.getFilteredStudentList());
+        assertEquals(BOB, model.getSelectedStudent().get());
+        assertEquals(1, storage.saveAttempts);
+    }
+
+    @Test
     public void execute_addStudentFailureThenSuccessfulSave_failedAdditionNotPersisted() throws Exception {
         assertRecoveryDoesNotPersistFailedChange(ADD_COMMAND);
     }

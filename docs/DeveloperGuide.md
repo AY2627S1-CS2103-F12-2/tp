@@ -337,7 +337,7 @@ The sequence diagram below follows `followup done n/John Tan i/1` through succes
 
 `JsonAdaptedStudent` stores the full follow-up history through `JsonAdaptedFollowUp`. Each entry contains `description`, `reviewDate` in ISO date format and `status` as `OUTSTANDING`, `DONE` or `CANCELLED`. Loading validates the description, calendar date and status before reconstructing the immutable record. A missing status defaults to `OUTSTANDING` for compatibility with older data files; an unrecognised status is rejected.
 
-After a command changes student data, `LogicManager` saves through `Storage#saveTutorLink`. If saving throws an `IOException`, it restores the previous data and selected student and reports an error instead of returning the command's success message. Read-only commands such as `followup list` skip saving because they leave the student data unchanged. Completed and cancelled records remain in the saved history and are excluded from the outstanding list after a restart.
+After a command changes student data, `LogicManager` saves through `Storage#saveTutorLink`. If saving throws an `IOException`, it restores the previous data, selected student and student list filter, and reports an error instead of returning the command's success message. Read-only commands such as `followup list` skip saving because they leave the student data unchanged. Completed and cancelled records remain in the saved history and are excluded from the outstanding list after a restart.
 
 #### Design considerations
 

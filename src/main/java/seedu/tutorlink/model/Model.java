@@ -72,6 +72,9 @@ public interface Model {
     /** Returns an unmodifiable view of the filtered student list */
     ObservableList<Student> getFilteredStudentList();
 
+    /** Returns the filter currently applied to the filtered student list. */
+    Predicate<Student> getFilteredStudentPredicate();
+
     /**
      * Returns the student currently shown in detail, or a property holding {@code null} if no student is selected.
      * The selection is cleared when the student is deleted or hidden by a filter, and follows the student when it

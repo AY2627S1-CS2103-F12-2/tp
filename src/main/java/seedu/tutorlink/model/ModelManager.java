@@ -142,6 +142,12 @@ public class ModelManager implements Model {
     }
 
     @Override
+    public Predicate<Student> getFilteredStudentPredicate() {
+        Predicate<? super Student> predicate = filteredStudents.getPredicate();
+        return predicate == null ? PREDICATE_SHOW_ALL_STUDENTS : predicate::test;
+    }
+
+    @Override
     public void updateFilteredStudentList(Predicate<Student> predicate) {
         requireNonNull(predicate);
         filteredStudents.setPredicate(predicate);
