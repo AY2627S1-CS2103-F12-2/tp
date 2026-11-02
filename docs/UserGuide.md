@@ -120,11 +120,11 @@ Examples:
 * `student add n/John Tan sub/Math sub/Physics`
 * `student add n/Aliyah Lim`
 
-On success, TutorLink shows the student and the new total:
+On success, TutorLink shows the student and the new total. For example, adding John Tan to the 6 sample students shows:
 
 ```
 ✔ Student added: John Tan (subjects: Math, Physics)
-Total students: 5
+Total students: 7
 ```
 
 ### Viewing a student: `student view`
