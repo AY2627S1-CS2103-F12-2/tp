@@ -6,11 +6,11 @@
 
 TutorLink is a desktop app for independent private tutors who teach several students through recurring one-to-one lessons. It is designed for tutors who type quickly and prefer entering commands to using a mouse.
 
-Between lessons, a tutor may need to piece together a student's learning context from chats, documents, and memory. TutorLink aims to keep each student's subjects, dated interaction notes, and outstanding follow-ups in one place, so the tutor can prepare for the next lesson quickly.
+Between lessons, a tutor may need to piece together a student's learning context from chats, documents, and memory. TutorLink keeps each student's subjects, dated interaction notes, and outstanding follow-ups in one place, so the tutor can prepare for the next lesson quickly.
 
-## Planned features
+## Features
 
-TutorLink's first version is planned around six commands:
+Examples of available commands:
 
 | Task | Command |
 | --- | --- |
@@ -20,10 +20,12 @@ TutorLink's first version is planned around six commands:
 | View a student's interaction history | `interaction list n/NAME` |
 | Add a follow-up for a student | `followup add n/NAME desc/TEXT review/DATE` |
 | View a student's outstanding follow-ups | `followup list n/NAME` |
+| Complete an outstanding follow-up | `followup done n/NAME i/INDEX` |
+| Cancel an outstanding follow-up | `followup cancel n/NAME i/INDEX` |
 
 For example, a tutor could record a lesson with `interaction add n/Alex Tan date/2026-10-01 note/Practised algebraic fractions`, then add `followup add n/Alex Tan desc/Revisit algebraic fractions review/2026-10-08`. Before the next lesson, `student view`, `interaction list`, and `followup list` would help the tutor regain context.
 
-Dates use `yyyy-MM-dd`, and an optional interaction time uses `HH:mm`. Follow-ups belong to a student. Until a command to complete or cancel them is added, every recorded follow-up is considered outstanding.
+Dates use `yyyy-MM-dd`, and an optional interaction time uses `HH:mm`. Follow-ups belong to a student. Completed and cancelled follow-ups remain saved but no longer appear in the outstanding list or panel. Use `followup list` to find an item's current index before completing or cancelling it.
 
 ## Scope
 
