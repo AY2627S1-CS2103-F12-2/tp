@@ -1056,8 +1056,17 @@ testers are expected to do more *exploratory* testing.
       Expected: Only the first interaction's note changes. Its date and time remain unchanged, and the result shows
       the original and updated interaction.
 
+   1. Setup for testing time removal: `interaction edit n/John Tan i/1 t/00:00`, then
+      `interaction list n/John Tan`.<br>
+      Expected: The first interaction has time `00:00`. If it already had this time, the edit reports no changes.
+      Using midnight keeps this interaction first in chronological order.
+
    1. Test case: `interaction edit n/John Tan i/1 t/`<br>
-      Expected: The first interaction's time is removed while its date and note remain unchanged.
+      Expected: The first interaction's time changes from `00:00` to no time, while its date and note remain
+      unchanged. The result shows the original and updated interaction.
+
+   1. Test case: Repeat `interaction edit n/John Tan i/1 t/`.<br>
+      Expected: Nothing changes. The error says `No changes made: interaction 1 for John Tan already has these values.`
 
    1. Test case: `interaction edit n/John Tan i/1 date/2099-12-31`<br>
       Expected: TutorLink warns about the future date, updates the interaction, and renumbers the chronological list
