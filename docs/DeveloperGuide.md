@@ -95,21 +95,15 @@ Here's a (partial) class diagram of the `Logic` component:
 
 <img src="images/LogicClassDiagram.png" width="550"/>
 
-The sequence diagram below illustrates the interactions within the `Logic` component, taking
-`execute("interaction delete n/John Tan i/1")` API call as an example.
-
-![Interactions Inside the Logic Component for the `interaction delete n/John Tan i/1` Command](images/DeleteSequenceDiagram.png)
-
-<div markdown="span" class="alert alert-info">:information_source: **Note:** The lifeline for `DeleteInteractionCommandParser` should end at the destroy marker (X), but due to a limitation of PlantUML, it continues to the end of the diagram.
-</div>
-
 How the `Logic` component works:
 
 1. When `Logic` is called upon to execute a command, the command is passed to a `TutorLinkParser` object, which in turn creates a parser that matches the command (e.g., `DeleteInteractionCommandParser`) and uses it to parse the command.
 1. This results in a `Command` object (more precisely, an object of one of its subclasses e.g., `DeleteInteractionCommand`) which is executed by the `LogicManager`.
-1. The command can communicate with the `Model` when it is executed (e.g. to replace a student after deleting the selected interaction).<br>
-   Note that although this is shown as a single step in the diagram above for simplicity, the code can require several interactions between the command object and the `Model` to complete the operation.
+1. The command can communicate with the `Model` when it is executed (e.g. to replace a student after deleting the selected interaction).
 1. The result of the command execution is encapsulated as a `CommandResult` object which is returned from `Logic`.
+
+For a focused sequence diagram of command execution, see
+[Editing and deleting interactions](#editing-and-deleting-interactions).
 
 Here are the other classes in `Logic` (omitted from the class diagram above) that are used for parsing a user command:
 
@@ -266,13 +260,56 @@ treated as `00:00`, so it appears before later timed interactions on the same da
 Keeping the stored order separate from the displayed order allows later commands to refer to the number shown to the
 tutor without rewriting the persisted list.
 
-**Persistence.** `JsonAdaptedStudent` serializes each interaction as a `JsonAdaptedInteraction` containing the ISO
+#### Editing and deleting interactions
+
+`EditInteractionCommand` and `DeleteInteractionCommand` interpret `i/INDEX` using the same chronological order as
+`ListInteractionsCommand`. They find the student, obtain `Student#getInteractionsInChronologicalOrder`, and check
+that the requested index is within that list. The user's index starts at 1; `Index#getZeroBased` converts it to a
+position starting at 0.
+
+The sequence diagram follows `interaction delete n/John Tan i/1`, assuming John Tan exists and has at least one
+interaction. It focuses on deletion after parsing: before `execute(m)`, `TutorLinkParser` and
+`DeleteInteractionCommandParser` have already created the command and validated its arguments. Parsing is omitted
+to keep the diagram focused on chronological index handling and model updates. The command still checks whether
+the student exists and whether the index is within the student's interaction list.
+
+The lifeline labels use `objectName:Type` notation: `c` is the `DeleteInteractionCommand`, `m` is the `Model`
+passed to `execute(m)`, and `s` is the `Student` returned by the lookup. `name` is the parsed `Name` for John Tan.
+Internal Model calls, assertions, logging, result construction, persistence and UI notifications are omitted.
+
+<img src="images/DeleteSequenceDiagram.png" alt="Sequence diagram of deleting the first displayed interaction through the command and Model API" width="900" />
+
+1. `DeleteInteractionCommand` obtains the chronological list and identifies the interaction to report as deleted.
+1. `Student#withoutInteractionAtChronologicalIndex` maps the displayed position to its stored position, removes
+   that record from a copy of the stored list, and returns a new student. Every other record keeps its stored order.
+1. The command replaces the old student through `Model#setStudent` and returns a `CommandResult` identifying the
+   deleted interaction and the remaining count. `LogicManager` then saves the changed data before returning success.
+
+For example, suppose two interactions were recorded out of date order:
+
+| View | First entry | Second entry |
+| --- | --- | --- |
+| Stored order | `2026-10-03 — Algebra` | `2026-10-01 — Fractions` |
+| Displayed chronological order | `1. 2026-10-01 — Fractions` | `2. 2026-10-03 — Algebra` |
+
+Deleting displayed item 1 removes `Fractions`, which is the second stored record. The remaining `Algebra` entry
+becomes displayed item 1. Using the displayed index directly against the stored list would remove the wrong record.
+
+Editing uses `Student#withInteractionAtChronologicalIndex` to perform the same position mapping and replace only
+the chosen record. Omitted fields retain their original values. For time, `EditInteractionCommand` distinguishes
+an omitted `t/` (keep the current time) from an empty `t/` (remove it). Changing a date or time can move an entry
+within the chronological view, so subsequent edits and deletions must use the newly displayed numbers.
+Subjects and follow-ups are preserved by both operations.
+
+#### Persistence
+
+`JsonAdaptedStudent` serializes each interaction as a `JsonAdaptedInteraction` containing the ISO
 date, an optional `HH:mm` time, and the note. A missing time is stored as `null` and restored as an empty
 `Optional`. When the data file is loaded, the adapter validates the date, time, note length and single-line note
 constraint before reconstructing the immutable `Interaction`; invalid stored values are reported instead of being
 silently accepted.
 
-**Design considerations**
+#### Design considerations for interactions
 
 **Aspect: Where interactions are stored**
 
@@ -858,7 +895,7 @@ TutorLink marks it as cancelled instead of done.
 4.  Should be able to hold up to 100 students, each with up to 200 interactions and 50 follow-ups, and still respond to any command within 2 seconds on a typical laptop (US54).
 5.  A user with above average typing speed for regular English text (i.e. not code, not system admin commands) should be able to accomplish every frequent task faster using commands than using the mouse (US53).
 6.  Should be distributed as a single JAR file of at most 100MB that runs without an installer.
-7.  Should show an error message for every invalid command that states what is wrong and the expected command format, without changing any stored data.
+7.  Should reject invalid commands with an error message identifying the problem or showing the expected command format, without changing stored data.
 8.  Should display text readably on screens with a resolution of 1920x1080 or higher, at 100% and 125% screen scale.
 
 ### Glossary
