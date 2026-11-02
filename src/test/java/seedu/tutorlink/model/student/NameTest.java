@@ -36,6 +36,9 @@ public class NameTest {
         assertFalse(Name.isValidName("Ravi s/ Kumar")); // '/' outside a name connector
         assertFalse(Name.isValidName("Ravi a/o Kumar")); // not a name connector
         assertFalse(Name.isValidName("Ravi s/oKumar")); // connector joined to the next word
+        assertFalse(Name.isValidName("s/o")); // connector only
+        assertFalse(Name.isValidName("D/O")); // connector only, upper case
+        assertFalse(Name.isValidName("s/o d/o")); // connectors only
         assertFalse(Name.isValidName("-'.")); // no letter
         assertFalse(Name.isValidName(" Peter")); // leading space
         assertFalse(Name.isValidName("a".repeat(Name.MAX_LENGTH + 1))); // too long

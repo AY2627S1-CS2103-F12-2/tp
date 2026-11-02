@@ -105,7 +105,7 @@ Format: `student add n/NAME [sub/SUBJECT]…`
   The limit counts Unicode code points after equivalent accented spellings are normalized.
   A supplementary CJK letter such as `𠀀` counts as one character. An `e` followed by a combining acute
   accent becomes `é` before counting and also counts as one character.
-* `NAME` may also contain `s/o` or `d/o` as a separate word, in any case, as in `Raj s/o Kumar` or `Siti D/O Ahmad`.
+* `NAME` may also contain `s/o` or `d/o` as a separate word, in any case, as in `Raj s/o Kumar` or `Siti D/O Ahmad`. A name made of only connectors, such as `s/o`, is rejected.
 * Each student's name must be unique, ignoring case. If `John Tan` exists, adding `john tan` is rejected as a duplicate.
 * `SUBJECT` is 1 to 30 characters long and may use letters, digits, spaces, hyphens, `+` and `&`, for example `H2 Math` or `Biology + Chemistry`.
 * Subject names support accented letters and combining marks, such as `Français` and `தமிழ்`.

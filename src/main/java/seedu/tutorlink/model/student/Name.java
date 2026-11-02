@@ -49,9 +49,11 @@ public class Name {
     public static boolean isValidName(String test) {
         String composedTest = toComposedForm(test);
         String testWithoutConnectors = composedTest.replaceAll(CONNECTOR_REGEX, "so");
+        // A connector joins name parts, so its letters do not count as the name's letter
+        String testWithConnectorsRemoved = composedTest.replaceAll(CONNECTOR_REGEX, "");
         return composedTest.codePointCount(0, composedTest.length()) <= MAX_LENGTH
                 && testWithoutConnectors.matches(VALIDATION_REGEX)
-                && composedTest.matches(LETTER_REGEX);
+                && testWithConnectorsRemoved.matches(LETTER_REGEX);
     }
 
     /**
