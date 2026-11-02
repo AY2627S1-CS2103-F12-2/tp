@@ -322,7 +322,7 @@ Updated to: 2026-10-02 — Reviewed algebra
 ```
 
 An unknown student, an out-of-range index, missing edit fields, invalid values, or repeated structured
-parameters are rejected. A zero, negative, or non-integer index gives `Index must be a positive integer.`
+parameters are rejected. A zero, negative, or non-integer index, or one larger than `2147483647`, gives `Index must be a positive integer.`
 
 ### Deleting an interaction: `interaction delete`
 
@@ -352,7 +352,7 @@ Total interactions for John Tan: 2
 ```
 
 An unknown student gives `No student named 'NAME' found.` Missing or repeated `n/` or `i/` parameters
-are rejected. A zero, negative, or non-integer index is rejected with `Index must be a positive integer.`
+are rejected. A zero, negative, or non-integer index, or one larger than `2147483647`, is rejected with `Index must be a positive integer.`
 
 ### Adding a follow-up: `followup add`
 
